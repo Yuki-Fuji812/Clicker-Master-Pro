@@ -106,6 +106,23 @@ button,.filebtn,.scorebtn,.special-btn,.reset-row,.actions{
 }
 button,.filebtn{touch-action:manipulation;}
 
+
+.scoring-slider{overflow:hidden;touch-action:pan-y;margin-top:0}
+.scoring-track{display:flex;width:200%;transform:translateX(0);transition:transform .22s ease}
+.scoring-page{width:50%;flex:0 0 50%;padding:0 1px}
+.scoring-slider.show-fe .scoring-track{transform:translateX(-50%)}
+.fe-head{display:flex;align-items:center;justify-content:space-between;margin:2px 0 8px}
+.fe-head b{font-size:18px}
+.fe-hint{font-size:12px;color:#aaa}
+.fe-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fe-item{background:#18181b;border-radius:14px;padding:8px}
+.fe-name{font-size:13px;font-weight:900;margin-bottom:6px;text-align:center}
+.fe-controls{display:grid;grid-template-columns:42px 1fr 42px;gap:5px;align-items:center}
+.fe-controls button{height:40px;background:#3f3f46;font-size:22px}
+.fe-value{text-align:center;font-size:23px;font-weight:900}
+.fe-total{margin-top:8px;background:#18181b;border-radius:14px;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800}
+.fe-total b{font-size:24px}
+
 </style>
 </head>
 <body>
@@ -119,6 +136,9 @@ button,.filebtn{touch-action:manipulation;}
 <div id="searchResults" class="search-results"></div>
 
 <div class="video" id="video"><div style="display:grid;place-items:center;height:100%;color:#888">YouTube動画を表示</div></div>
+<div id="scoringSlider" class="scoring-slider">
+<div class="scoring-track">
+<div class="scoring-page">
 <div class="grid">
 <button id="plusBtn" class="big plus" onclick="addEvent('+1',1,'plusBtn')">＋ <span id="plusScore">0</span></button>
 <button id="minusBtn" class="big minus" onclick="addEvent('-1',-1,'minusBtn')">− <span id="minusScore">0</span></button>
@@ -127,6 +147,31 @@ button,.filebtn{touch-action:manipulation;}
 <button id="stopBtn" class="big special" onclick="specialNamed('停止',-1,'stopBtn')">停止 -1<br><span id="stopStat">0回</span></button>
 <button id="changeBtn" class="big special" onclick="specialNamed('交換',-3,'changeBtn')">交換 -3<br><span id="changeStat">0回</span></button>
 <button id="cutBtn" class="big special" onclick="specialNamed('切断',-5,'cutBtn')">切断 -5<br><span id="cutStat">0回</span></button>
+</div>
+<div class="fe-hint" style="text-align:right;margin-top:5px">← 左スワイプでFE</div>
+</div>
+<div class="scoring-page">
+<div class="fe-head"><b>FE（JYYF）</b><span class="fe-hint">右スワイプで戻る →</span></div>
+<div class="fe-grid"><div class="fe-item"><div class="fe-name">EXE<br><small>エクスキューション</small></div>
+<div class="fe-controls"><button onclick="changeFE('EXE',-1)">−</button><div id="fe_EXE" class="fe-value">0</div><button onclick="changeFE('EXE',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">CTR<br><small>コントロール</small></div>
+<div class="fe-controls"><button onclick="changeFE('CTR',-1)">−</button><div id="fe_CTR" class="fe-value">0</div><button onclick="changeFE('CTR',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">TRV<br><small>トリック・ダイバーシティ</small></div>
+<div class="fe-controls"><button onclick="changeFE('TRV',-1)">−</button><div id="fe_TRV" class="fe-value">0</div><button onclick="changeFE('TRV',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">SUE<br><small>スペースユース／エンファシス</small></div>
+<div class="fe-controls"><button onclick="changeFE('SUE',-1)">−</button><div id="fe_SUE" class="fe-value">0</div><button onclick="changeFE('SUE',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">CHG<br><small>コレオグラフィ</small></div>
+<div class="fe-controls"><button onclick="changeFE('CHG',-1)">−</button><div id="fe_CHG" class="fe-value">0</div><button onclick="changeFE('CHG',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">CNS<br><small>コンストラクション</small></div>
+<div class="fe-controls"><button onclick="changeFE('CNS',-1)">−</button><div id="fe_CNS" class="fe-value">0</div><button onclick="changeFE('CNS',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">BDY<br><small>ボディ・コントロール</small></div>
+<div class="fe-controls"><button onclick="changeFE('BDY',-1)">−</button><div id="fe_BDY" class="fe-value">0</div><button onclick="changeFE('BDY',1)">＋</button></div></div>
+<div class="fe-item"><div class="fe-name">SHW<br><small>ショーマンシップ</small></div>
+<div class="fe-controls"><button onclick="changeFE('SHW',-1)">−</button><div id="fe_SHW" class="fe-value">0</div><button onclick="changeFE('SHW',1)">＋</button></div></div>
+</div>
+<div class="fe-total">FE合計 <b id="feTotal">0.0</b> / 40</div>
+</div>
+</div>
 </div>
 <div class="actions">
 <div class="scorebox"><div class="stat">合計 <b id="totalScore">0</b></div></div>
@@ -157,9 +202,23 @@ function addEvent(label,value,buttonId){events.push({label,value,miss:false,time
 function addMiss(){events.push({label:"MISS",value:0,miss:true,time:timeText()});save();navigator.vibrate?.(35)}
 function specialNamed(name,v,buttonId){events.push({label:name+" "+v,value:v,special:name,time:timeText()});save();flashButton(buttonId || ({"停止":"stopBtn","交換":"changeBtn","切断":"cutBtn"}[name]));navigator.vibrate?.(35)}
 function undo(){events.pop();save()}
-function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();save()}}
+function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();feScores=Object.fromEntries(FE_CODES.map(k=>[k,0]));saveFE();save()}}
 function openSpecial(){document.getElementById("sheet").style.display="flex"}
 function closeSpecial(){document.getElementById("sheet").style.display="none"}
+
+
+const FE_CODES=["EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW"];
+let feScores=JSON.parse(localStorage.getItem("yoyo-fe-scores")||"null") || Object.fromEntries(FE_CODES.map(k=>[k,0]));
+function saveFE(){localStorage.setItem("yoyo-fe-scores",JSON.stringify(feScores));renderFE()}
+function changeFE(code,delta){
+  feScores[code]=Math.max(0,Math.min(10,(Number(feScores[code])||0)+delta));
+  saveFE(); navigator.vibrate?.(15);
+}
+function renderFE(){
+  FE_CODES.forEach(code=>{const el=document.getElementById("fe_"+code);if(el)el.textContent=Number(feScores[code])||0});
+  const raw=FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0);
+  const el=document.getElementById("feTotal"); if(el)el.textContent=(raw/2).toFixed(1);
+}
 
 function csvCell(value){
   const text=String(value ?? "");
@@ -173,8 +232,8 @@ function saveCsv(){
   const cut=events.filter(e=>e.special==="切断").length;
   const title=currentVideoTitle || "動画タイトル未設定";
   const rows=[
-    ["動画タイトル","加点","減点","停止","交換","切断"],
-    [title,plus,minus,stop,change,cut]
+    ["動画タイトル","加点","減点","停止","交換","切断","EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW","FE合計"],
+    [title,plus,minus,stop,change,cut,...FE_CODES.map(k=>Number(feScores[k])||0),FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2]
   ];
   const csv="\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\r\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
@@ -199,6 +258,7 @@ function render(){
  document.getElementById("stopStat").textContent=events.filter(e=>e.special==="停止").length+"回";
  document.getElementById("changeStat").textContent=events.filter(e=>e.special==="交換").length+"回";
  document.getElementById("cutStat").textContent=events.filter(e=>e.special==="切断").length+"回";
+ renderFE();
 }
 let currentVideoTitle = "";
 let localVideoObjectUrl = null;
@@ -389,6 +449,20 @@ document.getElementById("searchQ")?.addEventListener("keydown", e => {
 });
 
 render();
+
+(function(){
+ const slider=document.getElementById("scoringSlider"); if(!slider)return;
+ let sx=0,sy=0,tracking=false;
+ slider.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;tracking=true},{passive:true});
+ slider.addEventListener("touchend",e=>{
+   if(!tracking)return; tracking=false;
+   const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+   if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.25){
+     if(dx<0) slider.classList.add("show-fe"); else slider.classList.remove("show-fe");
+   }
+ },{passive:true});
+})();
+
 </script>
 </body>
 </html>
