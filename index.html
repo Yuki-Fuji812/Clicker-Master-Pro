@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Clicker Master</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#0b0b0d;color:#fff;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)}
+.wrap{max-width:760px;margin:auto;padding-bottom:90px}
+h1{
+  font-size:28px;
+  margin:12px 0;
+  font-weight:950;
+  letter-spacing:.8px;
+  font-style:italic;
+  text-shadow:0 2px 0 #444,0 0 10px rgba(255,255,255,.35);
+}
+.urlrow{display:flex;gap:8px;margin-bottom:10px}
+input{flex:1;padding:12px;border-radius:12px;border:1px solid #444;background:#18181b;color:#fff;font-size:16px}
+button{border:2px solid rgba(255,255,255,.72);border-radius:14px;font-weight:800;color:white;touch-action:manipulation;transition:filter .06s,box-shadow .06s,transform .06s}
+.score-flash{filter:brightness(2.15)!important;box-shadow:0 0 0 3px #fff,0 0 24px rgba(255,255,255,.95)!important;transform:scale(.97)}
+.load{padding:0 16px;background:#3b82f6}
+.filebtn{border:2px solid rgba(255,255,255,.72);display:flex;align-items:center;justify-content:center;padding:0 14px;background:#52525b;border-radius:14px;font-weight:800;white-space:nowrap;cursor:pointer}
+.filebtn input{display:none}
+.local-video{width:100%;height:100%;background:#000;object-fit:contain}
+.video{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden}
+iframe{width:100%;height:100%;border:0}
+.search-results{display:none;background:#18181b;border-radius:14px;padding:10px;margin-bottom:10px;max-height:42vh;overflow:auto}
+.search-results.show{display:block}
+.result{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #333;cursor:pointer}
+.result:last-child{border-bottom:0}.result img{width:120px;aspect-ratio:16/9;object-fit:cover;border-radius:8px}.result-title{font-size:14px;font-weight:700;line-height:1.3}.api-note{font-size:12px;color:#aaa;margin:4px 0 0}
+@media(max-width:520px){.result{grid-template-columns:100px 1fr}.result img{width:100px}}
+.scorebox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.stat{background:#18181b;border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:26px}
+.scorebox{margin:0;display:block}.scorebox .stat{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 12px}.scorebox .stat b{display:inline;font-size:24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.big{height:82px;font-size:25px}
+.plus{background:#16a34a}.minus{background:#dc2626}.miss{background:#ea580c}.special{background:#7c3aed}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.actions .scorebox{width:100%}.reset-row{display:flex;justify-content:center;margin-top:10px}.reset-row button{width:50%;max-width:360px;height:48px;background:#27272a;font-size:16px}
+.actions button{height:48px;background:#27272a;font-size:16px}
+h2{font-size:18px;margin:18px 0 8px}
+.sheet{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:10}
+.panel{width:100%;background:#18181b;border-radius:22px 22px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom))}
+.panel h3{text-align:center;margin-top:0}
+.penalties{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.penalties button{height:60px;background:#7c3aed;font-size:20px}
+.cancel{width:100%;height:48px;margin-top:10px;background:#3f3f46}
+.small{color:#aaa;font-size:12px;margin:8px 2px}
+.special-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.special-row .big{font-size:18px;height:72px}
+.controller-box{background:#18181b;border-radius:14px;padding:12px;margin-top:12px;text-align:center}
+.controller-map{font-size:13px;color:#aaa;margin-top:5px}
+
+
+/* 横向き表示 */
+@media (orientation:landscape) and (max-height:600px){
+  body{padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left))}
+  .wrap{max-width:none;display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(360px,.85fr);grid-template-areas:
+    "title title"
+    "search search"
+    "video scores"
+    "video normal"
+    "video special"
+    "video reset"
+    "video specialTitle"
+    "video specialStats";gap:8px 12px;align-items:start}
+  h1{grid-area:title;font-size:22px;margin:4px 0}
+  .urlrow{grid-area:search;margin:0}
+  .search-results{grid-column:1/-1;max-height:45vh;margin:0}
+  .video{grid-area:video;align-self:start}
+  .scorebox{position:static;width:auto;margin:0;display:block}
+  .grid{grid-area:normal}
+  .special-row{grid-area:special;margin:0}
+  .actions{grid-area:reset;margin:0}
+  .reset-row{grid-column:2;justify-content:center;margin-top:0}
+  .small{display:none}
+  h2:nth-of-type(1){grid-area:specialTitle;margin:4px 0 0}
+  h2:nth-of-type(1)+.scorebox{grid-area:specialStats}
+  .big{height:58px;font-size:22px}
+  .special-row .big{height:56px;font-size:15px}
+  .actions button{height:42px}
+  .stat{padding:6px}
+  .stat b{font-size:21px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Clicker Master</h1>
+<div class="urlrow">
+<input id="searchQ" placeholder="YouTubeで動画を検索">
+<button class="load" onclick="searchVideo()">検索</button>
+<label class="filebtn">ファイル<input id="localVideoFile" type="file" accept="video/*" onchange="playLocalVideo(this)"></label>
+</div>
+<div id="searchResults" class="search-results"></div>
+
+<div class="video" id="video"><div style="display:grid;place-items:center;height:100%;color:#888">YouTube動画を表示</div></div>
+<div class="grid">
+<button id="plusBtn" class="big plus" onclick="addEvent('+1',1,'plusBtn')">＋ <span id="plusScore">0</span></button>
+<button id="minusBtn" class="big minus" onclick="addEvent('-1',-1,'minusBtn')">− <span id="minusScore">0</span></button>
+</div>
+<div class="special-row">
+<button id="stopBtn" class="big special" onclick="specialNamed('停止',-1,'stopBtn')">停止 -1<br><span id="stopStat">0回</span></button>
+<button id="changeBtn" class="big special" onclick="specialNamed('交換',-3,'changeBtn')">交換 -3<br><span id="changeStat">0回</span></button>
+<button id="cutBtn" class="big special" onclick="specialNamed('切断',-5,'cutBtn')">切断 -5<br><span id="cutStat">0回</span></button>
+</div>
+<div class="actions">
+<div class="scorebox"><div class="stat">合計 <b id="totalScore">0</b></div></div>
+<div class="scorebox"><div class="stat">特別減点合計 <b id="specialTotal">0</b></div></div>
+</div>
+<div class="reset-row"><button id="resetHoldBtn">リセット<br><small>1秒長押し</small></button></div>
+
+
+
+</div>
+
+<script>
+let events = JSON.parse(localStorage.getItem("yoyo-events")||"[]");
+let started = Number(localStorage.getItem("yoyo-started")) || Date.now();
+
+function save(){localStorage.setItem("yoyo-events",JSON.stringify(events));localStorage.setItem("yoyo-started",started);render()}
+function timeText(){
+  let s=Math.floor((Date.now()-started)/1000), m=Math.floor(s/60);
+  return String(m).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+}
+function flashButton(id){
+ const b=document.getElementById(id); if(!b)return;
+ b.classList.remove("score-flash"); void b.offsetWidth; b.classList.add("score-flash");
+ setTimeout(()=>b.classList.remove("score-flash"),110);
+}
+function addEvent(label,value,buttonId){events.push({label,value,miss:false,time:timeText()});save();flashButton(buttonId || (value>0?"plusBtn":"minusBtn"));navigator.vibrate?.(20)}
+function addMiss(){events.push({label:"MISS",value:0,miss:true,time:timeText()});save();navigator.vibrate?.(35)}
+function specialNamed(name,v,buttonId){events.push({label:name+" "+v,value:v,special:name,time:timeText()});save();flashButton(buttonId || ({"停止":"stopBtn","交換":"changeBtn","切断":"cutBtn"}[name]));navigator.vibrate?.(35)}
+function undo(){events.pop();save()}
+function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();save()}}
+function openSpecial(){document.getElementById("sheet").style.display="flex"}
+function closeSpecial(){document.getElementById("sheet").style.display="none"}
+function render(){
+ let plus=events.filter(e=>!e.special && e.value>0).reduce((a,e)=>a+e.value,0);
+ let minus=Math.abs(events.filter(e=>!e.special && e.value<0).reduce((a,e)=>a+e.value,0));
+ document.getElementById("totalScore").textContent=plus-minus;
+ let specialTotal=events.filter(e=>e.special).reduce((a,e)=>a+e.value,0);
+ document.getElementById("specialTotal").textContent=specialTotal;
+ document.getElementById("plusScore").textContent=plus;
+ document.getElementById("minusScore").textContent=minus;
+ document.getElementById("stopStat").textContent=events.filter(e=>e.special==="停止").length+"回";
+ document.getElementById("changeStat").textContent=events.filter(e=>e.special==="交換").length+"回";
+ document.getElementById("cutStat").textContent=events.filter(e=>e.special==="切断").length+"回";
+}
+let localVideoObjectUrl = null;
+function playLocalVideo(input){
+  const file=input.files && input.files[0];
+  if(!file) return;
+  if(localVideoObjectUrl) URL.revokeObjectURL(localVideoObjectUrl);
+  localVideoObjectUrl=URL.createObjectURL(file);
+  const box=document.getElementById("video");
+  box.innerHTML="";
+  const v=document.createElement("video");
+  v.className="local-video";
+  v.controls=true;
+  v.playsInline=true;
+  v.preload="metadata";
+  v.src=localVideoObjectUrl;
+  box.appendChild(v);
+  document.getElementById("searchResults").className="search-results";
+  v.play().catch(()=>{});
+}
+
+function getYoutubeApiKey(){
+  let key=localStorage.getItem("yt-api-key")||"";
+  if(!key){
+    key=prompt("初回のみ：YouTube Data APIキーを入力してください")||"";
+    key=key.trim();
+    if(key) localStorage.setItem("yt-api-key",key);
+  }
+  return key;
+}
+async function searchVideo(){
+  const q=document.getElementById("searchQ").value.trim();
+  if(!q){alert("検索する言葉を入力してください");return}
+  const key=getYoutubeApiKey();
+  if(!key) return;
+  const box=document.getElementById("searchResults");
+  box.className="search-results show";
+  box.innerHTML="検索中…";
+  try{
+    const u="https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q="+encodeURIComponent(q)+"&key="+encodeURIComponent(key);
+    const r=await fetch(u);
+    const data=await r.json();
+    if(!r.ok) throw new Error(data?.error?.message||"検索できませんでした");
+    box.innerHTML="";
+    if(!data.items?.length){box.textContent="動画が見つかりませんでした";return}
+    data.items.forEach(item=>{
+      const d=document.createElement("div"); d.className="result";
+      const img=document.createElement("img"); img.src=item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default?.url||"";
+      const t=document.createElement("div"); t.className="result-title"; t.textContent=item.snippet.title;
+      d.append(img,t);
+      d.onclick=()=>playVideo(item.id.videoId);
+      box.appendChild(d);
+    });
+  }catch(e){
+    box.innerHTML="検索エラー："+e.message+"<br><button class='load' style='height:40px;margin-top:8px' onclick='changeApiKey()'>APIキーを入れ直す</button>";
+  }
+}
+function changeApiKey(){
+  localStorage.removeItem("yt-api-key");
+  searchVideo();
+}
+function playVideo(id){
+  document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  document.getElementById("searchResults").className="search-results";
+  document.getElementById("video").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function youtubeId(u){
+ try{
+  let x=new URL(u);
+  if(x.hostname.includes("youtu.be")) return x.pathname.slice(1).split("/")[0];
+  if(x.pathname.startsWith("/shorts/")) return x.pathname.split("/")[2];
+  return x.searchParams.get("v");
+ }catch(e){return null}
+}
+function loadVideo(){
+ let id=youtubeId(document.getElementById("url").value.trim());
+ if(!id){alert("YouTubeのURLを確認してください");return}
+ document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+ localStorage.setItem("yoyo-url",document.getElementById("url").value.trim());
+}
+
+
+
+function undoBySign(sign){
+  for(let i=events.length-1;i>=0;i--){
+    const e=events[i];
+    // Only cancel normal +/- scoring, not special penalties.
+    if(!e.special && ((sign>0 && e.value>0) || (sign<0 && e.value<0))){
+      events.splice(i,1);
+      save();
+      navigator.vibrate?.(25);
+      return;
+    }
+  }
+}
+
+
+function performReset(){
+  events = [];
+  save();
+  navigator.vibrate?.(50);
+}
+
+// Smartphone: reset only after holding the reset button for 1 second.
+let resetHoldTimer = null;
+const resetHoldBtn = document.getElementById("resetHoldBtn");
+if(resetHoldBtn){
+  const startResetHold = (ev) => {
+    ev.preventDefault();
+    clearTimeout(resetHoldTimer);
+    resetHoldTimer = setTimeout(() => {
+      performReset();
+      resetHoldTimer = null;
+    }, 1000);
+  };
+  const cancelResetHold = () => {
+    if(resetHoldTimer){
+      clearTimeout(resetHoldTimer);
+      resetHoldTimer = null;
+    }
+  };
+  resetHoldBtn.addEventListener("pointerdown", startResetHold);
+  resetHoldBtn.addEventListener("pointerup", cancelResetHold);
+  resetHoldBtn.addEventListener("pointercancel", cancelResetHold);
+  resetHoldBtn.addEventListener("pointerleave", cancelResetHold);
+  resetHoldBtn.addEventListener("contextmenu", e => e.preventDefault());
+}
+
+// Bluetooth / Gamepad controller
+// Standard Gamepad mapping assumed:
+// A=0, B=1, X=2, L/LB=4, R/RB=5.
+// Edge detection prevents holding a button from repeatedly scoring.
+let previousButtons = [];
+let lrHoldStart = null;
+let lrResetFired = false;
+
+window.addEventListener("gamepadconnected", e => {
+  document.getElementById("controllerStatus") && (document.getElementById("controllerStatus").textContent =
+    "🎮 接続済み: " + e.gamepad.id);
+});
+window.addEventListener("gamepaddisconnected", e => {
+  document.getElementById("controllerStatus") && (document.getElementById("controllerStatus").textContent =
+    "🎮 コントローラー未接続");
+  previousButtons = [];
+});
+
+function pollGamepad(){
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const gp = Array.from(pads).find(Boolean);
+  if(gp){
+    document.getElementById("controllerStatus") && (document.getElementById("controllerStatus").textContent =
+      "🎮 接続済み: " + gp.id);
+    const now = gp.buttons.map(b => b.pressed);
+    
+    const pressed = i => now[i] && !previousButtons[i];
+
+    // L + R simultaneous hold for 1 second = reset.
+    if(now[4] && now[5]){
+      if(lrHoldStart === null) lrHoldStart = performance.now();
+      if(!lrResetFired && performance.now() - lrHoldStart >= 1000){
+        performReset();
+        lrResetFired = true;
+      }
+    } else {
+      lrHoldStart = null;
+      lrResetFired = false;
+    }
+
+    if(pressed(4) && !now[5]) addEvent("+1",1);        // L: immediate
+    if(pressed(5) && !now[4]) addEvent("-1",-1);       // R: immediate
+    if(pressed(6)) undoBySign(1);                     // ZL: last normal + undo
+    if(pressed(7)) undoBySign(-1);                    // ZR: last normal - undo
+    if(pressed(2)) specialNamed("停止", -1);          // X
+    if(pressed(0)) specialNamed("交換", -3);          // A
+    if(pressed(1)) specialNamed("切断", -5);          // B
+
+    previousButtons = now;
+  }
+  requestAnimationFrame(pollGamepad);
+}
+requestAnimationFrame(pollGamepad);
+
+document.getElementById("searchQ")?.addEventListener("keydown", e => {
+  if(e.key === "Enter") searchVideo();
+});
+
+render();
+</script>
+</body>
+</html>
