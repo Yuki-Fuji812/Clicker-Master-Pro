@@ -27,8 +27,6 @@ iframe{width:100%;height:100%;border:0}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .actions button{height:48px;background:#27272a;font-size:16px}
 h2{font-size:18px;margin:18px 0 8px}
-#history{background:#18181b;border-radius:14px;min-height:80px;max-height:230px;overflow:auto;padding:8px}
-.item{display:flex;justify-content:space-between;border-bottom:1px solid #333;padding:9px 5px;font-size:14px}
 .sheet{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:10}
 .panel{width:100%;background:#18181b;border-radius:22px 22px 0 0;padding:18px 14px calc(18px + env(safe-area-inset-bottom))}
 .panel h3{text-align:center;margin-top:0}
@@ -40,11 +38,36 @@ h2{font-size:18px;margin:18px 0 8px}
 .controller-box{background:#18181b;border-radius:14px;padding:12px;margin-top:12px;text-align:center}
 .controller-map{font-size:13px;color:#aaa;margin-top:5px}
 
-.search-overlay{display:none;position:fixed;inset:0;background:#000b;z-index:50;align-items:flex-end}
-.search-browser{width:100%;height:78vh;background:#111;border-radius:20px 20px 0 0;overflow:hidden;display:flex;flex-direction:column}
-.search-browser-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#18181b}
-.search-browser-bar button{background:#3f3f46;padding:9px 16px}
-.search-browser iframe{width:100%;flex:1;border:0;background:#000}
+
+/* 横向き表示 */
+@media (orientation:landscape) and (max-height:600px){
+  body{padding:env(safe-area-inset-top) max(10px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(10px,env(safe-area-inset-left))}
+  .wrap{max-width:none;display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(360px,.85fr);grid-template-areas:
+    "title title"
+    "search search"
+    "video scores"
+    "video normal"
+    "video special"
+    "video reset"
+    "video specialTitle"
+    "video specialStats";gap:8px 12px;align-items:start}
+  h1{grid-area:title;font-size:18px;margin:4px 0}
+  .urlrow{grid-area:search;margin:0}
+  .video{grid-area:video;align-self:start}
+  .scorebox{grid-area:scores;margin:0}
+  .grid{grid-area:normal}
+  .special-row{grid-area:special;margin:0}
+  .actions{grid-area:reset;margin:0}
+  .small{display:none}
+  h2:nth-of-type(1){grid-area:specialTitle;margin:4px 0 0}
+  h2:nth-of-type(1)+.scorebox{grid-area:specialStats}
+  .big{height:58px;font-size:22px}
+  .special-row .big{height:56px;font-size:15px}
+  .actions button{height:42px}
+  .stat{padding:6px}
+  .stat b{font-size:21px}
+}
+
 </style>
 </head>
 <body>
@@ -82,19 +105,8 @@ h2{font-size:18px;margin:18px 0 8px}
 <div class="stat">切断 -5<b id="cutStat">0回</b></div>
 </div>
 
-<h2>採点履歴</h2>
-<div id="history"></div>
 </div>
 
-<div id="searchOverlay" class="search-overlay">
-  <div class="search-browser">
-    <div class="search-browser-bar">
-      <b>YouTube検索</b>
-      <button onclick="closeSearch()">閉じる</button>
-    </div>
-    <iframe id="searchFrame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
-  </div>
-</div>
 <script>
 let events = JSON.parse(localStorage.getItem("yoyo-events")||"[]");
 let started = Number(localStorage.getItem("yoyo-started")) || Date.now();
@@ -120,21 +132,13 @@ function render(){
  document.getElementById("stopStat").textContent=events.filter(e=>e.special==="停止").length+"回";
  document.getElementById("changeStat").textContent=events.filter(e=>e.special==="交換").length+"回";
  document.getElementById("cutStat").textContent=events.filter(e=>e.special==="切断").length+"回";
- document.getElementById("history").innerHTML=events.length?events.slice().reverse().map(e=>`<div class="item"><span>${e.time}</span><b>${e.label}</b></div>`).join(""):'<div style="padding:20px;text-align:center;color:#777">まだ入力はありません</div>';
 }
 function searchVideo(){
- let q=document.getElementById("searchQ").value.trim();
- if(!q){alert("検索する言葉を入力してください");return}
- const overlay=document.getElementById("searchOverlay");
- const frame=document.getElementById("searchFrame");
- // Embedded YouTube search-list style player, keeping YoYo Clicker visible underneath.
- frame.src="https://www.youtube.com/embed?listType=search&list="+encodeURIComponent(q)+"&playsinline=1";
- overlay.style.display="flex";
+  const q=document.getElementById("searchQ").value.trim();
+  if(!q){alert("検索する言葉を入力してください");return}
+  window.open("https://www.youtube.com/results?search_query="+encodeURIComponent(q), "_blank");
 }
-function closeSearch(){
- document.getElementById("searchOverlay").style.display="none";
- document.getElementById("searchFrame").src="";
-}
+
 function youtubeId(u){
  try{
   let x=new URL(u);
@@ -256,6 +260,10 @@ function pollGamepad(){
   requestAnimationFrame(pollGamepad);
 }
 requestAnimationFrame(pollGamepad);
+
+document.getElementById("searchQ")?.addEventListener("keydown", e => {
+  if(e.key === "Enter") searchVideo();
+});
 
 render();
 </script>
