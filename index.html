@@ -87,6 +87,8 @@ h2{font-size:18px;margin:18px 0 8px}
   .stat b{font-size:21px}
 }
 
+
+.csv-save{width:100%;height:48px;margin-top:10px;background:#2563eb;font-size:16px}
 </style>
 </head>
 <body>
@@ -114,6 +116,7 @@ h2{font-size:18px;margin:18px 0 8px}
 <div class="scorebox"><div class="stat">特別減点合計 <b id="specialTotal">0</b></div></div>
 </div>
 <div class="reset-row"><button id="resetHoldBtn">リセット<br><small>1秒長押し</small></button></div>
+<button class="csv-save" onclick="saveCsv()">CSV保存</button>
 
 
 
@@ -140,6 +143,34 @@ function undo(){events.pop();save()}
 function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();save()}}
 function openSpecial(){document.getElementById("sheet").style.display="flex"}
 function closeSpecial(){document.getElementById("sheet").style.display="none"}
+
+function csvCell(v){
+  const t=String(v ?? "");
+  return '"' + t.replace(/"/g,'""') + '"';
+}
+function saveCsv(){
+  const plus=events.filter(e=>!e.special && e.value>0).reduce((a,e)=>a+e.value,0);
+  const minus=Math.abs(events.filter(e=>!e.special && e.value<0).reduce((a,e)=>a+e.value,0));
+  const stop=events.filter(e=>e.special==="停止").length;
+  const change=events.filter(e=>e.special==="交換").length;
+  const cut=events.filter(e=>e.special==="切断").length;
+  const title=currentVideoTitle || "動画タイトル未設定";
+  const rows=[
+    ["動画タイトル","加点","減点","停止","交換","切断"],
+    [title,plus,minus,stop,change,cut]
+  ];
+  const csv="\uFEFF"+rows.map(r=>r.map(csvCell).join(",")).join("\r\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="ClickerMaster_"+new Date().toISOString().slice(0,10)+".csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function render(){
  let plus=events.filter(e=>!e.special && e.value>0).reduce((a,e)=>a+e.value,0);
  let minus=Math.abs(events.filter(e=>!e.special && e.value<0).reduce((a,e)=>a+e.value,0));
@@ -152,10 +183,12 @@ function render(){
  document.getElementById("changeStat").textContent=events.filter(e=>e.special==="交換").length+"回";
  document.getElementById("cutStat").textContent=events.filter(e=>e.special==="切断").length+"回";
 }
+let currentVideoTitle = "";
 let localVideoObjectUrl = null;
 function playLocalVideo(input){
   const file=input.files && input.files[0];
   if(!file) return;
+   currentVideoTitle = file.name;
   if(localVideoObjectUrl) URL.revokeObjectURL(localVideoObjectUrl);
   localVideoObjectUrl=URL.createObjectURL(file);
   const box=document.getElementById("video");
@@ -200,7 +233,7 @@ async function searchVideo(){
       const img=document.createElement("img"); img.src=item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default?.url||"";
       const t=document.createElement("div"); t.className="result-title"; t.textContent=item.snippet.title;
       d.append(img,t);
-      d.onclick=()=>playVideo(item.id.videoId);
+      d.onclick=()=>playVideo(item.id.videoId, item.snippet.title);
       box.appendChild(d);
     });
   }catch(e){
@@ -211,7 +244,8 @@ function changeApiKey(){
   localStorage.removeItem("yt-api-key");
   searchVideo();
 }
-function playVideo(id){
+function playVideo(id,title){
+   currentVideoTitle = title || currentVideoTitle || id;
   document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
   document.getElementById("searchResults").className="search-results";
   document.getElementById("video").scrollIntoView({behavior:"smooth",block:"nearest"});
