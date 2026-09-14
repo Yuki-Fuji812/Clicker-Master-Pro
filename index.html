@@ -10,21 +10,28 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:#0b0b0d;color:#fff;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom)}
-.wrap{max-width:760px;margin:auto}
+.wrap{max-width:760px;margin:auto;padding-bottom:90px}
 h1{font-size:24px;margin:12px 0}
 .urlrow{display:flex;gap:8px;margin-bottom:10px}
 input{flex:1;padding:12px;border-radius:12px;border:1px solid #444;background:#18181b;color:#fff;font-size:16px}
-button{border:0;border-radius:14px;font-weight:800;color:white;touch-action:manipulation}
+button{border:0;border-radius:14px;font-weight:800;color:white;touch-action:manipulation;transition:filter .06s,box-shadow .06s,transform .06s}
+.score-flash{filter:brightness(2.15)!important;box-shadow:0 0 0 3px #fff,0 0 24px rgba(255,255,255,.95)!important;transform:scale(.97)}
 .load{padding:0 16px;background:#3b82f6}
 .video{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden}
 iframe{width:100%;height:100%;border:0}
+.search-results{display:none;background:#18181b;border-radius:14px;padding:10px;margin-bottom:10px;max-height:42vh;overflow:auto}
+.search-results.show{display:block}
+.result{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid #333;cursor:pointer}
+.result:last-child{border-bottom:0}.result img{width:120px;aspect-ratio:16/9;object-fit:cover;border-radius:8px}.result-title{font-size:14px;font-weight:700;line-height:1.3}.api-note{font-size:12px;color:#aaa;margin:4px 0 0}
+@media(max-width:520px){.result{grid-template-columns:100px 1fr}.result img{width:100px}}
 .scorebox{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
 .stat{background:#18181b;border-radius:14px;padding:10px;text-align:center}
 .stat b{display:block;font-size:26px}
+.scorebox{margin:0;display:block}.scorebox .stat{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 12px}.scorebox .stat b{display:inline;font-size:24px}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .big{height:82px;font-size:25px}
 .plus{background:#16a34a}.minus{background:#dc2626}.miss{background:#ea580c}.special{background:#7c3aed}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.actions .scorebox{width:100%}
 .actions button{height:48px;background:#27272a;font-size:16px}
 h2{font-size:18px;margin:18px 0 8px}
 .sheet{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;z-index:10}
@@ -53,8 +60,9 @@ h2{font-size:18px;margin:18px 0 8px}
     "video specialStats";gap:8px 12px;align-items:start}
   h1{grid-area:title;font-size:18px;margin:4px 0}
   .urlrow{grid-area:search;margin:0}
+  .search-results{grid-column:1/-1;max-height:45vh;margin:0}
   .video{grid-area:video;align-self:start}
-  .scorebox{grid-area:scores;margin:0}
+  .scorebox{position:static;width:auto;margin:0;display:block}
   .grid{grid-area:normal}
   .special-row{grid-area:special;margin:0}
   .actions{grid-area:reset;margin:0}
@@ -77,33 +85,25 @@ h2{font-size:18px;margin:18px 0 8px}
 <input id="searchQ" placeholder="YouTubeで動画を検索">
 <button class="load" onclick="searchVideo()">検索</button>
 </div>
+<div id="searchResults" class="search-results"></div>
 
 <div class="video" id="video"><div style="display:grid;place-items:center;height:100%;color:#888">YouTube動画を表示</div></div>
-<div class="scorebox">
-<div class="stat">合計<b id="totalScore">0</b></div>
-<div class="stat">加点<b id="plusScore">0</b></div>
-<div class="stat">減点<b id="minusScore">0</b></div>
-</div>
 <div class="grid">
-<button class="big plus" onclick="addEvent('+1',1)">＋</button>
-<button class="big minus" onclick="addEvent('-1',-1)">−</button>
+<button id="plusBtn" class="big plus" onclick="addEvent('+1',1,'plusBtn')">＋ <span id="plusScore">0</span></button>
+<button id="minusBtn" class="big minus" onclick="addEvent('-1',-1,'minusBtn')">− <span id="minusScore">0</span></button>
 </div>
 <div class="special-row">
-<button class="big special" onclick="specialNamed('停止',-1)">停止<br>-1</button>
-<button class="big special" onclick="specialNamed('交換',-3)">交換<br>-3</button>
-<button class="big special" onclick="specialNamed('切断',-5)">切断<br>-5</button>
+<button id="stopBtn" class="big special" onclick="specialNamed('停止',-1,'stopBtn')">停止 -1<br><span id="stopStat">0回</span></button>
+<button id="changeBtn" class="big special" onclick="specialNamed('交換',-3,'changeBtn')">交換 -3<br><span id="changeStat">0回</span></button>
+<button id="cutBtn" class="big special" onclick="specialNamed('切断',-5,'cutBtn')">切断 -5<br><span id="cutStat">0回</span></button>
 </div>
 <div class="actions">
 
-<button  id="resetHoldBtn">リセット<br><small>1秒長押し</small></button>
+<button id="resetHoldBtn">リセット<br><small>1秒長押し</small></button>
+<div class="scorebox"><div class="stat">合計 <b id="totalScore">0</b></div></div>
 </div>
 <p class="small">入力時刻は、この採点セッションを開始してからの経過時間として記録します。</p>
-<h2>特別減点</h2>
-<div class="scorebox">
-<div class="stat">停止 -1<b id="stopStat">0回</b></div>
-<div class="stat">交換 -3<b id="changeStat">0回</b></div>
-<div class="stat">切断 -5<b id="cutStat">0回</b></div>
-</div>
+
 
 </div>
 
@@ -116,9 +116,14 @@ function timeText(){
   let s=Math.floor((Date.now()-started)/1000), m=Math.floor(s/60);
   return String(m).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 }
-function addEvent(label,value){events.push({label,value,miss:false,time:timeText()});save();navigator.vibrate?.(20)}
+function flashButton(id){
+ const b=document.getElementById(id); if(!b)return;
+ b.classList.remove("score-flash"); void b.offsetWidth; b.classList.add("score-flash");
+ setTimeout(()=>b.classList.remove("score-flash"),110);
+}
+function addEvent(label,value,buttonId){events.push({label,value,miss:false,time:timeText()});save();flashButton(buttonId || (value>0?"plusBtn":"minusBtn"));navigator.vibrate?.(20)}
 function addMiss(){events.push({label:"MISS",value:0,miss:true,time:timeText()});save();navigator.vibrate?.(35)}
-function specialNamed(name,v){events.push({label:name+" "+v,value:v,special:name,time:timeText()});save();navigator.vibrate?.(35)}
+function specialNamed(name,v,buttonId){events.push({label:name+" "+v,value:v,special:name,time:timeText()});save();flashButton(buttonId || ({"停止":"stopBtn","交換":"changeBtn","切断":"cutBtn"}[name]));navigator.vibrate?.(35)}
 function undo(){events.pop();save()}
 function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();save()}}
 function openSpecial(){document.getElementById("sheet").style.display="flex"}
@@ -133,10 +138,50 @@ function render(){
  document.getElementById("changeStat").textContent=events.filter(e=>e.special==="交換").length+"回";
  document.getElementById("cutStat").textContent=events.filter(e=>e.special==="切断").length+"回";
 }
-function searchVideo(){
+function getYoutubeApiKey(){
+  let key=localStorage.getItem("yt-api-key")||"";
+  if(!key){
+    key=prompt("初回のみ：YouTube Data APIキーを入力してください")||"";
+    key=key.trim();
+    if(key) localStorage.setItem("yt-api-key",key);
+  }
+  return key;
+}
+async function searchVideo(){
   const q=document.getElementById("searchQ").value.trim();
   if(!q){alert("検索する言葉を入力してください");return}
-  window.open("https://www.youtube.com/results?search_query="+encodeURIComponent(q), "_blank");
+  const key=getYoutubeApiKey();
+  if(!key) return;
+  const box=document.getElementById("searchResults");
+  box.className="search-results show";
+  box.innerHTML="検索中…";
+  try{
+    const u="https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=10&q="+encodeURIComponent(q)+"&key="+encodeURIComponent(key);
+    const r=await fetch(u);
+    const data=await r.json();
+    if(!r.ok) throw new Error(data?.error?.message||"検索できませんでした");
+    box.innerHTML="";
+    if(!data.items?.length){box.textContent="動画が見つかりませんでした";return}
+    data.items.forEach(item=>{
+      const d=document.createElement("div"); d.className="result";
+      const img=document.createElement("img"); img.src=item.snippet.thumbnails.medium?.url||item.snippet.thumbnails.default?.url||"";
+      const t=document.createElement("div"); t.className="result-title"; t.textContent=item.snippet.title;
+      d.append(img,t);
+      d.onclick=()=>playVideo(item.id.videoId);
+      box.appendChild(d);
+    });
+  }catch(e){
+    box.innerHTML="検索エラー："+e.message+"<br><button class='load' style='height:40px;margin-top:8px' onclick='changeApiKey()'>APIキーを入れ直す</button>";
+  }
+}
+function changeApiKey(){
+  localStorage.removeItem("yt-api-key");
+  searchVideo();
+}
+function playVideo(id){
+  document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  document.getElementById("searchResults").className="search-results";
+  document.getElementById("video").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
 
 function youtubeId(u){
@@ -241,14 +286,8 @@ function pollGamepad(){
       lrResetFired = false;
     }
 
-    if(pressed(4) && !now[5]) setTimeout(() => {
-      const g = Array.from(navigator.getGamepads?.() || []).find(Boolean);
-      if(g && !g.buttons[5].pressed && g.buttons[4].pressed) addEvent("+1",1);
-    },120);                                           // L
-    if(pressed(5) && !now[4]) setTimeout(() => {
-      const g = Array.from(navigator.getGamepads?.() || []).find(Boolean);
-      if(g && !g.buttons[4].pressed && g.buttons[5].pressed) addEvent("-1",-1);
-    },120);                                           // R
+    if(pressed(4) && !now[5]) addEvent("+1",1);        // L: immediate
+    if(pressed(5) && !now[4]) addEvent("-1",-1);       // R: immediate
     if(pressed(6)) undoBySign(1);                     // ZL: last normal + undo
     if(pressed(7)) undoBySign(-1);                    // ZR: last normal - undo
     if(pressed(2)) specialNamed("停止", -1);          // X
