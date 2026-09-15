@@ -409,6 +409,8 @@ function undoBySign(sign){
 
 function performReset(){
   events = [];
+  feScores = Object.fromEntries(FE_CODES.map(k => [k, 0]));
+  saveFE();
   save();
   navigator.vibrate?.(50);
 }
