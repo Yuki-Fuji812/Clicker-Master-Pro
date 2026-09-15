@@ -272,6 +272,77 @@ h1{
   .big{height:72px!important}
 }
 
+
+/* v20: smartphone/tablet landscape large-control mode */
+@media (orientation:landscape){
+  html,body{width:100%;min-height:100%;background:#000!important}
+  body{
+    padding:max(4px,env(safe-area-inset-top))
+            max(8px,env(safe-area-inset-right))
+            max(4px,env(safe-area-inset-bottom))
+            max(8px,env(safe-area-inset-left))!important;
+    overflow-x:hidden;
+  }
+  .wrap{
+    max-width:none!important;
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:minmax(280px,44vw) minmax(420px,1fr)!important;
+    grid-template-areas:
+      "title title"
+      "search search"
+      "video scoring"
+      "video scoring"!important;
+    gap:6px 10px!important;
+    align-items:start!important;
+  }
+  h1{
+    grid-area:title!important;
+    min-height:42px!important;
+    height:42px!important;
+    margin:0!important;
+    font-size:27px!important;
+  }
+  .title-clickers{
+    width:82px!important;height:42px!important;flex-basis:82px!important;
+  }
+  .urlrow{grid-area:search!important;height:42px!important;margin:0!important}
+  .urlrow>input,.load,.filebtn{height:42px!important;border-radius:11px!important}
+  .search-results{grid-column:1/-1!important;max-height:36vh!important}
+  .video{grid-area:video!important;border-radius:12px!important;position:sticky!important;top:4px!important}
+  .grid{grid-column:2!important;grid-row:3!important;gap:8px!important;margin:0!important}
+  .grid .big{height:88px!important;font-size:30px!important;border-radius:14px!important}
+  .special-row{grid-column:2!important;grid-row:4!important;margin:96px 0 0!important;gap:8px!important}
+  .special-row .big{height:68px!important;font-size:19px!important}
+  .fe-summary-row,.compact-fe,.compact-total,.bottom-actions{
+    grid-column:2!important;
+  }
+  .fe-summary-row{margin-top:8px!important}
+  .fe-summary-row .stat{height:48px!important}
+  .compact-fe{gap:5px!important}
+  .fe-compact{min-height:46px!important;padding:3px 7px!important}
+  .fe-range{height:18px!important}
+  .compact-total{height:36px!important}
+  .bottom-actions button{height:48px!important}
+}
+/* Phones with short landscape height: prioritize the scoring buttons */
+@media (orientation:landscape) and (max-height:500px){
+  h1{display:none!important}
+  .wrap{
+    grid-template-areas:"search search" "video scoring"!important;
+    grid-template-columns:minmax(260px,42vw) 1fr!important;
+  }
+  .urlrow{height:38px!important}
+  .urlrow>input,.load,.filebtn{height:38px!important}
+  .video{grid-area:video!important}
+  .grid{grid-column:2!important;grid-row:2!important}
+  .grid .big{height:76px!important;font-size:28px!important}
+  .special-row{grid-column:2!important;grid-row:2!important;margin-top:84px!important}
+  .special-row .big{height:58px!important}
+  .fe-summary-row,.compact-fe,.compact-total,.bottom-actions{grid-column:2!important}
+  .fe-compact{min-height:42px!important}
+}
+
 </style>
 </head>
 <body>
