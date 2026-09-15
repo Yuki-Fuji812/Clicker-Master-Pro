@@ -123,6 +123,19 @@ button,.filebtn{touch-action:manipulation;}
 .fe-total{margin-top:8px;background:#18181b;border-radius:14px;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:800}
 .fe-total b{font-size:24px}
 
+
+.fe-picker{width:100%;height:46px;background:#27272a;display:flex;align-items:center;justify-content:center;gap:12px}
+.fe-arrow{font-size:24px;color:#aaa}
+.fe-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:9999;align-items:center;justify-content:center;padding:18px}
+.fe-modal.open{display:flex}
+.fe-dialog{width:min(92vw,420px);background:#18181b;border:1px solid #555;border-radius:18px;padding:16px}
+.fe-dialog-title{text-align:center;font-weight:900;font-size:18px;margin-bottom:12px}
+.fe-slider-value{text-align:center;font-size:34px;font-weight:950;margin:4px 0 8px}
+.fe-slider{width:100%;height:40px}
+.fe-scale{display:flex;justify-content:space-between;font-size:10px;color:#aaa}
+.fe-modal-actions{display:flex;gap:8px;margin-top:14px}
+.fe-modal-actions button{flex:1;height:44px}
+
 </style>
 </head>
 <body>
@@ -148,26 +161,26 @@ button,.filebtn{touch-action:manipulation;}
 <button id="changeBtn" class="big special" onclick="specialNamed('交換',-3,'changeBtn')">交換 -3<br><span id="changeStat">0回</span></button>
 <button id="cutBtn" class="big special" onclick="specialNamed('切断',-5,'cutBtn')">切断 -5<br><span id="cutStat">0回</span></button>
 </div>
-<div class="fe-hint" style="text-align:right;margin-top:5px">← 左スワイプでFE</div>
+<div class="fe-hint" style="text-align:right;margin-top:5px">← 左スワイプ</div>
 </div>
 <div class="scoring-page">
-<div class="fe-head"><b>FE（JYYF）</b><span class="fe-hint">右スワイプで戻る →</span></div>
+<div class="fe-head"><span></span><span class="fe-hint">右スワイプで戻る →</span></div>
 <div class="fe-grid"><div class="fe-item"><div class="fe-name">EXE<br><small>エクスキューション</small></div>
-<div class="fe-controls"><button onclick="changeFE('EXE',-1)">−</button><div id="fe_EXE" class="fe-value">0</div><button onclick="changeFE('EXE',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('EXE')"><span id="fe_EXE" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">CTR<br><small>コントロール</small></div>
-<div class="fe-controls"><button onclick="changeFE('CTR',-1)">−</button><div id="fe_CTR" class="fe-value">0</div><button onclick="changeFE('CTR',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('CTR')"><span id="fe_CTR" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">TRV<br><small>トリック・ダイバーシティ</small></div>
-<div class="fe-controls"><button onclick="changeFE('TRV',-1)">−</button><div id="fe_TRV" class="fe-value">0</div><button onclick="changeFE('TRV',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('TRV')"><span id="fe_TRV" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">SUE<br><small>スペースユース／エンファシス</small></div>
-<div class="fe-controls"><button onclick="changeFE('SUE',-1)">−</button><div id="fe_SUE" class="fe-value">0</div><button onclick="changeFE('SUE',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('SUE')"><span id="fe_SUE" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">CHG<br><small>コレオグラフィ</small></div>
-<div class="fe-controls"><button onclick="changeFE('CHG',-1)">−</button><div id="fe_CHG" class="fe-value">0</div><button onclick="changeFE('CHG',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('CHG')"><span id="fe_CHG" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">CNS<br><small>コンストラクション</small></div>
-<div class="fe-controls"><button onclick="changeFE('CNS',-1)">−</button><div id="fe_CNS" class="fe-value">0</div><button onclick="changeFE('CNS',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('CNS')"><span id="fe_CNS" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">BDY<br><small>ボディ・コントロール</small></div>
-<div class="fe-controls"><button onclick="changeFE('BDY',-1)">−</button><div id="fe_BDY" class="fe-value">0</div><button onclick="changeFE('BDY',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('BDY')"><span id="fe_BDY" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 <div class="fe-item"><div class="fe-name">SHW<br><small>ショーマンシップ</small></div>
-<div class="fe-controls"><button onclick="changeFE('SHW',-1)">−</button><div id="fe_SHW" class="fe-value">0</div><button onclick="changeFE('SHW',1)">＋</button></div></div>
+<button class="fe-picker" onclick="openFEPicker('SHW')"><span id="fe_SHW" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
 </div>
 <div class="fe-total">FE合計 <b id="feTotal">0.0</b> / 40</div>
 </div>
@@ -182,6 +195,17 @@ button,.filebtn{touch-action:manipulation;}
 
 
 
+</div>
+
+
+<div id="feModal" class="fe-modal" onclick="if(event.target===this)closeFEPicker()">
+ <div class="fe-dialog">
+  <div id="feDialogTitle" class="fe-dialog-title"></div>
+  <div id="feSliderValue" class="fe-slider-value">1</div>
+  <input id="feSlider" class="fe-slider" type="range" min="1" max="10" step="1" value="1">
+  <div class="fe-scale"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+  
+ </div>
 </div>
 
 <script>
@@ -210,10 +234,34 @@ function closeSpecial(){document.getElementById("sheet").style.display="none"}
 const FE_CODES=["EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW"];
 let feScores=JSON.parse(localStorage.getItem("yoyo-fe-scores")||"null") || Object.fromEntries(FE_CODES.map(k=>[k,0]));
 function saveFE(){localStorage.setItem("yoyo-fe-scores",JSON.stringify(feScores));renderFE()}
-function changeFE(code,delta){
-  feScores[code]=Math.max(0,Math.min(10,(Number(feScores[code])||0)+delta));
-  saveFE(); navigator.vibrate?.(15);
+let activeFECode=null;
+function openFEPicker(code){
+ activeFECode=code;
+ const v=Number(feScores[code])||1;
+ document.getElementById("feDialogTitle").textContent=code;
+ document.getElementById("feSlider").value=v;
+ document.getElementById("feSliderValue").textContent=v;
+ document.getElementById("feModal").classList.add("open");
 }
+function closeFEPicker(){
+ document.getElementById("feModal").classList.remove("open");
+ activeFECode=null;
+}
+function confirmFEPicker(){
+ if(!activeFECode)return;
+ feScores[activeFECode]=Number(document.getElementById("feSlider").value);
+ saveFE();
+ closeFEPicker();
+}
+document.addEventListener("input",e=>{
+ if(e.target?.id==="feSlider"){
+   document.getElementById("feSliderValue").textContent=e.target.value;
+   if(activeFECode){
+     feScores[activeFECode]=Number(e.target.value);
+     saveFE();
+   }
+ }
+});
 function renderFE(){
   FE_CODES.forEach(code=>{const el=document.getElementById("fe_"+code);if(el)el.textContent=Number(feScores[code])||0});
   const raw=FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0);
