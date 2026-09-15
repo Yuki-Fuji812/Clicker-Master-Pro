@@ -136,6 +136,32 @@ button,.filebtn{touch-action:manipulation;}
 .fe-modal-actions{display:flex;gap:8px;margin-top:14px}
 .fe-modal-actions button{flex:1;height:44px}
 
+
+.compact-fe{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px}
+.fe-compact{background:#18181b;border-radius:9px;padding:4px 7px}
+.fe-label{display:grid;grid-template-columns:38px 1fr 24px;align-items:center;gap:3px;line-height:1}
+.fe-label b{font-size:12px}
+.fe-label span{font-size:8px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fe-label strong{font-size:14px;text-align:right}
+.fe-range{width:100%;height:20px;margin:0}
+.compact-total{height:30px;margin-top:5px;font-size:12px}
+.compact-total b{font-size:17px}
+@media (max-width:600px){
+  .compact-fe{gap:4px}
+  .fe-compact{padding:3px 6px}
+}
+
+
+.fe-summary-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px;margin-bottom:4px}
+.fe-summary-row .scorebox{margin:0}
+.fe-summary-row .stat{font-size:13px;text-align:center}
+.fe-summary-row .stat b{font-size:20px}
+
+
+.bottom-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.bottom-actions button{width:100%;height:48px;margin:0}
+.bottom-actions .csv-save{max-width:none}
+
 </style>
 </head>
 <body>
@@ -149,9 +175,7 @@ button,.filebtn{touch-action:manipulation;}
 <div id="searchResults" class="search-results"></div>
 
 <div class="video" id="video"><div style="display:grid;place-items:center;height:100%;color:#888">YouTube動画を表示</div></div>
-<div id="scoringSlider" class="scoring-slider">
-<div class="scoring-track">
-<div class="scoring-page">
+
 <div class="grid">
 <button id="plusBtn" class="big plus" onclick="addEvent('+1',1,'plusBtn')">＋ <span id="plusScore">0</span></button>
 <button id="minusBtn" class="big minus" onclick="addEvent('-1',-1,'minusBtn')">− <span id="minusScore">0</span></button>
@@ -161,52 +185,48 @@ button,.filebtn{touch-action:manipulation;}
 <button id="changeBtn" class="big special" onclick="specialNamed('交換',-3,'changeBtn')">交換 -3<br><span id="changeStat">0回</span></button>
 <button id="cutBtn" class="big special" onclick="specialNamed('切断',-5,'cutBtn')">切断 -5<br><span id="cutStat">0回</span></button>
 </div>
-<div class="fe-hint" style="text-align:right;margin-top:5px">← 左スワイプ</div>
+<div class="fe-summary-row">
+  <div class="scorebox"><div class="stat">加減点合計 <b id="totalScore">0</b></div></div>
+  <div class="scorebox"><div class="stat">特別減点合計 <b id="specialTotal">0</b></div></div>
 </div>
-<div class="scoring-page">
-<div class="fe-head"><span></span><span class="fe-hint">右スワイプで戻る →</span></div>
-<div class="fe-grid"><div class="fe-item"><div class="fe-name">EXE<br><small>エクスキューション</small></div>
-<button class="fe-picker" onclick="openFEPicker('EXE')"><span id="fe_EXE" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">CTR<br><small>コントロール</small></div>
-<button class="fe-picker" onclick="openFEPicker('CTR')"><span id="fe_CTR" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">TRV<br><small>トリック・ダイバーシティ</small></div>
-<button class="fe-picker" onclick="openFEPicker('TRV')"><span id="fe_TRV" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">SUE<br><small>スペースユース／エンファシス</small></div>
-<button class="fe-picker" onclick="openFEPicker('SUE')"><span id="fe_SUE" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">CHG<br><small>コレオグラフィ</small></div>
-<button class="fe-picker" onclick="openFEPicker('CHG')"><span id="fe_CHG" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">CNS<br><small>コンストラクション</small></div>
-<button class="fe-picker" onclick="openFEPicker('CNS')"><span id="fe_CNS" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">BDY<br><small>ボディ・コントロール</small></div>
-<button class="fe-picker" onclick="openFEPicker('BDY')"><span id="fe_BDY" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-<div class="fe-item"><div class="fe-name">SHW<br><small>ショーマンシップ</small></div>
-<button class="fe-picker" onclick="openFEPicker('SHW')"><span id="fe_SHW" class="fe-value">0</span><span class="fe-arrow">›</span></button></div>
-</div>
-<div class="fe-total">FE合計 <b id="feTotal">0.0</b> / 40</div>
-</div>
-</div>
-</div>
-<div class="actions">
-<div class="scorebox"><div class="stat">合計 <b id="totalScore">0</b></div></div>
-<div class="scorebox"><div class="stat">特別減点合計 <b id="specialTotal">0</b></div></div>
-</div>
-<div class="reset-row"><button id="resetHoldBtn">リセット<br><small>1秒長押し</small></button></div>
+<div class="fe-grid compact-fe"><div class="fe-compact">
+<div class="fe-label"><b>EXE</b><span>エクスキューション</span><strong id="fe_EXE">0</strong></div>
+<input class="fe-range" data-fe="EXE" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('EXE',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>CTR</b><span>コントロール</span><strong id="fe_CTR">0</strong></div>
+<input class="fe-range" data-fe="CTR" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('CTR',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>TRV</b><span>トリック・ダイバーシティ</span><strong id="fe_TRV">0</strong></div>
+<input class="fe-range" data-fe="TRV" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('TRV',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>SUE</b><span>スペースユース／エンファシス</span><strong id="fe_SUE">0</strong></div>
+<input class="fe-range" data-fe="SUE" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('SUE',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>CHG</b><span>コレオグラフィ</span><strong id="fe_CHG">0</strong></div>
+<input class="fe-range" data-fe="CHG" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('CHG',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>CNS</b><span>コンストラクション</span><strong id="fe_CNS">0</strong></div>
+<input class="fe-range" data-fe="CNS" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('CNS',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>BDY</b><span>ボディ・コントロール</span><strong id="fe_BDY">0</strong></div>
+<input class="fe-range" data-fe="BDY" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('BDY',this.value)">
+</div><div class="fe-compact">
+<div class="fe-label"><b>SHW</b><span>ショーマンシップ</span><strong id="fe_SHW">0</strong></div>
+<input class="fe-range" data-fe="SHW" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('SHW',this.value)">
+</div></div>
+<div class="fe-total compact-total">合計 <b id="feTotal">0.0</b> / 40</div>
+<div class="bottom-actions">
+<button id="resetHoldBtn">リセット<br><small>1秒長押し</small></button>
 <button id="csvSaveBtn" class="csv-save" onclick="saveCsv()">CSV保存</button>
+</div>
+
+
+
 
 
 
 </div>
 
-
-<div id="feModal" class="fe-modal" onclick="if(event.target===this)closeFEPicker()">
- <div class="fe-dialog">
-  <div id="feDialogTitle" class="fe-dialog-title"></div>
-  <div id="feSliderValue" class="fe-slider-value">1</div>
-  <input id="feSlider" class="fe-slider" type="range" min="1" max="10" step="1" value="1">
-  <div class="fe-scale"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
-  
- </div>
-</div>
 
 <script>
 let events = JSON.parse(localStorage.getItem("yoyo-events")||"[]");
@@ -226,7 +246,7 @@ function addEvent(label,value,buttonId){events.push({label,value,miss:false,time
 function addMiss(){events.push({label:"MISS",value:0,miss:true,time:timeText()});save();navigator.vibrate?.(35)}
 function specialNamed(name,v,buttonId){events.push({label:name+" "+v,value:v,special:name,time:timeText()});save();flashButton(buttonId || ({"停止":"stopBtn","交換":"changeBtn","切断":"cutBtn"}[name]));navigator.vibrate?.(35)}
 function undo(){events.pop();save()}
-function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];started=Date.now();feScores=Object.fromEntries(FE_CODES.map(k=>[k,0]));saveFE();save()}}
+function resetAll(){if(confirm("採点をすべてリセットしますか？")){events=[];feScores=Object.fromEntries(FE_CODES.map(k=>[k,0]));saveFE();started=Date.now();feScores=Object.fromEntries(FE_CODES.map(k=>[k,0]));saveFE();save()}}
 function openSpecial(){document.getElementById("sheet").style.display="flex"}
 function closeSpecial(){document.getElementById("sheet").style.display="none"}
 
@@ -234,36 +254,16 @@ function closeSpecial(){document.getElementById("sheet").style.display="none"}
 const FE_CODES=["EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW"];
 let feScores=JSON.parse(localStorage.getItem("yoyo-fe-scores")||"null") || Object.fromEntries(FE_CODES.map(k=>[k,0]));
 function saveFE(){localStorage.setItem("yoyo-fe-scores",JSON.stringify(feScores));renderFE()}
-let activeFECode=null;
-function openFEPicker(code){
- activeFECode=code;
- const v=Number(feScores[code])||1;
- document.getElementById("feDialogTitle").textContent=code;
- document.getElementById("feSlider").value=v;
- document.getElementById("feSliderValue").textContent=v;
- document.getElementById("feModal").classList.add("open");
+function setFEInline(code,value){
+  feScores[code]=Number(value);
+  saveFE();
 }
-function closeFEPicker(){
- document.getElementById("feModal").classList.remove("open");
- activeFECode=null;
-}
-function confirmFEPicker(){
- if(!activeFECode)return;
- feScores[activeFECode]=Number(document.getElementById("feSlider").value);
- saveFE();
- closeFEPicker();
-}
-document.addEventListener("input",e=>{
- if(e.target?.id==="feSlider"){
-   document.getElementById("feSliderValue").textContent=e.target.value;
-   if(activeFECode){
-     feScores[activeFECode]=Number(e.target.value);
-     saveFE();
-   }
- }
-});
 function renderFE(){
-  FE_CODES.forEach(code=>{const el=document.getElementById("fe_"+code);if(el)el.textContent=Number(feScores[code])||0});
+  FE_CODES.forEach(code=>{
+    const v=Number(feScores[code])||0;
+    const el=document.getElementById("fe_"+code); if(el)el.textContent=v;
+    const range=document.querySelector('.fe-range[data-fe="'+code+'"]'); if(range)range.value=v;
+  });
   const raw=FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0);
   const el=document.getElementById("feTotal"); if(el)el.textContent=(raw/2).toFixed(1);
 }
@@ -498,18 +498,7 @@ document.getElementById("searchQ")?.addEventListener("keydown", e => {
 
 render();
 
-(function(){
- const slider=document.getElementById("scoringSlider"); if(!slider)return;
- let sx=0,sy=0,tracking=false;
- slider.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;tracking=true},{passive:true});
- slider.addEventListener("touchend",e=>{
-   if(!tracking)return; tracking=false;
-   const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-   if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.25){
-     if(dx<0) slider.classList.add("show-fe"); else slider.classList.remove("show-fe");
-   }
- },{passive:true});
-})();
+
 
 </script>
 </body>
