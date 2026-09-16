@@ -725,6 +725,44 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
   }
 }
 
+
+/* v40: landscape fixed 3-column layout, no left clipping */
+@media (orientation:landscape){
+  html,body{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    overflow-x:hidden!important;
+  }
+  body{
+    padding-left:max(6px,env(safe-area-inset-left))!important;
+    padding-right:max(6px,env(safe-area-inset-right))!important;
+    box-sizing:border-box!important;
+  }
+  .wrap{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 auto!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    grid-template-columns:minmax(105px,12%) minmax(0,1fr) minmax(105px,12%)!important;
+    column-gap:8px!important;
+    left:0!important;
+    right:0!important;
+    transform:none!important;
+  }
+  h1,.special-row,.compact-fe,.grid .big:first-child,.grid .big:nth-child(2){
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+  .video,.urlrow,.fe-summary-row,.bottom-actions{
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+}
+
 </style>
 </head>
 <body>
