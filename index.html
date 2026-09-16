@@ -701,6 +701,11 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 }
 
 @media (orientation:landscape){.title-clickers{display:none!important}h1{gap:0!important;padding-right:4px!important}}
+
+/* v38 draggable score button swap */
+.grid .big:first-child,.grid .big:nth-child(2){touch-action:none;user-select:none;-webkit-user-select:none}
+.score-dragging{opacity:.55!important}.score-drop-target{outline:3px solid #fff!important;outline-offset:2px}
+
 </style>
 </head>
 <body>
@@ -1051,6 +1056,27 @@ function val(e,d){if(!e)return;e.value=Math.max(0,Math.min(10,(+e.value||0)+d));
 function seek(d){let v=document.querySelector('video');if(v&&isFinite(v.duration)){v.currentTime=Math.max(0,Math.min(v.duration,v.currentTime+d));return}try{if(window.player&&player.getCurrentTime)player.seekTo(Math.max(0,player.getCurrentTime()+d),true)}catch(e){}}
 function loop(t){let g=navigator.getGamepads&&Array.from(navigator.getGamepads()).find(Boolean),a=ranges();if(g&&a.length){let lx=g.axes[0]||0,rx=g.axes[2]||0,ry=g.axes[3]||0;if(Math.abs(ry)>D&&t-tm>R){idx=(idx+(ry>0?1:-1)+a.length)%a.length;tm=t;hi(a)}if(Math.abs(rx)>D&&t-tc>R){val(a[idx],rx>0?1:-1);tc=t;hi(a)}if(Math.abs(lx)>D&&t-ts>220){seek(lx>0?S:-S);ts=t}}requestAnimationFrame(loop)}
 addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop);
+})();
+</script>
+<script>
+(function(){
+ const KEY='cmScoreOrder'; let held=null,timer=null,sx=0,sy=0;
+ function get(){let g=document.querySelector('.grid');if(!g)return null;let a=Array.from(g.children).filter(e=>e.classList.contains('big')).slice(0,2);return a.length===2?[g,a]:null}
+ function type(e){let t=e.textContent||'';return /[+＋]/.test(t)?'plus':'minus'}
+ function save(){let x=get();if(x)localStorage.setItem(KEY,x[1].map(type).join(','))}
+ function swap(a,b){let p=a.parentNode,m=document.createTextNode('');p.insertBefore(m,a);p.insertBefore(a,b);p.insertBefore(b,m);m.remove();save()}
+ function setup(){let x=get();if(!x)return;let [g,a]=x,o=localStorage.getItem(KEY);if(o){let w=o.split(','),m={};a.forEach(e=>m[type(e)]=e);if(w.length===2&&m[w[0]]&&type(a[0])!==w[0])swap(a[0],a[1]);x=get();a=x[1]}
+ a.forEach(el=>{el.draggable=true;
+  el.addEventListener('dragstart',e=>{held=el;el.classList.add('score-dragging');e.dataTransfer.effectAllowed='move'});
+  el.addEventListener('dragover',e=>{e.preventDefault();if(el!==held)el.classList.add('score-drop-target')});
+  el.addEventListener('dragleave',()=>el.classList.remove('score-drop-target'));
+  el.addEventListener('drop',e=>{e.preventDefault();if(held&&held!==el)swap(held,el)});
+  el.addEventListener('dragend',()=>{a.forEach(b=>b.classList.remove('score-dragging','score-drop-target'));held=null});
+  el.addEventListener('touchstart',e=>{let t=e.touches[0];sx=t.clientX;sy=t.clientY;timer=setTimeout(()=>{held=el;el.classList.add('score-dragging')},450)},{passive:true});
+  el.addEventListener('touchmove',e=>{let t=e.touches[0];if(!held&&Math.hypot(t.clientX-sx,t.clientY-sy)>12){clearTimeout(timer);return}if(held){e.preventDefault();a.forEach(b=>b.classList.remove('score-drop-target'));let q=document.elementFromPoint(t.clientX,t.clientY),b=a.find(z=>z===q||z.contains(q));if(b&&b!==held)b.classList.add('score-drop-target')}},{passive:false});
+  el.addEventListener('touchend',e=>{clearTimeout(timer);if(held){let t=e.changedTouches[0],q=document.elementFromPoint(t.clientX,t.clientY),b=a.find(z=>z===q||z.contains(q));if(b&&b!==held)swap(held,b);a.forEach(z=>z.classList.remove('score-dragging','score-drop-target'));held=null}})
+ })}
+ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',setup):setup();
 })();
 </script>
 </body>
