@@ -706,6 +706,25 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 .grid .big:first-child,.grid .big:nth-child(2){touch-action:none;user-select:none;-webkit-user-select:none}
 .score-dragging{opacity:.55!important}.score-drop-target{outline:3px solid #fff!important;outline-offset:2px}
 
+
+/* v39: center landscape screen horizontally */
+@media (orientation:landscape){
+  body{
+    padding-left:max(8px,env(safe-area-inset-left))!important;
+    padding-right:max(8px,env(safe-area-inset-right))!important;
+  }
+  .wrap{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+  }
+}
+
 </style>
 </head>
 <body>
