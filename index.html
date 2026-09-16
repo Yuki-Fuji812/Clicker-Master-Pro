@@ -763,6 +763,38 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
   }
 }
 
+
+/* v41: landscape uses the full viewport; subscriptions drawer */
+@media (orientation:landscape){
+  body{
+    width:100vw!important; max-width:100vw!important;
+    margin:0!important; padding:4px 6px!important;
+    overflow:hidden!important;
+  }
+  .wrap{
+    position:relative!important;
+    width:calc(100vw - 12px)!important;
+    max-width:none!important;
+    height:calc(100dvh - 8px)!important;
+    margin:0!important;
+    grid-template-columns:12% minmax(0,1fr) 12%!important;
+    transform:none!important;
+  }
+}
+#subsBtn{background:#34343b;color:#fff;border:1px solid #777;border-radius:10px;padding:0 10px;font-weight:700}
+#subsPanel{
+  display:none;position:fixed;z-index:9999;inset:8px;
+  background:#111;border:1px solid #555;border-radius:14px;padding:10px;
+  overflow:auto;color:#fff
+}
+#subsPanel.open{display:block}
+#subsTop{display:flex;gap:8px;align-items:center;position:sticky;top:0;background:#111;padding-bottom:8px;z-index:2}
+#subsTop button{padding:8px 12px;border-radius:9px;border:1px solid #777;background:#26262c;color:#fff;font-weight:700}
+#subsList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.subCard{background:#1c1c21;border:1px solid #444;border-radius:10px;padding:8px;color:#fff;text-align:left}
+.subCard img{width:42px;height:42px;border-radius:50%;vertical-align:middle;margin-right:7px}
+.vidCard img{width:100%;height:auto;border-radius:7px;display:block;margin-bottom:5px}
+
 </style>
 </head>
 <body>
@@ -1136,5 +1168,89 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',setup):setup();
 })();
 </script>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+(function(){
+ const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
+ let tokenClient=null,accessToken='';
+ function row(){
+   const r=document.querySelector('.urlrow'); if(!r||document.getElementById('subsBtn'))return;
+   const b=document.createElement('button');b.id='subsBtn';b.textContent='登録';b.type='button';r.appendChild(b);
+   b.onclick=openSubs;
+ }
+ function panel(){
+   if(document.getElementById('subsPanel'))return document.getElementById('subsPanel');
+   const p=document.createElement('div');p.id='subsPanel';
+   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="subsHome">登録チャンネル</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
+   document.body.appendChild(p);
+   p.querySelector('#subsClose').onclick=()=>p.classList.remove('open');
+   p.querySelector('#subsHome').onclick=loadSubs;
+   return p;
+ }
+ function getClientId(){
+   let id=localStorage.getItem('ytOAuthClientId');
+   if(!id){id=prompt('Google OAuth 2.0 クライアントIDを入力してください');if(id)localStorage.setItem('ytOAuthClientId',id.trim())}
+   return id&&id.trim();
+ }
+ function auth(cb){
+   if(accessToken){cb();return}
+   const id=getClientId();if(!id)return;
+   if(!window.google||!google.accounts||!google.accounts.oauth2){alert('Google認証を読み込み中です。数秒後にもう一度押してください。');return}
+   tokenClient=google.accounts.oauth2.initTokenClient({client_id:id,scope:SCOPE,callback:r=>{if(r.access_token){accessToken=r.access_token;cb()}}});
+   tokenClient.requestAccessToken({prompt:'consent'});
+ }
+ async function api(url){
+   const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+   if(!r.ok)throw new Error('YouTube API '+r.status);
+   return r.json();
+ }
+ function openSubs(){panel().classList.add('open');auth(loadSubs)}
+ async function loadSubs(){
+   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
+   title.textContent='登録チャンネル';list.innerHTML='読み込み中…';
+   try{
+     let items=[],page='';
+     do{
+       const d=await api('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50'+(page?'&pageToken='+encodeURIComponent(page):''));
+       items.push(...(d.items||[]));page=d.nextPageToken||'';
+     }while(page&&items.length<300);
+     list.innerHTML='';
+     items.forEach(it=>{
+       const sn=it.snippet,ch=sn.resourceId.channelId,b=document.createElement('button');
+       b.className='subCard';b.innerHTML=(sn.thumbnails?.default?.url?'<img src="'+sn.thumbnails.default.url+'">':'')+'<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>loadChannel(ch,sn.title);list.appendChild(b);
+     });
+   }catch(e){list.textContent='取得できませんでした。Google認証設定を確認してください。'}
+ }
+ async function loadChannel(id,name){
+   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
+   title.textContent=name;list.innerHTML='動画を読み込み中…';
+   try{
+     const c=await api('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
+     const pl=c.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;if(!pl)throw 0;
+     const d=await api('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
+     list.innerHTML='';
+     d.items.forEach(it=>{
+       const sn=it.snippet,vid=sn.resourceId.videoId,b=document.createElement('button');
+       b.className='subCard vidCard';b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+sn.thumbnails.medium.url+'">':'')+'<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>playVideo(vid,sn.title);list.appendChild(b);
+     });
+   }catch(e){list.textContent='動画を取得できませんでした。'}
+ }
+ function playVideo(id,title){
+   const p=document.getElementById('subsPanel');p.classList.remove('open');
+   const input=document.querySelector('.urlrow input');if(input)input.value=title||'';
+   try{
+     if(window.player&&typeof player.loadVideoById==='function'){player.loadVideoById(id);return}
+   }catch(e){}
+   const frame=document.querySelector('.video iframe, iframe');
+   if(frame)frame.src='https://www.youtube.com/embed/'+encodeURIComponent(id)+'?autoplay=1&enablejsapi=1';
+ }
+ function esc(x){const d=document.createElement('div');d.textContent=x||'';return d.innerHTML}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',row);else row();
+})();
+</script>
+
 </body>
 </html>
