@@ -1042,5 +1042,16 @@ render();
 
 
 </script>
+<script>
+(function(){
+let idx=0,tm=0,tc=0,ts=0; const D=.55,R=180,S=5;
+function ranges(){return Array.from(document.querySelectorAll('.fe-range')).slice(0,8)}
+function hi(a){a.forEach((e,i)=>{let b=e.closest('.fe-compact')||e.parentElement;if(b)b.style.outline=i===idx?'2px solid #ffd54a':''})}
+function val(e,d){if(!e)return;e.value=Math.max(0,Math.min(10,(+e.value||0)+d));e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}))}
+function seek(d){let v=document.querySelector('video');if(v&&isFinite(v.duration)){v.currentTime=Math.max(0,Math.min(v.duration,v.currentTime+d));return}try{if(window.player&&player.getCurrentTime)player.seekTo(Math.max(0,player.getCurrentTime()+d),true)}catch(e){}}
+function loop(t){let g=navigator.getGamepads&&Array.from(navigator.getGamepads()).find(Boolean),a=ranges();if(g&&a.length){let lx=g.axes[0]||0,rx=g.axes[2]||0,ry=g.axes[3]||0;if(Math.abs(ry)>D&&t-tm>R){idx=(idx+(ry>0?1:-1)+a.length)%a.length;tm=t;hi(a)}if(Math.abs(rx)>D&&t-tc>R){val(a[idx],rx>0?1:-1);tc=t;hi(a)}if(Math.abs(lx)>D&&t-ts>220){seek(lx>0?S:-S);ts=t}}requestAnimationFrame(loop)}
+addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
