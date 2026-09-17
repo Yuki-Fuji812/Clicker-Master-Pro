@@ -1182,7 +1182,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  function panel(){
    if(document.getElementById('subsPanel'))return document.getElementById('subsPanel');
    const p=document.createElement('div');p.id='subsPanel';
-   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="subsHome">登録チャンネル</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
+   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="ytAccountSwitchBtn" type="button">アカウント切替</button><button id="subsHome">登録チャンネル</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
    document.body.appendChild(p);
    p.querySelector('#subsClose').onclick=()=>p.classList.remove('open');
    p.querySelector('#subsHome').onclick=loadSubs;
@@ -1249,6 +1249,64 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  }
  function esc(x){const d=document.createElement('div');d.textContent=x||'';return d.innerHTML}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',row);else row();
+})();
+</script>
+
+
+<style id="yt-account-switch-style">
+#ytAccountSwitchBtn{
+  margin-left:8px;padding:10px 14px;border:1px solid #666;border-radius:10px;
+  background:#2a2a2e;color:#fff;font-weight:700;font-size:14px;white-space:nowrap;
+}
+</style>
+<script id="yt-account-switch-script">
+(function(){
+  function clearYouTubeOAuth(){
+    try{
+      const tokenKeys = [
+        'ytAccessToken','youtubeAccessToken','googleAccessToken',
+        'ytOAuthToken','oauthAccessToken'
+      ];
+      tokenKeys.forEach(k => localStorage.removeItem(k));
+      sessionStorage.clear();
+    }catch(e){}
+  }
+  function switchYouTubeAccount(){
+    clearYouTubeOAuth();
+
+    // Force a fresh Google account/channel choice on the next token request.
+    try{
+      if (window.google && google.accounts && google.accounts.oauth2 && window.ytOAuthClientId){
+        const tc = google.accounts.oauth2.initTokenClient({
+          client_id: window.ytOAuthClientId,
+          scope: 'https://www.googleapis.com/auth/youtube.readonly',
+          callback: function(resp){
+            if(resp && resp.access_token){
+              try{ localStorage.setItem('ytAccessToken', resp.access_token); }catch(e){}
+              location.reload();
+            }
+          },
+          error_callback: function(){ location.reload(); }
+        });
+        tc.requestAccessToken({prompt:'select_account consent'});
+        return;
+      }
+    }catch(e){}
+
+    // Existing app flow will ask again after reload; keep Client ID but clear auth state.
+    alert('Googleアカウントを選び直します。次のログイン画面で、登録チャンネルを取得したいアカウントを選択してください。');
+    location.reload();
+  }
+
+  function bind(){
+    const b=document.getElementById('ytAccountSwitchBtn');
+    if(b && !b.dataset.bound){
+      b.dataset.bound='1';
+      b.addEventListener('click', switchYouTubeAccount);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
 })();
 </script>
 
