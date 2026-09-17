@@ -3442,5 +3442,125 @@ input[type="range"]{
 })();
 </script>
 
+
+<style id="v89-landscape-hard-layout">
+@media (orientation:landscape){
+  html,body{width:100%;height:100%;overflow:hidden!important}
+  body{padding:0!important;margin:0!important}
+  .wrap{
+    position:relative!important;
+    display:block!important;
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  h1{
+    position:absolute!important;left:18px!important;top:8px!important;
+    width:150px!important;height:34px!important;margin:0!important;
+    z-index:20!important;
+  }
+  .urlrow{
+    position:absolute!important;
+    left:190px!important;right:126px!important;top:7px!important;
+    height:38px!important;margin:0!important;z-index:20!important;
+  }
+
+  /* Video fills all free space between left scoring and right FE. */
+  #video{
+    position:absolute!important;
+    left:128px!important;right:124px!important;
+    top:50px!important;bottom:49px!important;
+    width:auto!important;height:auto!important;
+    max-width:none!important;max-height:none!important;
+    min-width:0!important;min-height:0!important;
+    margin:0!important;padding:0!important;
+    border-radius:10px!important;overflow:hidden!important;
+    aspect-ratio:auto!important;z-index:1!important;
+  }
+  #video>iframe,#video>video{
+    position:absolute!important;inset:0!important;
+    width:100%!important;height:100%!important;
+    max-width:none!important;max-height:none!important;
+    margin:0!important;border:0!important;
+    object-fit:contain!important;background:#000!important;
+  }
+
+  .special-row{
+    position:absolute!important;left:14px!important;top:88px!important;
+    width:108px!important;margin:0!important;z-index:10!important;
+  }
+  .fe-grid{
+    position:absolute!important;right:8px!important;top:50px!important;
+    width:112px!important;height:calc(100dvh - 101px)!important;
+    margin:0!important;z-index:10!important;
+  }
+  .grid.landscape-main{position:static!important}
+  #plusBtn{
+    position:absolute!important;left:14px!important;bottom:48px!important;
+    z-index:15!important;
+  }
+  #minusBtn{
+    position:absolute!important;right:10px!important;bottom:48px!important;
+    z-index:15!important;
+  }
+
+  .fe-summary-row{
+    position:absolute!important;
+    left:280px!important;right:430px!important;bottom:5px!important;
+    height:38px!important;margin:0!important;z-index:20!important;
+  }
+  .fe-total{
+    position:absolute!important;
+    right:300px!important;bottom:5px!important;
+    width:150px!important;height:38px!important;margin:0!important;z-index:20!important;
+  }
+  .bottom-actions{
+    position:static!important;margin:0!important;
+  }
+  #resetHoldBtn{
+    position:absolute!important;left:135px!important;bottom:5px!important;
+    width:138px!important;height:38px!important;z-index:20!important;
+  }
+  #csvSaveBtn{
+    position:absolute!important;right:130px!important;bottom:5px!important;
+    width:155px!important;height:38px!important;z-index:20!important;
+  }
+  #subsBtn{display:none!important}
+}
+</style>
+
+<script id="v89-local-file-display">
+(function(){
+ let localBlobURL=null;
+ function install(){
+   const input=document.getElementById('localVideoFile');
+   const box=document.getElementById('video');
+   if(!input||!box) return;
+   input.onchange=null;
+   input.addEventListener('change',function(){
+     const file=this.files&&this.files[0];
+     if(!file)return;
+     if(localBlobURL)URL.revokeObjectURL(localBlobURL);
+     localBlobURL=URL.createObjectURL(file);
+     box.innerHTML='';
+     const v=document.createElement('video');
+     v.controls=true; v.playsInline=true;
+     v.setAttribute('playsinline','');
+     v.setAttribute('webkit-playsinline','');
+     v.src=localBlobURL;
+     box.appendChild(v);
+     v.load();
+     v.play().catch(()=>{});
+   });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install);
+ else install();
+})();
+</script>
+
 </body>
 </html>
