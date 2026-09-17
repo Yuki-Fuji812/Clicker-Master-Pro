@@ -3275,5 +3275,88 @@ input[type="range"]{
 })();
 </script>
 
+
+<style id="v87-landscape-video-authoritative">
+@media (orientation:landscape){
+  /* Give the center video substantially more width while reserving fixed,
+     non-overlapping side columns for scoring and FE. */
+  .wrap{
+    grid-template-columns:118px minmax(0,1fr) 118px!important;
+    grid-template-rows:52px minmax(0,1fr) 54px 43px!important;
+    gap:5px 6px!important;
+    padding:6px 10px 7px 10px!important;
+  }
+
+  .video.landscape-video{
+    grid-area:video!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    align-self:stretch!important;
+    justify-self:stretch!important;
+    overflow:hidden!important;
+    aspect-ratio:auto!important;
+  }
+
+  .video.landscape-video iframe,
+  .video.landscape-video video,
+  #localVideoPlayer{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    object-fit:contain!important;
+  }
+}
+</style>
+
+<script id="v87-local-file-real-video-area">
+(function(){
+  let localURL = null;
+
+  window.playLocalVideo = function(input){
+    const file = input && input.files && input.files[0];
+    if(!file) return;
+
+    currentVideoTitle = file.name;
+    if(localURL) URL.revokeObjectURL(localURL);
+    localURL = URL.createObjectURL(file);
+
+    /* Actual app video container is #video. */
+    const box = document.getElementById('video');
+    if(!box) return;
+
+    box.innerHTML = '';
+
+    const v = document.createElement('video');
+    v.id = 'localVideoPlayer';
+    v.className = 'local-video';
+    v.controls = true;
+    v.playsInline = true;
+    v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline','');
+    v.preload = 'auto';
+    v.src = localURL;
+
+    box.appendChild(v);
+
+    const results = document.getElementById('searchResults');
+    if(results) results.className = 'search-results';
+
+    v.load();
+    v.play().catch(function(){});
+  };
+})();
+</script>
+
 </body>
 </html>
