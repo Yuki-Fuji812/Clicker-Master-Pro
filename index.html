@@ -3745,5 +3745,27 @@ input[type="range"]{
 }
 </style>
 
+
+<style id="v93-force-layout">
+@media (orientation:landscape){
+  #video{left:-70px!important;right:140px!important;}
+  .urlrow.landscape-search{left:315px!important;right:210px!important;width:auto!important;display:flex!important;}
+  #searchQ{width:360px!important;max-width:360px!important;min-width:0!important;flex:0 0 360px!important;}
+  .fe-grid.compact-fe.landscape-fe{display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:2px!important;right:6px!important;top:92px!important;width:108px!important;height:calc(100dvh - 185px)!important;}
+  .fe-grid.compact-fe.landscape-fe>.fe-compact{display:block!important;width:108px!important;height:calc((100% - 14px)/8)!important;min-height:0!important;flex:1 1 0!important;margin:0!important;}
+}
+</style>
+<script id="v93-force-layout-js">
+(function(){
+ function force(){
+   if(!matchMedia('(orientation: landscape)').matches)return;
+   const v=document.getElementById('video'); if(v){v.style.setProperty('left','-70px','important');v.style.setProperty('right','140px','important');}
+   const q=document.getElementById('searchQ'); if(q){q.style.setProperty('width','360px','important');q.style.setProperty('max-width','360px','important');q.style.setProperty('flex','0 0 360px','important');}
+   const g=document.querySelector('.fe-grid.compact-fe.landscape-fe'); if(g){g.style.setProperty('display','flex','important');g.style.setProperty('flex-direction','column','important');g.style.setProperty('flex-wrap','nowrap','important');g.style.setProperty('width','108px','important'); [...g.children].forEach(x=>{x.style.setProperty('width','108px','important');x.style.setProperty('flex','1 1 0','important');});}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',force);else force();
+ addEventListener('resize',force);addEventListener('orientationchange',()=>setTimeout(force,100));
+})();
+</script>
 </body>
 </html>
