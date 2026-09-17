@@ -796,6 +796,36 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 .vidCard img{width:100%;height:auto;border-radius:7px;display:block;margin-bottom:5px}
 
 </style>
+
+<style id="v91-layout-tuning">
+@media (orientation:landscape){
+  /* search bar: shorter vertically, clear of video */
+  .urlrow{height:34px!important;top:5px!important;align-items:stretch!important}
+  .urlrow input,#searchQ{height:34px!important;min-height:34px!important;max-height:34px!important;padding-top:3px!important;padding-bottom:3px!important;box-sizing:border-box!important}
+  .urlrow button{height:34px!important;min-height:34px!important;max-height:34px!important;padding-top:0!important;padding-bottom:0!important}
+
+  /* nudge video right while preserving current size */
+  #video{transform:translateX(18px)!important;top:43px!important;bottom:48px!important}
+
+  /* FE: compact 8 x 1 column so minus button remains clear */
+  .fe-grid{top:47px!important;bottom:57px!important;height:auto!important;display:grid!important;grid-template-columns:1fr!important;grid-template-rows:repeat(8,minmax(0,1fr))!important;gap:2px!important}
+  .fe-grid>*{min-height:0!important;height:auto!important;margin:0!important;padding:1px 5px!important;box-sizing:border-box!important}
+  .fe-grid input[type=range]{margin:0!important}
+  #minusBtn{z-index:50!important}
+
+  /* uniform footer controls; five equal visual blocks, no overlap */
+  #resetHoldBtn,.fe-summary-row,.fe-total,#csvSaveBtn{bottom:5px!important;height:38px!important;min-height:38px!important;max-height:38px!important;box-sizing:border-box!important;margin:0!important;z-index:40!important}
+  #resetHoldBtn{left:14%!important;width:18%!important}
+  .fe-summary-row{left:33%!important;width:15%!important;right:auto!important;display:flex!important;gap:4px!important}
+  .fe-summary-row>*{height:38px!important;min-height:38px!important;box-sizing:border-box!important;flex:1 1 0!important;margin:0!important}
+  .fe-total{left:49%!important;right:auto!important;width:18%!important}
+  #csvSaveBtn{left:68%!important;right:auto!important;width:18%!important}
+  #resetHoldBtn,.fe-total,#csvSaveBtn,.fe-summary-row>*{font-size:clamp(12px,1.7vw,22px)!important;padding:2px 6px!important}
+}
+</style>
+<script id="v91-force-layout">
+(function(){function f(){if(!matchMedia('(orientation: landscape)').matches)return;var v=document.getElementById('video');if(v){v.style.setProperty('transform','translateX(18px)','important');v.style.setProperty('top','43px','important');v.style.setProperty('bottom','48px','important');}var g=document.querySelector('.fe-grid');if(g){g.style.setProperty('grid-template-columns','1fr','important');g.style.setProperty('grid-template-rows','repeat(8,minmax(0,1fr))','important');g.style.setProperty('gap','2px','important');}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',f);else f();addEventListener('resize',f);setTimeout(f,250);})();
+</script>
 </head>
 <body>
 <div class="wrap">
