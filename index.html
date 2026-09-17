@@ -3707,5 +3707,43 @@ input[type="range"]{
 }
 </style>
 
+
+<style id="v92-layout-adjustments">
+@media (orientation:landscape){
+  /* Shift the oversized video left while keeping its current size. */
+  #video{
+    left:-70px!important;
+    right:140px!important;
+  }
+
+  /* Keep the YouTube search field compact so it does not cover the video unnecessarily. */
+  .urlrow #searchQ{
+    flex:0 1 360px!important;
+    width:360px!important;
+    max-width:360px!important;
+  }
+  .urlrow{
+    justify-content:flex-end!important;
+  }
+
+  /* FE: EXE through SHW in one vertical column (8 x 1). */
+  .fe-grid{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    grid-template-rows:repeat(8,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;
+    grid-auto-columns:1fr!important;
+    width:106px!important;
+    right:5px!important;
+  }
+  .fe-grid > *{
+    grid-column:1!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
 </body>
 </html>
