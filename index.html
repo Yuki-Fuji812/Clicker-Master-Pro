@@ -1617,5 +1617,87 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 }
 </style>
 
+
+<style id="landscape-v48-left">
+@media (orientation:landscape){
+  .wrap{
+    /* Move the working area left and give more room to video/FE. */
+    grid-template-columns:minmax(125px,10%) minmax(0,1fr) minmax(135px,11%)!important;
+    padding-left:max(8px,env(safe-area-inset-left))!important;
+    padding-right:max(18px,env(safe-area-inset-right))!important;
+    column-gap:8px!important;
+  }
+  h1{justify-self:start!important}
+  .special-row.landscape-special{justify-self:start!important}
+  .grid.landscape-main .big:first-child{
+    justify-self:start!important;
+    margin-left:4px!important;
+  }
+  .video.landscape-video{
+    justify-self:stretch!important;
+    margin-left:-10px!important;
+    width:calc(100% + 10px)!important;
+  }
+  .fe-grid.compact-fe.landscape-fe{
+    margin-left:-6px!important;
+    width:calc(100% + 6px)!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v49-more-video">
+@media (orientation:landscape){
+  .wrap{
+    /* Give the video row more height; compress the two bottom rows. */
+    grid-template-rows:50px minmax(0,1fr) 42px 36px!important;
+    row-gap:5px!important;
+  }
+
+  .fe-summary-row.landscape-summary{
+    height:42px!important;
+    align-self:end!important;
+    gap:6px!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    min-height:38px!important;
+    height:38px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+  }
+
+  .bottom-actions.landscape-actions{
+    height:36px!important;
+    align-self:end!important;
+    width:58%!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:34px!important;
+    min-height:34px!important;
+    padding-top:2px!important;
+    padding-bottom:2px!important;
+  }
+
+  .video.landscape-video{
+    height:100%!important;
+    min-height:0!important;
+    align-self:stretch!important;
+  }
+  .video.landscape-video iframe,
+  .video.landscape-video video{
+    width:100%!important;
+    height:100%!important;
+    max-height:none!important;
+  }
+
+  /* Keep all eight FE rows inside the taller video/FE area. */
+  .fe-grid.compact-fe.landscape-fe{
+    min-height:0!important;
+    height:100%!important;
+    grid-template-rows:repeat(8,minmax(0,1fr))!important;
+  }
+}
+</style>
+
 </body>
 </html>
