@@ -3358,5 +3358,89 @@ input[type="range"]{
 })();
 </script>
 
+
+<style id="v88-final-video-layout">
+@media (orientation:landscape){
+  .wrap{
+    grid-template-columns:118px minmax(0,1fr) 118px!important;
+    grid-template-rows:48px minmax(0,1fr) 82px!important;
+    grid-template-areas:
+      "brand search search"
+      "special video fe"
+      "plus bottom minus"!important;
+    gap:4px 6px!important;
+    padding:4px max(10px,env(safe-area-inset-right)) 5px max(10px,env(safe-area-inset-left))!important;
+  }
+  #video{
+    grid-area:video!important;
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    min-width:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    align-self:stretch!important;
+    justify-self:stretch!important;
+    aspect-ratio:auto!important;
+  }
+  #video>iframe,#video>video{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    border:0!important;
+    object-fit:contain!important;
+  }
+  #subsBtn{display:none!important}
+}
+</style>
+
+<script id="v88-file-video-hard-fix">
+(function(){
+  let blobURL=null;
+
+  function showLocal(input){
+    const file=input && input.files && input.files[0];
+    if(!file) return;
+    const box=document.getElementById('video');
+    if(!box) return;
+
+    if(blobURL) URL.revokeObjectURL(blobURL);
+    blobURL=URL.createObjectURL(file);
+
+    const v=document.createElement('video');
+    v.id='localVideoPlayer';
+    v.controls=true;
+    v.playsInline=true;
+    v.setAttribute('playsinline','');
+    v.setAttribute('webkit-playsinline','');
+    v.src=blobURL;
+
+    box.replaceChildren(v);
+    v.load();
+    v.play().catch(function(){});
+  }
+
+  function init(){
+    const input=document.getElementById('localVideoFile');
+    if(!input) return;
+    input.removeAttribute('onchange');
+    input.addEventListener('change',function(){showLocal(this)},false);
+  }
+
+  window.playLocalVideo=showLocal;
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
 </body>
 </html>
