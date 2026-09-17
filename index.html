@@ -3144,5 +3144,82 @@ input[type="range"]{
 }
 </style>
 
+
+<style id="v84-one-register-button-only">
+#subsBtn{display:none!important;}
+</style>
+<script id="v84-remove-duplicate-register">
+(function(){
+  function removeDuplicate(){
+    const duplicate=document.getElementById('subsBtn');
+    if(duplicate) duplicate.remove();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',removeDuplicate);
+  }else{
+    removeDuplicate();
+  }
+  setTimeout(removeDuplicate,100);
+  setTimeout(removeDuplicate,500);
+})();
+</script>
+
+
+<script id="v85-local-file-video-display">
+(function(){
+  let localObjectURL = null;
+
+  window.playLocalVideo = function(input){
+    const file = input && input.files && input.files[0];
+    if(!file) return;
+
+    if(localObjectURL) URL.revokeObjectURL(localObjectURL);
+    localObjectURL = URL.createObjectURL(file);
+
+    const area =
+      document.querySelector('.video-wrap') ||
+      document.querySelector('.video-area') ||
+      document.querySelector('.player-wrap') ||
+      document.querySelector('#videoArea') ||
+      document.querySelector('#player')?.parentElement;
+
+    if(!area) return;
+
+    const ytPlayer = document.getElementById('player');
+    if(ytPlayer) ytPlayer.style.display = 'none';
+
+    let video = document.getElementById('localVideoPlayer');
+    if(!video){
+      video = document.createElement('video');
+      video.id = 'localVideoPlayer';
+      video.controls = true;
+      video.playsInline = true;
+      video.setAttribute('webkit-playsinline','');
+      area.appendChild(video);
+    }
+
+    video.src = localObjectURL;
+    video.style.display = 'block';
+    video.style.width = '100%';
+    video.style.height = '100%';
+    video.style.maxWidth = '100%';
+    video.style.maxHeight = '100%';
+    video.style.objectFit = 'contain';
+    video.load();
+    video.play().catch(()=>{});
+  };
+})();
+</script>
+<style id="v85-local-video-layout">
+#localVideoPlayer{
+  width:100%!important;
+  height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+  background:#000!important;
+}
+</style>
+
 </body>
 </html>
