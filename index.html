@@ -803,6 +803,8 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 <div class="urlrow landscape-search">
 <input id="searchQ" placeholder="YouTubeで動画を検索">
 <button class="load" onclick="searchVideo()">検索</button>
+<button id="subsLauncherV61" type="button">登録</button>
+
 <label class="filebtn">ファイル<input id="localVideoFile" type="file" accept="video/*" onchange="playLocalVideo(this)"></label>
 </div>
 <div id="searchResults" class="search-results landscape-results"></div>
@@ -1695,6 +1697,1449 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     min-height:0!important;
     height:100%!important;
     grid-template-rows:repeat(8,minmax(0,1fr))!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v50-balanced">
+@media (orientation:landscape){
+  html,body{
+    margin:0!important;padding:0!important;
+    width:100vw!important;height:100dvh!important;
+    overflow:hidden!important;background:#000!important;
+  }
+
+  .wrap{
+    position:fixed!important;inset:0!important;
+    width:100vw!important;height:100dvh!important;
+    margin:0!important;transform:none!important;
+    padding:
+      max(7px,env(safe-area-inset-top))
+      max(34px,env(safe-area-inset-right))
+      max(9px,env(safe-area-inset-bottom))
+      max(34px,env(safe-area-inset-left))!important;
+    box-sizing:border-box!important;
+
+    display:grid!important;
+    grid-template-columns:150px minmax(0,1fr) 150px!important;
+    grid-template-rows:50px minmax(0,1fr) 42px 38px!important;
+    grid-template-areas:
+      "brand search search"
+      "special video fe"
+      "plus summary minus"
+      ". actions ."!important;
+    column-gap:14px!important;
+    row-gap:6px!important;
+    align-items:stretch!important;
+  }
+
+  h1{
+    grid-area:brand!important;position:static!important;
+    margin:0!important;padding:0!important;
+    align-self:center!important;justify-self:start!important;
+    font-size:14px!important;white-space:nowrap!important;
+    overflow:visible!important;
+  }
+  .title-clickers{display:none!important}
+
+  .urlrow.landscape-search{
+    grid-area:search!important;position:static!important;
+    width:100%!important;height:46px!important;margin:0!important;
+    min-width:0!important;align-self:center!important;
+  }
+  .urlrow.landscape-search button{
+    height:42px!important;
+    padding:4px 13px!important;
+    font-size:13px!important;
+    min-width:0!important;
+  }
+
+  .special-row.landscape-special{
+    grid-area:special!important;position:static!important;
+    width:132px!important;margin:0!important;
+    justify-self:center!important;align-self:start!important;
+    display:grid!important;grid-template-columns:1fr!important;gap:8px!important;
+  }
+  .special-row.landscape-special .big{
+    width:132px!important;height:48px!important;min-height:48px!important;
+    margin:0!important;padding:3px!important;font-size:13px!important;
+  }
+
+  .video.landscape-video{
+    grid-area:video!important;position:static!important;
+    width:100%!important;height:100%!important;
+    min-width:0!important;min-height:0!important;
+    max-width:none!important;margin:0!important;
+    justify-self:stretch!important;align-self:stretch!important;
+  }
+  .video.landscape-video iframe,
+  .video.landscape-video video{
+    width:100%!important;height:100%!important;
+    max-width:100%!important;max-height:100%!important;
+    object-fit:contain!important;
+  }
+
+  .fe-grid.compact-fe.landscape-fe{
+    grid-area:fe!important;position:static!important;
+    width:140px!important;height:100%!important;
+    min-height:0!important;margin:0!important;
+    justify-self:center!important;align-self:stretch!important;
+    display:grid!important;
+    grid-template-rows:repeat(8,minmax(0,1fr))!important;
+    gap:1px!important;overflow:hidden!important;
+  }
+  .fe-compact{
+    min-height:0!important;height:auto!important;
+    padding:0 2px!important;margin:0!important;
+  }
+  .fe-range,input[type="range"]{
+    min-height:27px!important;height:27px!important;
+    padding:7px 0!important;margin:-6px 0!important;
+    touch-action:none!important;
+  }
+  .fe-range::-webkit-slider-thumb,input[type="range"]::-webkit-slider-thumb{
+    width:23px!important;height:23px!important;
+  }
+
+  .grid.landscape-main{display:contents!important}
+  .grid.landscape-main .big:first-child{
+    grid-area:plus!important;
+    width:112px!important;height:62px!important;
+    margin:0!important;justify-self:center!important;align-self:center!important;
+    font-size:25px!important;
+  }
+  .grid.landscape-main .big:nth-child(2){
+    grid-area:minus!important;
+    width:112px!important;height:62px!important;
+    margin:0!important;justify-self:center!important;align-self:center!important;
+    font-size:25px!important;
+  }
+
+  .fe-summary-row.landscape-summary{
+    grid-area:summary!important;position:static!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;height:42px!important;
+    margin:0!important;gap:7px!important;
+    align-self:end!important;justify-self:stretch!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:0!important;height:40px!important;
+    margin:0!important;padding:2px 5px!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+  }
+
+  /* Restore the FE total as the third bottom summary. */
+  .fe-total.landscape-total{
+    display:flex!important;
+    position:static!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    width:100%!important;height:40px!important;
+    margin:0!important;padding:2px 5px!important;
+    align-items:center!important;justify-content:center!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+  }
+
+  .bottom-actions.landscape-actions{
+    grid-area:actions!important;position:static!important;
+    width:58%!important;height:36px!important;
+    margin:0 auto!important;
+    display:grid!important;grid-template-columns:1fr 1fr!important;
+    gap:8px!important;align-self:end!important;justify-self:center!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:34px!important;min-height:34px!important;
+    margin:0!important;padding:2px 8px!important;
+    font-size:12px!important;white-space:nowrap!important;
+  }
+
+  /* Never allow the overlay thumbnail to cover the logo or left controls. */
+  .search-results.landscape-results{display:none!important}
+}
+</style>
+
+
+<style id="landscape-v51-video-priority">
+@media (orientation:landscape){
+  .wrap{
+    /* Smaller side columns = larger centered video */
+    grid-template-columns:118px minmax(0,1fr) 118px!important;
+    grid-template-rows:46px minmax(0,1fr) 38px 34px!important;
+    column-gap:9px!important;
+    row-gap:4px!important;
+    padding-left:max(24px,env(safe-area-inset-left))!important;
+    padding-right:max(24px,env(safe-area-inset-right))!important;
+  }
+
+  h1{font-size:12px!important}
+
+  .urlrow.landscape-search{height:42px!important}
+  .urlrow.landscape-search button{
+    height:36px!important;
+    padding:2px 10px!important;
+    font-size:11px!important;
+  }
+
+  .special-row.landscape-special{
+    width:104px!important;
+    gap:6px!important;
+  }
+  .special-row.landscape-special .big{
+    width:104px!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:2px!important;
+    font-size:11px!important;
+  }
+
+  .grid.landscape-main .big:first-child,
+  .grid.landscape-main .big:nth-child(2){
+    width:92px!important;
+    height:52px!important;
+    font-size:21px!important;
+  }
+
+  .fe-grid.compact-fe.landscape-fe{
+    width:112px!important;
+  }
+
+  /* Smaller visible FE thumb, while retaining the enlarged touch area. */
+  .fe-range,input[type="range"]{
+    min-height:27px!important;
+    height:27px!important;
+    padding:8px 0!important;
+    margin:-6px 0!important;
+    touch-action:none!important;
+  }
+  .fe-range::-webkit-slider-thumb,input[type="range"]::-webkit-slider-thumb{
+    width:15px!important;
+    height:15px!important;
+  }
+  .fe-range::-moz-range-thumb,input[type="range"]::-moz-range-thumb{
+    width:15px!important;
+    height:15px!important;
+  }
+
+  .fe-summary-row.landscape-summary{
+    height:38px!important;
+    gap:5px!important;
+  }
+  .fe-summary-row.landscape-summary > *,
+  .fe-total.landscape-total{
+    height:36px!important;
+    min-height:36px!important;
+    padding:1px 4px!important;
+    font-size:11px!important;
+  }
+
+  .bottom-actions.landscape-actions{
+    height:32px!important;
+    width:52%!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:30px!important;
+    min-height:30px!important;
+    font-size:10px!important;
+    padding:1px 6px!important;
+  }
+
+  .video.landscape-video{
+    width:100%!important;
+    height:100%!important;
+    margin:0!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v52-bottom-bar">
+@media (orientation:landscape){
+  .wrap{
+    /* Keep almost all vertical space for the video/FE area. */
+    grid-template-rows:44px minmax(0,1fr) 34px!important;
+    grid-template-areas:
+      "brand search search"
+      "special video fe"
+      "plus bottom minus"!important;
+    row-gap:4px!important;
+  }
+
+  /* The three totals now form one bottom row. */
+  .fe-summary-row.landscape-summary{
+    grid-area:bottom!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr 1fr!important;
+    width:66%!important;
+    height:32px!important;
+    margin:0!important;
+    justify-self:start!important;
+    align-self:end!important;
+    gap:5px!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    height:30px!important;
+    min-height:30px!important;
+    margin:0!important;
+    padding:1px 4px!important;
+    box-sizing:border-box!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+  }
+
+  /* Restore FE total beside Special Penalty Total, never in the upper-right. */
+  .fe-total.landscape-total{
+    display:flex!important;
+    position:static!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    width:100%!important;
+    height:30px!important;
+    min-height:30px!important;
+    margin:0!important;
+    padding:1px 4px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+    font-size:10px!important;
+    white-space:nowrap!important;
+    z-index:auto!important;
+  }
+
+  /* Reset / CSV share the same bottom edge, to the right of the totals. */
+  .bottom-actions.landscape-actions{
+    grid-area:bottom!important;
+    position:static!important;
+    width:32%!important;
+    height:32px!important;
+    margin:0!important;
+    justify-self:end!important;
+    align-self:end!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:5px!important;
+    z-index:2!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:30px!important;
+    min-height:30px!important;
+    margin:0!important;
+    padding:1px 5px!important;
+    font-size:9px!important;
+    white-space:nowrap!important;
+  }
+
+  /* Small score buttons remain inset from both screen edges. */
+  .grid.landscape-main .big:first-child{
+    grid-area:plus!important;
+    align-self:end!important;
+    margin-bottom:0!important;
+  }
+  .grid.landscape-main .big:nth-child(2){
+    grid-area:minus!important;
+    align-self:end!important;
+    margin-bottom:0!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v53-compact-bottom">
+@media (orientation:landscape){
+  /* Force FE total into the bottom summary row and remove any old top-right positioning. */
+  .fe-total.landscape-total{
+    display:flex!important;
+    position:static!important;
+    inset:auto!important;
+    top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+    transform:none!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    width:100%!important;
+    height:28px!important;
+    min-height:28px!important;
+    margin:0!important;
+    z-index:auto!important;
+  }
+
+  .fe-summary-row.landscape-summary{
+    grid-area:bottom!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:68%!important;
+    height:30px!important;
+    align-self:end!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    height:28px!important;
+    min-height:28px!important;
+    font-size:9px!important;
+  }
+
+  /* Smaller scoring / special / search buttons. */
+  .grid.landscape-main .big:first-child,
+  .grid.landscape-main .big:nth-child(2){
+    width:80px!important;
+    height:44px!important;
+    min-height:44px!important;
+    font-size:18px!important;
+  }
+  .special-row.landscape-special{
+    width:92px!important;
+  }
+  .special-row.landscape-special .big{
+    width:92px!important;
+    height:35px!important;
+    min-height:35px!important;
+    font-size:10px!important;
+  }
+  .urlrow.landscape-search button{
+    height:32px!important;
+    padding:1px 8px!important;
+    font-size:10px!important;
+  }
+  .bottom-actions.landscape-actions{
+    height:30px!important;
+    width:30%!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:27px!important;
+    min-height:27px!important;
+    font-size:8px!important;
+  }
+
+  /* Smaller visible white thumb; keep the large invisible touch target / sensitivity. */
+  .fe-range,input[type="range"]{
+    min-height:27px!important;
+    height:27px!important;
+    padding:9px 0!important;
+    margin:-7px 0!important;
+    touch-action:none!important;
+  }
+  .fe-range::-webkit-slider-thumb,input[type="range"]::-webkit-slider-thumb{
+    width:11px!important;
+    height:11px!important;
+  }
+  .fe-range::-moz-range-thumb,input[type="range"]::-moz-range-thumb{
+    width:11px!important;
+    height:11px!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v54-force-total-bottom">
+@media (orientation:landscape){
+  /* Hide the independently positioned FE total from its old upper-right location. */
+  body .fe-total.landscape-total{
+    position:fixed!important;
+    top:auto!important;
+    right:auto!important;
+    left:50%!important;
+    bottom:max(10px,env(safe-area-inset-bottom))!important;
+    transform:translateX(15%)!important;
+    width:170px!important;
+    height:28px!important;
+    min-height:28px!important;
+    margin:0!important;
+    padding:1px 5px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    z-index:20!important;
+    font-size:9px!important;
+    white-space:nowrap!important;
+  }
+
+  /* Put clicker / special totals together along the same bottom edge. */
+  .fe-summary-row.landscape-summary{
+    position:fixed!important;
+    left:50%!important;
+    bottom:max(10px,env(safe-area-inset-bottom))!important;
+    transform:translateX(-100%)!important;
+    width:340px!important;
+    height:28px!important;
+    margin:0!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:5px!important;
+    z-index:19!important;
+  }
+
+  /* If the summary row contains an old third total placeholder, don't let it duplicate. */
+  .fe-summary-row.landscape-summary > :nth-child(n+3){
+    display:none!important;
+  }
+
+  .bottom-actions.landscape-actions{
+    position:fixed!important;
+    left:50%!important;
+    bottom:max(42px,calc(env(safe-area-inset-bottom) + 42px))!important;
+    transform:translateX(-50%)!important;
+    width:260px!important;
+    height:27px!important;
+    margin:0!important;
+    z-index:18!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v55-tiny-footer">
+@media (orientation:landscape){
+  /* Reserve a clean, very small footer strip. */
+  .wrap{
+    padding-bottom:max(38px,calc(env(safe-area-inset-bottom) + 34px))!important;
+  }
+
+  /* Clicker value + special penalty: tiny and fixed at bottom center-left. */
+  .fe-summary-row.landscape-summary{
+    position:fixed!important;
+    left:50%!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:translateX(-255px)!important;
+    width:220px!important;
+    height:22px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:4px!important;
+    margin:0!important;
+    z-index:30!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    height:22px!important;
+    min-height:22px!important;
+    padding:0 3px!important;
+    margin:0!important;
+    font-size:7px!important;
+    line-height:1!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+  }
+
+  /* FE total: immediately beside the two summary boxes. */
+  body .fe-total.landscape-total{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:translateX(-30px)!important;
+    width:105px!important;
+    height:22px!important;
+    min-height:22px!important;
+    padding:0 3px!important;
+    margin:0!important;
+    font-size:7px!important;
+    line-height:1!important;
+    z-index:31!important;
+    white-space:nowrap!important;
+  }
+
+  /* Reset + CSV: tiny, to the right of all totals. */
+  .bottom-actions.landscape-actions{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:translateX(80px)!important;
+    width:175px!important;
+    height:22px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:4px!important;
+    margin:0!important;
+    z-index:32!important;
+  }
+  .bottom-actions.landscape-actions button{
+    height:22px!important;
+    min-height:22px!important;
+    padding:0 3px!important;
+    margin:0!important;
+    font-size:7px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+
+  /* Scoring buttons stay above/in their own side columns and cannot overlap footer. */
+  .grid.landscape-main .big:first-child,
+  .grid.landscape-main .big:nth-child(2){
+    position:relative!important;
+    bottom:auto!important;
+    width:76px!important;
+    height:40px!important;
+    min-height:40px!important;
+    margin-bottom:4px!important;
+    z-index:10!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v56-small-controls-subscriptions">
+@media (orientation:landscape){
+  /* Smaller controls overall; preserve video as the priority. */
+  .urlrow.landscape-search button{
+    height:28px!important;
+    min-height:28px!important;
+    padding:1px 7px!important;
+    font-size:9px!important;
+  }
+
+  .special-row.landscape-special{
+    width:82px!important;
+    gap:5px!important;
+  }
+  .special-row.landscape-special .big{
+    width:82px!important;
+    height:30px!important;
+    min-height:30px!important;
+    padding:1px!important;
+    font-size:9px!important;
+  }
+
+  .grid.landscape-main .big:first-child,
+  .grid.landscape-main .big:nth-child(2){
+    width:68px!important;
+    height:36px!important;
+    min-height:36px!important;
+    font-size:16px!important;
+  }
+
+  .bottom-actions.landscape-actions button{
+    height:20px!important;
+    min-height:20px!important;
+    font-size:7px!important;
+  }
+
+  /* Make sure the subscription/registered-channel button remains visible. */
+  #subsBtn,#subscriptionBtn,#registeredChannelsBtn,
+  .urlrow button[id*="subs"],.urlrow button[id*="register"]{
+    display:inline-flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+}
+</style>
+
+<script id="v56-subscription-button-restore">
+(function(){
+  function restore(){
+    const row=document.querySelector('.urlrow');
+    if(!row) return;
+
+    let btn =
+      document.getElementById('subsBtn') ||
+      document.getElementById('subscriptionBtn') ||
+      document.getElementById('registeredChannelsBtn');
+
+    if(!btn){
+      btn=[...row.querySelectorAll('button')].find(b =>
+        /登録|チャンネル/.test((b.textContent||'').trim())
+      );
+    }
+
+    /* If an earlier layout accidentally removed the button, recreate it and
+       trigger the existing subscription flow where possible. */
+    if(!btn){
+      btn=document.createElement('button');
+      btn.type='button';
+      btn.id='subsBtn';
+      btn.textContent='登録';
+      btn.addEventListener('click',function(){
+        const panel=document.getElementById('subsPanel');
+        if(panel){
+          panel.style.display='block';
+          const existing=[...document.querySelectorAll('button')].find(b =>
+            b!==btn && /登録チャンネル/.test((b.textContent||''))
+          );
+          if(existing) existing.click();
+          return;
+        }
+        if(typeof window.openSubscriptions==='function') window.openSubscriptions();
+        else if(typeof window.loadSubscriptions==='function') window.loadSubscriptions();
+        else alert('登録チャンネルを開けませんでした。');
+      });
+      row.appendChild(btn);
+    }
+    btn.style.display='inline-flex';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore);
+  else restore();
+})();
+</script>
+
+
+<style id="landscape-v57-footer-score-fix">
+@media (orientation:landscape){
+  /* Reset alone at the far-left bottom, but inset from the physical edge. */
+  .bottom-actions.landscape-actions{
+    position:fixed!important;
+    left:max(28px,env(safe-area-inset-left))!important;
+    right:auto!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:none!important;
+    width:78px!important;
+    height:20px!important;
+    display:block!important;
+    margin:0!important;
+    z-index:40!important;
+  }
+  .bottom-actions.landscape-actions button{
+    width:78px!important;
+    height:20px!important;
+    min-height:20px!important;
+    margin:0!important;
+    padding:0 3px!important;
+    font-size:7px!important;
+  }
+  /* CSV becomes the second tiny footer action just to the right of Reset. */
+  .bottom-actions.landscape-actions button:nth-child(2){
+    position:fixed!important;
+    left:max(110px,calc(env(safe-area-inset-left) + 110px))!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+  }
+
+  /* Slide the three score displays to the right. */
+  .fe-summary-row.landscape-summary{
+    left:50%!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:translateX(-120px)!important;
+    width:220px!important;
+    height:22px!important;
+  }
+  body .fe-total.landscape-total{
+    left:50%!important;
+    bottom:max(5px,env(safe-area-inset-bottom))!important;
+    transform:translateX(105px)!important;
+    width:105px!important;
+    height:22px!important;
+  }
+
+  /* Much smaller +/- buttons. Keep minus safely left of the FE slider column. */
+  .grid.landscape-main .big:first-child{
+    width:56px!important;
+    height:31px!important;
+    min-height:31px!important;
+    font-size:14px!important;
+    justify-self:center!important;
+  }
+  .grid.landscape-main .big:nth-child(2){
+    width:56px!important;
+    height:31px!important;
+    min-height:31px!important;
+    font-size:14px!important;
+    justify-self:center!important;
+    margin-right:22px!important;
+  }
+
+  /* FE sliders stay inside their own column and above the bottom controls. */
+  .fe-grid.compact-fe.landscape-fe{
+    padding-bottom:5px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v58-footer-order">
+@media (orientation:landscape){
+  /* Bottom order:
+     Reset | Clicker | Special penalty | FE total | CSV */
+  .bottom-actions.landscape-actions{
+    display:contents!important;
+  }
+
+  .bottom-actions.landscape-actions button:first-child{
+    position:fixed!important;
+    left:calc(50% - 285px)!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    width:82px!important;height:21px!important;min-height:21px!important;
+    transform:none!important;margin:0!important;padding:0 3px!important;
+    font-size:7px!important;z-index:50!important;
+  }
+  .bottom-actions.landscape-actions button:nth-child(2){
+    position:fixed!important;
+    left:calc(50% + 205px)!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    width:82px!important;height:21px!important;min-height:21px!important;
+    transform:none!important;margin:0!important;padding:0 3px!important;
+    font-size:7px!important;z-index:50!important;
+  }
+
+  .fe-summary-row.landscape-summary{
+    position:fixed!important;
+    left:calc(50% - 198px)!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    transform:none!important;
+    width:260px!important;height:21px!important;
+    display:grid!important;
+    grid-template-columns:125px 130px!important;
+    gap:5px!important;margin:0!important;z-index:49!important;
+  }
+  .fe-summary-row.landscape-summary > *{
+    height:21px!important;min-height:21px!important;
+    padding:0 3px!important;font-size:7px!important;
+    margin:0!important;white-space:nowrap!important;
+  }
+
+  body .fe-total.landscape-total{
+    position:fixed!important;
+    left:calc(50% + 67px)!important;
+    right:auto!important;top:auto!important;
+    bottom:max(4px,env(safe-area-inset-bottom))!important;
+    transform:none!important;
+    width:133px!important;height:21px!important;min-height:21px!important;
+    margin:0!important;padding:0 3px!important;
+    font-size:7px!important;z-index:51!important;
+  }
+
+  /* Force the actual +/- controls smaller and lower, above footer. */
+  .grid.landscape-main > .big:first-child,
+  .grid.landscape-main > .big:nth-child(2),
+  button#plusBtn,button#minusBtn,
+  .plus,.minus,.plusbtn,.minusbtn{
+    width:50px!important;
+    min-width:50px!important;
+    max-width:50px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+    padding:0!important;
+    font-size:13px!important;
+    line-height:1!important;
+    align-self:end!important;
+    margin-top:0!important;
+    margin-bottom:-1px!important;
+    box-sizing:border-box!important;
+  }
+
+  .grid.landscape-main > .big:first-child,
+  button#plusBtn,.plus,.plusbtn{
+    justify-self:center!important;
+  }
+  .grid.landscape-main > .big:nth-child(2),
+  button#minusBtn,.minus,.minusbtn{
+    justify-self:center!important;
+    margin-right:30px!important;
+  }
+
+  /* Leave a guaranteed gap between +/- and footer. */
+  .wrap{
+    padding-bottom:max(31px,calc(env(safe-area-inset-bottom) + 28px))!important;
+  }
+}
+</style>
+
+
+<style id="landscape-v59-wide-score-small-thumb">
+@media (orientation:landscape){
+  .grid.landscape-main > .big:first-child,
+  .grid.landscape-main > .big:nth-child(2),
+  button#plusBtn,button#minusBtn,.plus,.minus,.plusbtn,.minusbtn{
+    width:72px!important;
+    min-width:72px!important;
+    max-width:72px!important;
+    height:28px!important;
+    min-height:28px!important;
+    max-height:28px!important;
+  }
+  .fe-range::-webkit-slider-thumb,input[type="range"]::-webkit-slider-thumb{
+    width:8px!important;height:8px!important;
+  }
+  .fe-range::-moz-range-thumb,input[type="range"]::-moz-range-thumb{
+    width:8px!important;height:8px!important;
+  }
+  .fe-range,input[type="range"]{
+    min-height:27px!important;height:27px!important;
+    padding:9px 0!important;
+    touch-action:none!important;
+  }
+}
+</style>
+
+
+<style id="v60-registered-channels-visible">
+/* Keep the registered-channel entry visible. */
+#subsBtn,#subscriptionBtn,#registeredChannelsBtn{
+  display:inline-flex!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media (orientation:landscape){
+  #subsBtn,#subscriptionBtn,#registeredChannelsBtn{
+    display:inline-flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    height:28px!important;
+    min-height:28px!important;
+    padding:1px 7px!important;
+    font-size:9px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+<script id="v60-registered-channels-restore">
+(function(){
+ function restore(){
+   const row=document.querySelector('.urlrow');
+   if(!row) return;
+   let b=document.getElementById('subsBtn') ||
+         document.getElementById('subscriptionBtn') ||
+         document.getElementById('registeredChannelsBtn') ||
+         [...row.querySelectorAll('button')].find(x=>/登録チャンネル|登録/.test(x.textContent||''));
+   if(b){
+     b.style.setProperty('display','inline-flex','important');
+     b.style.setProperty('visibility','visible','important');
+     b.style.setProperty('opacity','1','important');
+     if((b.textContent||'').trim()==='登録') b.textContent='登録チャンネル';
+   }
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore);
+ else restore();
+})();
+</script>
+
+
+<style id="v61-subs-launcher">
+#subsLauncherV61{
+  display:none;
+}
+@media (orientation:landscape){
+  #subsLauncherV61{
+    display:flex!important;
+    position:fixed!important;
+    left:max(26px,env(safe-area-inset-left))!important;
+    top:max(52px,calc(env(safe-area-inset-top) + 48px))!important;
+    width:88px!important;
+    height:25px!important;
+    min-height:25px!important;
+    padding:0 4px!important;
+    margin:0!important;
+    border:1px solid #777!important;
+    border-radius:8px!important;
+    background:#29292f!important;
+    color:#fff!important;
+    font-size:8px!important;
+    font-weight:700!important;
+    line-height:1!important;
+    align-items:center!important;
+    justify-content:center!important;
+    white-space:nowrap!important;
+    z-index:9999!important;
+  }
+}
+</style>
+<script id="v61-subs-launcher-script">
+(function(){
+  function openSubs(){
+    /* Prefer the original registration/subscription button so all existing
+       OAuth and channel-loading behavior is preserved. */
+    const candidates=[...document.querySelectorAll('button')].filter(b=>
+      b.id!=='subsLauncherV61' &&
+      (/登録チャンネル/.test((b.textContent||'').trim()) ||
+       b.id==='subsBtn' || b.id==='subscriptionBtn' || b.id==='registeredChannelsBtn')
+    );
+    if(candidates.length){
+      candidates[0].click();
+      return;
+    }
+    const panel=document.getElementById('subsPanel');
+    if(panel){
+      panel.style.display='block';
+      panel.style.visibility='visible';
+      panel.style.opacity='1';
+      return;
+    }
+    if(typeof window.openSubscriptions==='function'){ window.openSubscriptions(); return; }
+    if(typeof window.loadSubscriptions==='function'){ window.loadSubscriptions(); return; }
+    alert('登録チャンネル機能を開けませんでした。');
+  }
+  function bind(){
+    const b=document.getElementById('subsLauncherV61');
+    if(b && !b.dataset.bound){
+      b.dataset.bound='1';
+      b.addEventListener('click',openSubs);
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
+})();
+</script>
+
+
+<style id="v62-layout-safety">
+/* Registered Channels: always visible in portrait and landscape. */
+#subsLauncherV61{
+  display:flex!important;
+  position:relative!important;
+  left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+  width:auto!important;
+  min-width:92px!important;
+  height:34px!important;
+  min-height:34px!important;
+  margin:6px auto!important;
+  padding:2px 9px!important;
+  border:1px solid #777!important;
+  border-radius:8px!important;
+  background:#29292f!important;
+  color:#fff!important;
+  font-size:11px!important;
+  font-weight:700!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  box-sizing:border-box!important;
+  z-index:auto!important;
+}
+
+/* Prevent accidental overlap in the normal portrait flow. */
+@media (orientation:portrait){
+  .wrap>*{
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+  #subsLauncherV61{
+    position:relative!important;
+    display:flex!important;
+    margin:7px auto!important;
+  }
+}
+
+@media (orientation:landscape){
+  /* Dedicated grid cells remain the authority: no control shares the video cell. */
+  .wrap{
+    grid-template-columns:118px minmax(0,1fr) 118px!important;
+    grid-template-rows:44px minmax(0,1fr) 34px!important;
+    grid-template-areas:
+      "brand search search"
+      "special video fe"
+      "plus bottom minus"!important;
+  }
+
+  #subsLauncherV61{
+    position:fixed!important;
+    left:max(27px,env(safe-area-inset-left))!important;
+    top:max(49px,calc(env(safe-area-inset-top) + 45px))!important;
+    width:84px!important;
+    min-width:84px!important;
+    height:24px!important;
+    min-height:24px!important;
+    margin:0!important;
+    padding:0 3px!important;
+    font-size:8px!important;
+    z-index:60!important;
+  }
+
+  /* Larger +/- than v59, still confined to their own side columns. */
+  .grid.landscape-main > .big:first-child,
+  .grid.landscape-main > .big:nth-child(2),
+  button#plusBtn,button#minusBtn,.plus,.minus,.plusbtn,.minusbtn{
+    width:92px!important;
+    min-width:92px!important;
+    max-width:92px!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    font-size:20px!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    align-self:end!important;
+  }
+
+  .grid.landscape-main > .big:first-child,
+  button#plusBtn,.plus,.plusbtn{
+    justify-self:center!important;
+    margin:0!important;
+  }
+
+  .grid.landscape-main > .big:nth-child(2),
+  button#minusBtn,.minus,.minusbtn{
+    justify-self:center!important;
+    margin:0!important;
+  }
+
+  /* Footer stays separate from +/- buttons. */
+  .wrap{
+    padding-bottom:max(32px,calc(env(safe-area-inset-bottom) + 29px))!important;
+  }
+}
+</style>
+
+
+<style id="v63-subs-position">
+@media (orientation:landscape){
+  /* Registered Channels: directly between the logo and Stop button. */
+  #subsLauncherV61{
+    position:fixed!important;
+    left:max(27px,env(safe-area-inset-left))!important;
+    top:max(35px,calc(env(safe-area-inset-top) + 31px))!important;
+    width:84px!important;
+    min-width:84px!important;
+    height:22px!important;
+    min-height:22px!important;
+    margin:0!important;
+    padding:0 3px!important;
+    font-size:8px!important;
+    z-index:60!important;
+  }
+
+  /* Give the special buttons enough clearance below it. */
+  .special-row.landscape-special{
+    padding-top:18px!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+
+<script id="v67-registration-before-file-only">
+(function(){
+  function place(){
+    const row = document.querySelector('.urlrow');
+    const reg = document.getElementById('subsLauncherV61');
+    if(!row || !reg) return;
+
+    const file = [...row.children].find(el =>
+      /ファイル/.test((el.textContent || '').trim()) ||
+      el.matches?.('input[type="file"]') ||
+      /file/i.test(el.id || '') ||
+      /file/i.test(typeof el.className === 'string' ? el.className : '')
+    );
+    if(!file) return;
+
+    reg.textContent = '登録チャンネル';
+    reg.style.removeProperty('display');
+    reg.style.removeProperty('position');
+    reg.style.removeProperty('left');
+    reg.style.removeProperty('top');
+    reg.style.removeProperty('right');
+    reg.style.removeProperty('bottom');
+    reg.style.removeProperty('transform');
+    row.insertBefore(reg, file);
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', place);
+  } else {
+    place();
+  }
+  setTimeout(place, 100);
+  setTimeout(place, 500);
+})();
+</script>
+
+<style id="v67-registration-visible-in-row">
+.urlrow #subsLauncherV61{
+  display:inline-flex!important;
+  position:static!important;
+  left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+  transform:none!important;
+  margin:0!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+}
+</style>
+
+
+<style id="v68-smooth-fe-cursor">
+.fe-item input[type="range"],
+.fe-row input[type="range"],
+input[type="range"]{
+  touch-action:none!important;
+  transition:none!important;
+}
+</style>
+<script id="v68-smooth-fe-cursor-js">
+(function(){
+  function bindSmoothRange(r){
+    if(r.dataset.smoothV68) return;
+    r.dataset.smoothV68='1';
+
+    function setFromX(clientX){
+      const rect=r.getBoundingClientRect();
+      if(!rect.width) return;
+      const min=Number(r.min||0), max=Number(r.max||100);
+      let p=(clientX-rect.left)/rect.width;
+      p=Math.max(0,Math.min(1,p));
+      const raw=min+p*(max-min);
+      const step=Number(r.step||1);
+      const value=Math.round((raw-min)/step)*step+min;
+      r.value=Math.max(min,Math.min(max,value));
+      r.dispatchEvent(new Event('input',{bubbles:true}));
+      r.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+
+    r.addEventListener('pointerdown',e=>{
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      try{r.setPointerCapture(e.pointerId)}catch(_){}
+      setFromX(e.clientX);
+      e.preventDefault();
+    },{passive:false});
+
+    r.addEventListener('pointermove',e=>{
+      if(!r.hasPointerCapture?.(e.pointerId)) return;
+      setFromX(e.clientX);
+      e.preventDefault();
+    },{passive:false});
+  }
+
+  function init(){
+    document.querySelectorAll('input[type="range"]').forEach(bindSmoothRange);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+  else init();
+})();
+</script>
+
+
+<style id="v69-landscape-fe-thumb">
+@media (orientation: landscape){
+  /* FE white cursor: slightly larger visually, without changing layout footprint. */
+  .fe-item input[type="range"]::-webkit-slider-thumb,
+  .fe-row input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-webkit-slider-thumb{
+    width:12px!important;
+    height:12px!important;
+  }
+  .fe-item input[type="range"]::-moz-range-thumb,
+  .fe-row input[type="range"]::-moz-range-thumb,
+  input[type="range"]::-moz-range-thumb{
+    width:12px!important;
+    height:12px!important;
+  }
+}
+</style>
+
+
+<style id="v70-landscape-fe-thumb">
+@media (orientation: landscape){
+  .fe-item input[type="range"]::-webkit-slider-thumb,
+  .fe-row input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-webkit-slider-thumb{
+    width:11px!important;
+    height:11px!important;
+  }
+  .fe-item input[type="range"]::-moz-range-thumb,
+  .fe-row input[type="range"]::-moz-range-thumb,
+  input[type="range"]::-moz-range-thumb{
+    width:11px!important;
+    height:11px!important;
+  }
+}
+</style>
+
+
+<style id="v71-landscape-fe-thumb">
+@media (orientation: landscape){
+  .fe-item input[type="range"]::-webkit-slider-thumb,
+  .fe-row input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-webkit-slider-thumb{
+    width:9px!important;
+    height:9px!important;
+  }
+  .fe-item input[type="range"]::-moz-range-thumb,
+  .fe-row input[type="range"]::-moz-range-thumb,
+  input[type="range"]::-moz-range-thumb{
+    width:9px!important;
+    height:9px!important;
+  }
+}
+</style>
+
+
+<style id="v72-authoritative-fe-thumb">
+@media screen and (orientation: landscape) {
+  input.fe-range[type="range"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    min-height: 27px !important;
+    height: 27px !important;
+    padding: 9px 0 !important;
+    margin: -7px 0 !important;
+    touch-action: none !important;
+  }
+
+  input.fe-range[type="range"]::-webkit-slider-runnable-track {
+    -webkit-appearance: none !important;
+    height: 3px !important;
+    border-radius: 2px !important;
+  }
+
+  input.fe-range[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    border-radius: 50% !important;
+    margin-top: -2.5px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  input.fe-range[type="range"]::-moz-range-thumb {
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+</style>
+
+
+<style id="v76-subs-in-search-row">
+.urlrow > #subsLauncherV61{
+  display:inline-flex!important;
+  position:static!important;
+  left:auto!important; right:auto!important; top:auto!important; bottom:auto!important;
+  inset:auto!important;
+  transform:none!important;
+  margin:0!important;
+  visibility:visible!important;
+  opacity:1!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+}
+</style>
+
+
+<style id="v77-register-height-match">
+.urlrow > #subsLauncherV61{
+  height:auto!important;
+  min-height:0!important;
+  padding-top:6px!important;
+  padding-bottom:6px!important;
+  line-height:1.2!important;
+  box-sizing:border-box!important;
+  align-self:stretch!important;
+}
+</style>
+
+
+<style id="v78-register-match-file">
+.urlrow > #subsLauncherV61{
+  font:inherit!important;
+  font-size:inherit!important;
+  font-weight:inherit!important;
+  line-height:inherit!important;
+  padding:6px 10px!important;
+  height:auto!important;
+  min-height:0!important;
+  border-radius:8px!important;
+  box-sizing:border-box!important;
+  align-self:auto!important;
+  white-space:nowrap!important;
+}
+
+/* Copy the actual file button appearance via CSS variables/current computed-style friendly rules */
+.urlrow > #subsLauncherV61,
+.urlrow > .filebtn{
+  font-size:12px!important;
+  line-height:1.2!important;
+  padding:6px 10px!important;
+  min-height:0!important;
+  height:auto!important;
+  border-radius:8px!important;
+  box-sizing:border-box!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+}
+</style>
+
+
+<style id="v79-register-white-border">
+.urlrow > #subsLauncherV61{
+  border:1px solid #fff!important;
+}
+</style>
+
+
+<style id="v80-register-compact-lightblue">
+.urlrow > #subsLauncherV61{
+  width:auto!important;
+  min-width:42px!important;
+  padding-left:7px!important;
+  padding-right:7px!important;
+  background:#7ddcff!important;
+  color:#000!important;
+  border:1px solid #fff!important;
+}
+</style>
+
+
+<script id="v81-match-search-button-colors">
+(function(){
+  function apply(){
+    const search=document.querySelector('.urlrow .load');
+    const reg=document.getElementById('subsLauncherV61');
+    const file=document.querySelector('.urlrow .filebtn');
+    if(!search || !reg || !file) return;
+
+    const cs=getComputedStyle(search);
+    [reg,file].forEach(el=>{
+      el.style.setProperty('background',cs.background,'important');
+      el.style.setProperty('background-color',cs.backgroundColor,'important');
+      el.style.setProperty('color',cs.color,'important');
+      el.style.setProperty('border',cs.border,'important');
+      el.style.setProperty('border-color',cs.borderColor,'important');
+      el.style.setProperty('border-style',cs.borderStyle,'important');
+      el.style.setProperty('border-width',cs.borderWidth,'important');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply);
+  else apply();
+})();
+</script>
+
+
+<style id="v82-search-register-file-colors-authoritative">
+.urlrow > button.load,
+.urlrow > #subsLauncherV61,
+.urlrow > label.filebtn {
+  background: #0a84ff !important;
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+  border: 1px solid #0a84ff !important;
+}
+.urlrow > button.load *,
+.urlrow > #subsLauncherV61 *,
+.urlrow > label.filebtn * {
+  color: inherit !important;
+}
+</style>
+
+
+<style id="v83-landscape-search-register-height">
+@media (orientation: landscape){
+  .urlrow > button.load,
+  .urlrow > #subsLauncherV61{
+    height:34px!important;
+    min-height:34px!important;
+    max-height:34px!important;
+    box-sizing:border-box!important;
+    align-self:center!important;
   }
 }
 </style>
