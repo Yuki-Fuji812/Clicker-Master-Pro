@@ -3221,5 +3221,59 @@ input[type="range"]{
 }
 </style>
 
+
+<style id="v86-landscape-max-video">
+/* Old dynamically-created gray duplicate */
+#subsBtn{display:none!important;}
+
+@media (orientation:landscape){
+  /* Expand the center video to the available grid cell. */
+  .video-wrap,
+  .video-area,
+  .player-wrap,
+  #videoArea{
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  #player,
+  #localVideoPlayer,
+  .video-wrap iframe,
+  .video-area iframe,
+  .player-wrap iframe,
+  #videoArea iframe{
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    object-fit:contain!important;
+  }
+
+  /* Use more of the safe center area while retaining side controls and footer. */
+  .app,
+  main,
+  .landscape-layout{
+    column-gap:4px!important;
+  }
+}
+</style>
+
+<script id="v86-remove-old-gray-subscription">
+(function(){
+  function clean(){
+    const old=document.getElementById('subsBtn');
+    if(old) old.remove();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean);
+  else clean();
+  setTimeout(clean,100);
+  setTimeout(clean,500);
+})();
+</script>
+
 </body>
 </html>
