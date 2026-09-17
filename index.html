@@ -1212,9 +1212,9 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    try{
      let items=[],page='';
      do{
-       const d=await api('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50'+(page?'&pageToken='+encodeURIComponent(page):''));
+       const d=await api('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical'+(page?'&pageToken='+encodeURIComponent(page):''));
        items.push(...(d.items||[]));page=d.nextPageToken||'';
-     }while(page&&items.length<300);
+     }while(page);
      list.innerHTML='';
      items.forEach(it=>{
        const sn=it.snippet,ch=sn.resourceId.channelId,b=document.createElement('button');
