@@ -1215,19 +1215,29 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    if(!id){id=prompt('Google OAuth 2.0 クライアントIDを入力してください');if(id)localStorage.setItem('ytOAuthClientId',id.trim())}
    return id&&id.trim();
  }
- function auth(cb){
-   if(accessToken){cb();return}
+ function auth(cb,forceAccountSwitch){
+   if(accessToken && !forceAccountSwitch){cb();return}
    const id=getClientId();if(!id)return;
    if(!window.google||!google.accounts||!google.accounts.oauth2){alert('Google認証を読み込み中です。数秒後にもう一度押してください。');return}
-   tokenClient=google.accounts.oauth2.initTokenClient({client_id:id,scope:SCOPE,callback:r=>{if(r.access_token){accessToken=r.access_token;cb()}}});
-   tokenClient.requestAccessToken({prompt:'consent'});
+   tokenClient=google.accounts.oauth2.initTokenClient({
+     client_id:id,scope:SCOPE,
+     callback:r=>{if(r&&r.access_token){accessToken=r.access_token;localStorage.setItem('ytPreviouslyAuthorized','1');cb()}},
+     error_callback:()=>{}
+   });
+   tokenClient.requestAccessToken({prompt:forceAccountSwitch?'select_account':''});
  }
- async function api(url){
+  async function api(url){
    const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
    if(!r.ok)throw new Error('YouTube API '+r.status);
    return r.json();
  }
- function openSubs(){panel().classList.add('open');auth(loadSubs)}
+ function openSubs(){panel().classList.add('open');auth(loadSubs,false)}
+ function switchSubsAccount(){
+   accessToken='';
+   panel().classList.add('open');
+   auth(loadSubs,true);
+ }
+ window.switchSubscriptionsAccount=switchSubsAccount;
  /* Connect the visible blue registration button directly to the original
     OAuth/subscription function. */
  window.openSubscriptions=openSubs;
@@ -2611,7 +2621,25 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     const b=document.getElementById('subsLauncherV61');
     if(b && !b.dataset.bound){
       b.dataset.bound='1';
-      b.addEventListener('click',openSubs);
+      let holdTimer=null,longPressed=false;
+      const startHold=()=>{
+        longPressed=false;
+        clearTimeout(holdTimer);
+        holdTimer=setTimeout(()=>{
+          longPressed=true;
+          if(typeof window.switchSubscriptionsAccount==='function') window.switchSubscriptionsAccount();
+        },800);
+      };
+      const cancelHold=()=>clearTimeout(holdTimer);
+      b.addEventListener('pointerdown',startHold);
+      b.addEventListener('pointerup',cancelHold);
+      b.addEventListener('pointercancel',cancelHold);
+      b.addEventListener('pointerleave',cancelHold);
+      b.addEventListener('contextmenu',e=>e.preventDefault());
+      b.addEventListener('click',e=>{
+        if(longPressed){e.preventDefault();e.stopPropagation();longPressed=false;return}
+        openSubs();
+      });
     }
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
@@ -3096,6 +3124,30 @@ input[type="range"]{
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean); else clean();
  new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
  setTimeout(clean,100); setTimeout(clean,500); setTimeout(clean,1500);
+})();
+</script>
+<script id="registration-reopen-fix">
+(function(){
+  function bindReopen(){
+    var old=document.getElementById('subsLauncherV61');
+    if(!old || old.dataset.reopenFixed==='1') return;
+    var b=old.cloneNode(true); // remove accumulated old click listeners only
+    b.dataset.reopenFixed='1';
+    old.replaceWith(b);
+    b.addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var p=document.getElementById('subsPanel');
+      if(p) p.classList.add('open');
+      if(typeof window.openSubscriptions==='function'){
+        window.openSubscriptions();
+      }else{
+        alert('登録チャンネル機能を開けませんでした。');
+      }
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindReopen);
+  else bindReopen();
 })();
 </script>
 </body>
