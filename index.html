@@ -1193,12 +1193,13 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 <script>
 (function(){
  const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
- const CACHE_KEY='clickerMasterSubscriptionsV2';
- let tokenClient=null,accessToken='';
+ const SAVED_KEY='clickerMasterFixedSubscriptionsV1';
+ let tokenClient=null, accessToken='';
 
  function panel(){
-   if(document.getElementById('subsPanel')) return document.getElementById('subsPanel');
-   const p=document.createElement('div'); p.id='subsPanel';
+   let p=document.getElementById('subsPanel');
+   if(p) return p;
+   p=document.createElement('div'); p.id='subsPanel';
    p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
    document.body.appendChild(p);
    p.querySelector('#subsClose').onclick=()=>p.classList.remove('open');
@@ -1214,60 +1215,72 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    return id&&id.trim();
  }
 
- function getCache(){
+ function readSaved(){
    try{
-     const v=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
-     return v && Array.isArray(v.channels) ? v : null;
+     const x=JSON.parse(localStorage.getItem(SAVED_KEY)||'null');
+     return x && Array.isArray(x.channels) ? x : null;
    }catch(e){ return null; }
  }
- function saveCache(channels){
-   localStorage.setItem(CACHE_KEY,JSON.stringify({channels:channels,savedAt:Date.now()}));
+ function writeSaved(channels){
+   localStorage.setItem(SAVED_KEY,JSON.stringify({
+     channels:channels,
+     savedAt:Date.now()
+   }));
+ }
+ function clearSaved(){ localStorage.removeItem(SAVED_KEY); }
+
+ function esc(x){
+   return String(x||'').replace(/[&<>"']/g,c=>({
+     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+   }[c]));
  }
 
- function esc2(x){
-   return String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- }
-
- function renderChannels(channels){
-   const list=document.getElementById('subsList'), title=document.getElementById('subsTitle');
+ function renderSaved(channels){
+   const list=document.getElementById('subsList');
+   const title=document.getElementById('subsTitle');
    title.textContent='登録チャンネル';
    list.innerHTML='';
    channels.forEach(ch=>{
      const b=document.createElement('button');
      b.className='subCard';
      b.dataset.channelId=ch.id;
-     b.innerHTML=(ch.thumb?'<img src="'+esc2(ch.thumb)+'">':'')+'<span>'+esc2(ch.title)+'</span>';
-     b.onclick=()=>loadChannelPublic(ch.id,ch.title);
+     b.innerHTML=(ch.thumb?'<img src="'+esc(ch.thumb)+'">':'')+
+                 '<span>'+esc(ch.title)+'</span>';
+     b.onclick=()=>loadChannel(ch.id,ch.title);
      list.appendChild(b);
    });
    if(!channels.length) list.textContent='登録チャンネルがありません。';
  }
 
- async function publicApi(url){
+ async function keyApi(url){
    const key=localStorage.getItem('yt-api-key')||'';
    if(!key) throw new Error('API key missing');
-   const sep=url.includes('?')?'&':'?';
-   const r=await fetch(url+sep+'key='+encodeURIComponent(key));
+   const r=await fetch(url+(url.includes('?')?'&':'?')+'key='+encodeURIComponent(key));
    if(!r.ok) throw new Error('YouTube API '+r.status);
    return r.json();
  }
 
- async function loadChannelPublic(id,name){
-   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
-   title.textContent=name; list.innerHTML='動画を読み込み中…';
+ async function loadChannel(id,name){
+   const list=document.getElementById('subsList');
+   document.getElementById('subsTitle').textContent=name;
+   list.textContent='動画を読み込み中…';
    try{
-     const c=await publicApi('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
+     const c=await keyApi('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
      const pl=c.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-     if(!pl) throw 0;
-     const d=await publicApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
+     if(!pl) throw new Error('uploads');
+     const d=await keyApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
      list.innerHTML='';
      (d.items||[]).forEach(it=>{
-       const sn=it.snippet,vid=sn.resourceId?.videoId;
+       const sn=it.snippet, vid=sn.resourceId?.videoId;
        if(!vid) return;
        const b=document.createElement('button');
        b.className='subCard vidCard';
-       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc2(sn.thumbnails.medium.url)+'">':'')+'<span>'+esc2(sn.title)+'</span>';
-       b.onclick=()=>{ if(typeof playVideo==='function') playVideo(vid,sn.title); panel().classList.remove('open'); };
+       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc(sn.thumbnails.medium.url)+'">':'')+
+                   '<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>{
+         if(typeof playVideo==='function') playVideo(vid,sn.title);
+         panel().classList.remove('open');
+       };
        list.appendChild(b);
      });
    }catch(e){
@@ -1275,76 +1288,102 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    }
  }
 
- function auth(cb,forceAccountSwitch){
-   const id=getClientId(); if(!id)return;
+ function oauth(cb,chooseAccount){
+   const id=getClientId(); if(!id) return;
    if(!window.google||!google.accounts||!google.accounts.oauth2){
-     alert('Google認証を読み込み中です。数秒後にもう一度押してください。'); return;
+     alert('Google認証を読み込み中です。数秒後にもう一度押してください。');
+     return;
    }
    tokenClient=google.accounts.oauth2.initTokenClient({
-     client_id:id,scope:SCOPE,
+     client_id:id,
+     scope:SCOPE,
      callback:r=>{
        if(r&&r.access_token){
          accessToken=r.access_token;
-         localStorage.setItem('ytPreviouslyAuthorized','1');
          cb();
        }
      },
      error_callback:()=>{}
    });
-   tokenClient.requestAccessToken({prompt:forceAccountSwitch?'select_account':''});
+   tokenClient.requestAccessToken({prompt:chooseAccount?'select_account':''});
  }
 
- async function api(url){
+ async function oauthApi(url){
    const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
    if(!r.ok) throw new Error('YouTube API '+r.status);
    return r.json();
  }
 
- // Normal tap: never re-authenticate or change account when a saved list exists.
- function openSubs(){
-   panel().classList.add('open');
-   const cached=getCache();
-   if(cached){
-     renderChannels(cached.channels);
-     return;
-   }
-   auth(loadSubs,false);
- }
-
- // Long press only: explicitly show Google account chooser and replace saved list.
- function switchSubsAccount(){
-   accessToken='';
-   panel().classList.add('open');
+ async function fetchSubscriptionsForSelection(){
    const list=document.getElementById('subsList');
-   if(list) list.textContent='切り替えるGoogleアカウントを選択してください…';
-   auth(loadSubs,true);
- }
-
- window.switchSubscriptionsAccount=switchSubsAccount;
- window.openSubscriptions=openSubs;
-
- async function loadSubs(){
-   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
-   title.textContent='登録チャンネル'; list.innerHTML='読み込み中…';
+   const title=document.getElementById('subsTitle');
+   title.textContent='この登録チャンネルを固定しますか？';
+   list.textContent='登録チャンネルを確認中…';
    try{
      let items=[],page='';
      do{
-       const d=await api('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical'+(page?'&pageToken='+encodeURIComponent(page):''));
-       items.push(...(d.items||[])); page=d.nextPageToken||'';
+       const d=await oauthApi(
+         'https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical'+
+         (page?'&pageToken='+encodeURIComponent(page):'')
+       );
+       items.push(...(d.items||[]));
+       page=d.nextPageToken||'';
      }while(page);
+
      const channels=items.map(it=>({
        id:it.snippet?.resourceId?.channelId||'',
        title:it.snippet?.title||'',
        thumb:it.snippet?.thumbnails?.default?.url||''
-     })).filter(ch=>ch.id);
-     saveCache(channels);
-     renderChannels(channels);
+     })).filter(x=>x.id);
+
+     list.innerHTML='';
+     const confirm=document.createElement('button');
+     confirm.className='subCard';
+     confirm.style.gridColumn='1/-1';
+     confirm.textContent='この登録チャンネルで固定';
+     confirm.onclick=()=>{
+       writeSaved(channels);
+       renderSaved(channels);
+     };
+     list.appendChild(confirm);
+
+     channels.forEach(ch=>{
+       const b=document.createElement('button');
+       b.className='subCard';
+       b.dataset.channelId=ch.id;
+       b.innerHTML=(ch.thumb?'<img src="'+esc(ch.thumb)+'">':'')+
+                   '<span>'+esc(ch.title)+'</span>';
+       b.onclick=()=>{};
+       list.appendChild(b);
+     });
    }catch(e){
-     const cached=getCache();
-     if(cached) renderChannels(cached.channels);
-     else list.textContent='取得できませんでした。Google認証設定を確認してください。';
+     list.textContent='登録チャンネルを取得できませんでした。';
    }
  }
+
+ // Normal tap NEVER starts OAuth if a fixed snapshot exists.
+ function openSubs(){
+   panel().classList.add('open');
+   const saved=readSaved();
+   if(saved){
+     renderSaved(saved.channels);
+     return;
+   }
+   oauth(fetchSubscriptionsForSelection,false);
+ }
+
+ // Only explicit long press can discard the fixed snapshot.
+ function switchSubsAccount(){
+   clearSaved();
+   accessToken='';
+   panel().classList.add('open');
+   document.getElementById('subsTitle').textContent='登録チャンネルを変更';
+   document.getElementById('subsList').textContent='Googleアカウントを選択してください…';
+   oauth(fetchSubscriptionsForSelection,true);
+ }
+
+ window.openSubscriptions=openSubs;
+ window.switchSubscriptionsAccount=switchSubsAccount;
 })();
 </script>
 
@@ -3252,7 +3291,6 @@ input[type="range"]{
   }
 })();
 </script>
-
 
 </body>
 </html>
