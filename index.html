@@ -946,6 +946,21 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 }
 </style>
 
+
+<style id="contest-mode-v20-fixes">
+@media (orientation:landscape){
+ #contestModeV17{
+   width:105px!important;
+   min-width:105px!important;
+   max-width:105px!important;
+   padding-left:4px!important;
+   padding-right:4px!important;
+   font-size:10px!important;
+   white-space:nowrap!important;
+ }
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -3442,7 +3457,7 @@ input[type="range"]{
 
 
 
-<script id="contest-mode-script-v19">
+<script id="contest-mode-script-v20">
 (function(){
  var mode='final', timer=null;
  var keep={EXE:1,CTR:1,CHG:1,BDY:1};
@@ -3457,26 +3472,33 @@ input[type="range"]{
      var n=el.parentElement;
      for(var i=0;i<6 && n;i++,n=n.parentElement){
        var rs=n.querySelectorAll('input[type="range"][min="0"][max="10"]');
-       if(rs.length===1){ result[code]={card:n,range:rs[0]}; break; }
+       if(rs.length===1){result[code]={card:n,range:rs[0]};break;}
      }
    });
    return result;
  }
 
- function updateTotal(cards){
-   cards=cards||findCards();
-   var sum=0;
+ function calc(){
+   var cards=findCards(), sum=0;
+   if(mode==='prelim'){
+     ['EXE','CTR','CHG','BDY'].forEach(function(c){
+       if(cards[c]) sum += Number(cards[c].range.value||0);
+     });
+     return sum; // exactly these four only: max 40
+   }
    codes.forEach(function(c){
-     var x=cards[c]; if(!x)return;
-     if(mode==='final' || keep[c]) sum+=Number(x.range.value||0);
+     if(cards[c]) sum += Number(cards[c].range.value||0);
    });
-   var total = mode==='final' ? sum/2 : sum;  // prelim: 4 x 10 = 40
+   return sum/2; // finals: 8 items /2 = max 40
+ }
 
+ function forceTotal(){
+   var total=calc().toFixed(1);
    document.querySelectorAll('*').forEach(function(el){
      if(el.children.length)return;
      var t=(el.textContent||'').trim();
      if(/\/\s*40/.test(t) && /(合計|FE)/.test(t)){
-       el.textContent='合計 '+total.toFixed(1)+' / 40';
+       el.textContent='合計 '+total+' / 40';
      }
    });
  }
@@ -3487,30 +3509,30 @@ input[type="range"]{
      if(!cards[c])return;
      cards[c].card.style.setProperty(
        'display',
-       (mode==='prelim' && !keep[c]) ? 'none' : '',
+       (mode==='prelim' && !keep[c])?'none':'',
        'important'
      );
    });
-
    var b=document.getElementById('contestModeV17');
-   /* Requested reversed label:
-      finals selected -> button says 決勝
-      prelim selected -> button says 予選・準決勝 */
-   b.textContent = mode==='final' ? '決勝' : '予選・準決勝';
-
-   /* No mode-dependent color change. */
+   b.textContent=mode==='final'?'決勝':'予選・準決勝';
    b.style.setProperty('background','#29292e','important');
    b.style.setProperty('border-color','#777','important');
-
-   updateTotal(cards);
+   forceTotal();
  }
 
- function toggle(){ mode=mode==='final'?'prelim':'final'; apply(); }
- function start(){ clearTimeout(timer); timer=setTimeout(toggle,1000); }
- function cancel(){ clearTimeout(timer); timer=null; }
+ function toggle(){
+   mode=mode==='final'?'prelim':'final';
+   apply();
+   /* Reassert after legacy listeners finish their same-event updates. */
+   setTimeout(forceTotal,0);
+   setTimeout(forceTotal,50);
+ }
+
+ function start(){clearTimeout(timer);timer=setTimeout(toggle,1000);}
+ function cancel(){clearTimeout(timer);timer=null;}
 
  function place(){
-   var b=document.getElementById('contestModeV17'); if(!b)return;
+   var b=document.getElementById('contestModeV17');if(!b)return;
    if(matchMedia('(orientation: portrait)').matches){
      var csv=Array.from(document.querySelectorAll('button')).find(function(x){
        return /CSV保存/.test(x.textContent||'');
@@ -3523,7 +3545,7 @@ input[type="range"]{
  }
 
  function init(){
-   var b=document.getElementById('contestModeV17'); if(!b)return;
+   var b=document.getElementById('contestModeV17');if(!b)return;
    b.addEventListener('pointerdown',start);
    b.addEventListener('pointerup',cancel);
    b.addEventListener('pointercancel',cancel);
@@ -3532,11 +3554,16 @@ input[type="range"]{
 
    var cards=findCards();
    Object.keys(cards).forEach(function(c){
-     cards[c].range.addEventListener('input',function(){updateTotal(findCards());});
-     cards[c].range.addEventListener('change',function(){updateTotal(findCards());});
+     ['input','change'].forEach(function(ev){
+       cards[c].range.addEventListener(ev,function(){
+         /* Run after older FE handlers, so this mode's formula is final. */
+         setTimeout(forceTotal,0);
+       });
+     });
    });
-   place(); apply();
+   place();apply();
  }
+
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
  else init();
  window.addEventListener('orientationchange',function(){
