@@ -2595,26 +2595,16 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 <script id="v61-subs-launcher-script">
 (function(){
   function openSubs(){
-    /* Prefer the original registration/subscription button so all existing
-       OAuth and channel-loading behavior is preserved. */
-    const candidates=[...document.querySelectorAll('button')].filter(b=>
-      b.id!=='subsLauncherV61' &&
-      (/登録チャンネル/.test((b.textContent||'').trim()) ||
-       b.id==='subsBtn' || b.id==='subscriptionBtn' || b.id==='registeredChannelsBtn')
-    );
-    if(candidates.length){
-      candidates[0].click();
+    /* Call the original OAuth/subscription launcher directly.
+       Do not proxy through another button: duplicate-removal guards may remove it. */
+    if(typeof window.openSubscriptions==='function'){
+      window.openSubscriptions();
       return;
     }
-    const panel=document.getElementById('subsPanel');
-    if(panel){
-      panel.style.display='block';
-      panel.style.visibility='visible';
-      panel.style.opacity='1';
+    if(typeof window.loadSubscriptions==='function'){
+      window.loadSubscriptions();
       return;
     }
-    if(typeof window.openSubscriptions==='function'){ window.openSubscriptions(); return; }
-    if(typeof window.loadSubscriptions==='function'){ window.loadSubscriptions(); return; }
     alert('登録チャンネル機能を開けませんでした。');
   }
   function bind(){
