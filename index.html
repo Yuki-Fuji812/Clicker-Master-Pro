@@ -3428,44 +3428,42 @@ input[type="range"]{
 
 
 
-<script id="contest-mode-script-v17">
+<script id="contest-mode-script-v18">
 (function(){
- var mode='final', timer=null, fired=false;
- var keep=['EXE','CTR','CHG','BDY'];
+ var mode='final', timer=null;
+ var keep={EXE:1,CTR:1,CHG:1,BDY:1};
+ var codes=['EXE','CTR','TRV','SUE','CHG','CNS','BDY','SHW'];
 
- function getCode(r){
-   var n=r;
-   for(var i=0;i<7 && n;i++,n=n.parentElement){
-     var t=(n.textContent||'').replace(/\s+/g,' ').trim();
-     var m=t.match(/(?:^|\s)(EXE|CTR|TRV|SUE|CHG|CNS|BDY|SHW)(?:\s|$)/);
-     if(m)return {code:m[1],card:n};
-   }
-   return {code:'',card:r.parentElement};
- }
- function feRanges(){
-   return Array.from(document.querySelectorAll('input[type="range"]')).filter(function(r){
-     var x=getCode(r);
-     return !!x.code && Number(r.min||0)===0 && Number(r.max||10)===10;
+ function findCards(){
+   var result={};
+   /* Directly identify each FE item by its visible code, then choose the smallest
+      ancestor that contains that item's 0..10 range input. */
+   document.querySelectorAll('*').forEach(function(el){
+     if(el.children.length!==0)return;
+     var code=(el.textContent||'').trim();
+     if(codes.indexOf(code)<0 || result[code])return;
+     var n=el.parentElement;
+     for(var i=0;i<6 && n;i++,n=n.parentElement){
+       var rs=n.querySelectorAll('input[type="range"][min="0"][max="10"]');
+       if(rs.length===1){
+         result[code]={card:n,range:rs[0]};
+         break;
+       }
+     }
    });
+   return result;
  }
- function apply(){
-   feRanges().forEach(function(r){
-     var x=getCode(r);
-     x.card.classList.toggle('fe-hidden-v17',mode==='prelim' && keep.indexOf(x.code)<0);
-   });
-   var b=document.getElementById('contestModeV17');
-   b.textContent=(mode==='final')?'予選・準決勝':'決勝';
-   b.style.background=(mode==='final')?'#29292e':'#168cf5';
-   updateTotal();
- }
- function updateTotal(){
+
+ function updateTotal(cards){
+   cards=cards||findCards();
    var sum=0;
-   feRanges().forEach(function(r){
-     var c=getCode(r).code;
-     if(mode==='final' || keep.indexOf(c)>=0)sum+=Number(r.value||0);
+   codes.forEach(function(c){
+     var x=cards[c];
+     if(!x)return;
+     if(mode==='final' || keep[c])sum+=Number(x.range.value||0);
    });
-   var total=(mode==='final')?sum/2:sum;
-   /* target visible FE total containers/text */
+   var total=mode==='final'?sum/2:sum;
+
    document.querySelectorAll('*').forEach(function(el){
      if(el.children.length)return;
      var t=(el.textContent||'').trim();
@@ -3474,38 +3472,76 @@ input[type="range"]{
      }
    });
  }
+
+ function apply(){
+   var cards=findCards();
+   codes.forEach(function(c){
+     if(!cards[c])return;
+     cards[c].card.style.setProperty(
+       'display',
+       (mode==='prelim' && !keep[c]) ? 'none' : '',
+       'important'
+     );
+   });
+   var b=document.getElementById('contestModeV17');
+   b.textContent=mode==='final'?'予選・準決勝':'決勝';
+   b.style.background=mode==='final'?'#29292e':'#168cf5';
+   updateTotal(cards);
+ }
+
  function toggle(){
-   mode=(mode==='final')?'prelim':'final';
+   mode=mode==='final'?'prelim':'final';
    apply();
  }
- function start(e){
-   fired=false; clearTimeout(timer);
-   timer=setTimeout(function(){fired=true;toggle();},1000);
+
+ function start(){
+   clearTimeout(timer);
+   timer=setTimeout(function(){toggle();},1000);
  }
  function cancel(){clearTimeout(timer);timer=null;}
+
  function place(){
    var b=document.getElementById('contestModeV17');
+   if(!b)return;
    if(matchMedia('(orientation: portrait)').matches){
-     var csv=Array.from(document.querySelectorAll('button')).find(function(x){return /CSV保存/.test(x.textContent||'');});
+     var csv=Array.from(document.querySelectorAll('button')).find(function(x){
+       return /CSV保存/.test(x.textContent||'');
+     });
      if(csv){
        var row=csv.parentElement;
        if(row&&row.parentElement)row.parentElement.insertBefore(b,row.nextSibling);
      }
    }else document.body.appendChild(b);
  }
+
  function init(){
    var b=document.getElementById('contestModeV17');
-   ['pointerdown','touchstart'].forEach(function(ev){b.addEventListener(ev,start,{passive:true});});
-   ['pointerup','pointercancel','pointerleave','touchend','touchcancel'].forEach(function(ev){b.addEventListener(ev,cancel,{passive:true});});
-   b.addEventListener('click',function(e){e.preventDefault();}); // short tap does nothing
-   feRanges().forEach(function(r){
-     r.addEventListener('input',updateTotal);
-     r.addEventListener('change',updateTotal);
+   if(!b)return;
+
+   /* Pointer Events only: avoid pointerdown + touchstart double timers on iPhone. */
+   b.addEventListener('pointerdown',start);
+   b.addEventListener('pointerup',cancel);
+   b.addEventListener('pointercancel',cancel);
+   b.addEventListener('pointerleave',cancel);
+   b.addEventListener('click',function(e){e.preventDefault();});
+
+   var cards=findCards();
+   Object.keys(cards).forEach(function(c){
+     cards[c].range.addEventListener('input',function(){updateTotal(findCards());});
+     cards[c].range.addEventListener('change',function(){updateTotal(findCards());});
    });
-   place();apply();
+
+   place();
+   apply();
  }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
- window.addEventListener('orientationchange',function(){setTimeout(function(){place();apply();},200);});
+
+ if(document.readyState==='loading'){
+   document.addEventListener('DOMContentLoaded',init,{once:true});
+ }else init();
+
+ window.addEventListener('orientationchange',function(){
+   setTimeout(function(){place();apply();},200);
+ });
 })();
 </script>
 
