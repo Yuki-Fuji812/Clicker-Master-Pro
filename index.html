@@ -1228,6 +1228,9 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    return r.json();
  }
  function openSubs(){panel().classList.add('open');auth(loadSubs)}
+ /* Connect the visible blue registration button directly to the original
+    OAuth/subscription function. */
+ window.openSubscriptions=openSubs;
  async function loadSubs(){
    const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
    title.textContent='登録チャンネル';list.innerHTML='読み込み中…';
