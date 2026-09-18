@@ -1194,6 +1194,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 (function(){
  const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
  const SAVED_KEY='clickerMasterFixedSubscriptionsV1';
+ const LOCK_KEY='clickerMasterSubscriptionsPermanentLockV1';
  let tokenClient=null, accessToken='';
 
  function panel(){
@@ -1226,6 +1227,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
      channels:channels,
      savedAt:Date.now()
    }));
+   localStorage.setItem(LOCK_KEY,'1');
  }
  function clearSaved(){ localStorage.removeItem(SAVED_KEY); }
 
@@ -1374,10 +1376,13 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 
  // Only explicit long press can discard the fixed snapshot.
  function switchSubsAccount(){
-   clearSaved();
+   if(localStorage.getItem(LOCK_KEY)==='1'){
+     openSubs();
+     return;
+   }
    accessToken='';
    panel().classList.add('open');
-   document.getElementById('subsTitle').textContent='登録チャンネルを変更';
+   document.getElementById('subsTitle').textContent='登録チャンネルを選択';
    document.getElementById('subsList').textContent='Googleアカウントを選択してください…';
    oauth(fetchSubscriptionsForSelection,true);
  }
@@ -2704,46 +2709,33 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 </style>
 <script id="v61-subs-launcher-script">
 (function(){
-  function openSubs(){
-    /* Call the original OAuth/subscription launcher directly.
-       Do not proxy through another button: duplicate-removal guards may remove it. */
-    if(typeof window.openSubscriptions==='function'){
-      window.openSubscriptions();
-      return;
-    }
-    if(typeof window.loadSubscriptions==='function'){
-      window.loadSubscriptions();
-      return;
-    }
-    alert('登録チャンネル機能を開けませんでした。');
-  }
-  function bind(){
-    const b=document.getElementById('subsLauncherV61');
-    if(b && !b.dataset.bound){
-      b.dataset.bound='1';
-      let holdTimer=null,longPressed=false;
-      const startHold=()=>{
-        longPressed=false;
-        clearTimeout(holdTimer);
-        holdTimer=setTimeout(()=>{
-          longPressed=true;
-          if(typeof window.switchSubscriptionsAccount==='function') window.switchSubscriptionsAccount();
-        },800);
-      };
-      const cancelHold=()=>clearTimeout(holdTimer);
-      b.addEventListener('pointerdown',startHold);
-      b.addEventListener('pointerup',cancelHold);
-      b.addEventListener('pointercancel',cancelHold);
-      b.addEventListener('pointerleave',cancelHold);
-      b.addEventListener('contextmenu',e=>e.preventDefault());
-      b.addEventListener('click',e=>{
-        if(longPressed){e.preventDefault();e.stopPropagation();longPressed=false;return}
-        openSubs();
-      });
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
-  else bind();
+ function bind(){
+  const b=document.getElementById('subsLauncherV61');
+  if(!b || b.dataset.registrationFinal==='1') return;
+  b.dataset.registrationFinal='1';
+  let timer=null,longPressed=false;
+
+  b.addEventListener('pointerdown',function(){
+   longPressed=false;
+   clearTimeout(timer);
+   timer=setTimeout(function(){
+    if(localStorage.getItem('clickerMasterSubscriptionsPermanentLockV1')==='1') return;
+    longPressed=true;
+    if(typeof window.switchSubscriptionsAccount==='function') window.switchSubscriptionsAccount();
+   },800);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+   b.addEventListener(ev,function(){clearTimeout(timer)});
+  });
+  b.addEventListener('contextmenu',function(e){e.preventDefault()});
+  b.addEventListener('click',function(e){
+   if(longPressed){e.preventDefault();e.stopImmediatePropagation();longPressed=false;return}
+   if(typeof window.openSubscriptions==='function') window.openSubscriptions();
+   else alert('登録チャンネル機能を開けませんでした。');
+  });
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+ else bind();
 })();
 </script>
 
@@ -3226,93 +3218,9 @@ input[type="range"]{
  setTimeout(clean,100); setTimeout(clean,500); setTimeout(clean,1500);
 })();
 </script>
-<script id="registration-reopen-fix">
-(function(){
-  function bindReopen(){
-    var old=document.getElementById('subsLauncherV61');
-    if(!old || old.dataset.reopenFixed==='1') return;
-    var b=old.cloneNode(true); // remove accumulated old click listeners only
-    b.dataset.reopenFixed='1';
-    old.replaceWith(b);
-    b.addEventListener('click',function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      var p=document.getElementById('subsPanel');
-      if(p) p.classList.add('open');
-      if(typeof window.openSubscriptions==='function'){
-        window.openSubscriptions();
-      }else{
-        alert('登録チャンネル機能を開けませんでした。');
-      }
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindReopen);
-  else bindReopen();
-})();
-</script>
+<script id="registration-reopen-fix">/* disabled: unified registration handler */</script>
 
-<script id="registration-longpress-account-switch-final">
-(function(){
-  function bind(){
-    const b=document.getElementById('subsLauncherV61');
-    if(!b || b.dataset.accountSwitchBound==='1') return;
-    b.dataset.accountSwitchBound='1';
+<script id="registration-longpress-account-switch-final">/* disabled: unified registration handler */</script>
 
-    let timer=null, fired=false;
-    const start=function(e){
-      fired=false;
-      clearTimeout(timer);
-      timer=setTimeout(function(){
-        fired=true;
-        if(typeof window.switchSubscriptionsAccount==='function'){
-          window.switchSubscriptionsAccount();
-        }
-      },800);
-    };
-    const cancel=function(){ clearTimeout(timer); };
-
-    b.addEventListener('pointerdown',start);
-    b.addEventListener('pointerup',cancel);
-    b.addEventListener('pointercancel',cancel);
-    b.addEventListener('pointerleave',cancel);
-    b.addEventListener('contextmenu',function(e){e.preventDefault();});
-    b.addEventListener('click',function(e){
-      if(fired){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        fired=false;
-      }
-    },true);
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',function(){setTimeout(bind,0);});
-  }else{
-    setTimeout(bind,0);
-  }
-})();
-</script>
-
-<script id="subscription-permanent-lock-v4">
-(function(){
-const K='clickerMasterFixedSubscriptionsV1';
-const locked=()=>{const v=localStorage.getItem(K);return !!(v&&v!=='null'&&v!=='[]')};
-const set=Storage.prototype.setItem,rem=Storage.prototype.removeItem,clr=Storage.prototype.clear;
-Storage.prototype.setItem=function(k,v){if(this===localStorage&&k===K&&locked())return;return set.call(this,k,v)};
-Storage.prototype.removeItem=function(k){if(this===localStorage&&k===K&&locked())return;return rem.call(this,k)};
-Storage.prototype.clear=function(){if(this!==localStorage||!locked())return clr.call(this);const v=localStorage.getItem(K);clr.call(this);if(v)set.call(localStorage,K,v)};
-function bind(){
- const o=document.getElementById('subsLauncherV61');if(!o||o.dataset.lockV4)return;
- const b=o.cloneNode(true);b.dataset.lockV4='1';o.replaceWith(b);
- b.addEventListener('contextmenu',e=>{if(locked())e.preventDefault()},true);
- b.addEventListener('click',e=>{
-  if(!locked())return;
-  e.preventDefault();e.stopImmediatePropagation();
-  if(typeof window.openSubscriptions==='function')try{window.openSubscriptions()}catch(_){}
- },true);
-}
-function go(){setTimeout(bind,150);new MutationObserver(bind).observe(document.documentElement,{childList:true,subtree:true})}
-document.readyState==='loading'?document.addEventListener('DOMContentLoaded',go):go();
-})();
-</script>
 </body>
 </html>
