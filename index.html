@@ -807,7 +807,7 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 <div class="urlrow landscape-search">
 <input id="searchQ" placeholder="YouTubeで動画を検索">
 <button class="load" onclick="searchVideo()">検索</button>
-<button id="subsLauncherV61" type="button">登録</button>
+<button id="subsLauncherV61" type="button" onclick="window.openSubscriptions&&window.openSubscriptions()">登録</button>
 
 <label class="filebtn">ファイル<input id="localVideoFile" type="file" accept="video/*" onchange="playLocalVideo(this)"></label>
 </div>
@@ -1194,7 +1194,6 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 (function(){
  const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
  const SAVED_KEY='clickerMasterFixedSubscriptionsV1';
- const LOCK_KEY='clickerMasterSubscriptionsPermanentLockV1';
  let tokenClient=null, accessToken='';
 
  function panel(){
@@ -1227,7 +1226,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
      channels:channels,
      savedAt:Date.now()
    }));
-   localStorage.setItem(LOCK_KEY,'1');
+   localStorage.setItem('clickerMasterSubscriptionsPermanentLockV1','1');
  }
  function clearSaved(){ localStorage.removeItem(SAVED_KEY); }
 
@@ -1376,13 +1375,13 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 
  // Only explicit long press can discard the fixed snapshot.
  function switchSubsAccount(){
-   if(localStorage.getItem(LOCK_KEY)==='1'){
+   if(localStorage.getItem('clickerMasterSubscriptionsPermanentLockV1')==='1'){
      openSubs();
      return;
    }
    accessToken='';
    panel().classList.add('open');
-   document.getElementById('subsTitle').textContent='登録チャンネルを選択';
+   document.getElementById('subsTitle').textContent='登録チャンネルを変更';
    document.getElementById('subsList').textContent='Googleアカウントを選択してください…';
    oauth(fetchSubscriptionsForSelection,true);
  }
@@ -2707,37 +2706,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
 }
 </style>
-<script id="v61-subs-launcher-script">
-(function(){
- function bind(){
-  const b=document.getElementById('subsLauncherV61');
-  if(!b || b.dataset.registrationFinal==='1') return;
-  b.dataset.registrationFinal='1';
-  let timer=null,longPressed=false;
-
-  b.addEventListener('pointerdown',function(){
-   longPressed=false;
-   clearTimeout(timer);
-   timer=setTimeout(function(){
-    if(localStorage.getItem('clickerMasterSubscriptionsPermanentLockV1')==='1') return;
-    longPressed=true;
-    if(typeof window.switchSubscriptionsAccount==='function') window.switchSubscriptionsAccount();
-   },800);
-  });
-  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
-   b.addEventListener(ev,function(){clearTimeout(timer)});
-  });
-  b.addEventListener('contextmenu',function(e){e.preventDefault()});
-  b.addEventListener('click',function(e){
-   if(longPressed){e.preventDefault();e.stopImmediatePropagation();longPressed=false;return}
-   if(typeof window.openSubscriptions==='function') window.openSubscriptions();
-   else alert('登録チャンネル機能を開けませんでした。');
-  });
- }
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
- else bind();
-})();
-</script>
+<script id="v61-subs-launcher-script">/* disabled: registration handler consolidated */</script>
 
 
 <style id="v62-layout-safety">
@@ -3218,9 +3187,44 @@ input[type="range"]{
  setTimeout(clean,100); setTimeout(clean,500); setTimeout(clean,1500);
 })();
 </script>
-<script id="registration-reopen-fix">/* disabled: unified registration handler */</script>
+<script id="registration-reopen-fix">/* disabled: registration handler consolidated */</script>
 
-<script id="registration-longpress-account-switch-final">/* disabled: unified registration handler */</script>
+<script id="registration-longpress-account-switch-final">/* disabled: registration handler consolidated */</script>
+
+
+<script id="registration-authoritative-handler-v5">/* disabled: direct button binding used */</script>
+
+
+<script id="registration-longpress-v7">
+(function(){
+  function bind(){
+    var b=document.getElementById('subsLauncherV61');
+    if(!b || b.dataset.lp7==='1') return;
+    b.dataset.lp7='1';
+    var timer=null, fired=false;
+    function start(){
+      fired=false;
+      clearTimeout(timer);
+      timer=setTimeout(function(){
+        fired=true;
+        if(typeof window.switchSubscriptionsAccount==='function'){
+          window.switchSubscriptionsAccount();
+        }
+      },800);
+    }
+    function stop(){ clearTimeout(timer); }
+    b.addEventListener('touchstart',start,{passive:true});
+    b.addEventListener('touchend',stop,{passive:true});
+    b.addEventListener('touchcancel',stop,{passive:true});
+    b.addEventListener('pointerdown',function(e){ if(e.pointerType!=='touch') start(); });
+    b.addEventListener('pointerup',function(e){ if(e.pointerType!=='touch') stop(); });
+    b.addEventListener('pointercancel',stop);
+    b.addEventListener('contextmenu',function(e){e.preventDefault();});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
+})();
+</script>
 
 </body>
 </html>
