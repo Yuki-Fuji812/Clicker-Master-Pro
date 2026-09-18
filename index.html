@@ -3090,5 +3090,20 @@ input[type="range"]{
   setTimeout(removeDuplicates,1200);
 })();
 </script>
+<script id="single-registration-absolute-guard">
+(function(){
+ function clean(){
+  document.querySelectorAll('button').forEach(function(el){
+   if(el.id==='subsLauncherV61') return;
+   if(el.closest&&el.closest('#subsPanel')) return;
+   const t=(el.textContent||'').replace(/\s+/g,'').trim();
+   if(t==='登録チャンネル') el.remove();
+  });
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',clean); else clean();
+ new MutationObserver(clean).observe(document.documentElement,{childList:true,subtree:true});
+ setTimeout(clean,100); setTimeout(clean,500); setTimeout(clean,1500);
+})();
+</script>
 </body>
 </html>
