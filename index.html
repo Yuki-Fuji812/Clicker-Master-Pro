@@ -1193,97 +1193,158 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
 <script>
 (function(){
  const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
+ const CACHE_KEY='clickerMasterSubscriptionsV2';
  let tokenClient=null,accessToken='';
- function row(){
-   const r=document.querySelector('.urlrow'); if(!r)return;
-   /* Legacy duplicate launcher disabled. Blue #subsLauncherV61 remains the only launcher. */
-   const oldBtn=document.getElementById('subsBtn');
-   if(oldBtn) oldBtn.remove();
-   return;
- }
+
  function panel(){
-   if(document.getElementById('subsPanel'))return document.getElementById('subsPanel');
-   const p=document.createElement('div');p.id='subsPanel';
-   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="ytAccountSwitchBtn" type="button">OAuth ID再設定</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
+   if(document.getElementById('subsPanel')) return document.getElementById('subsPanel');
+   const p=document.createElement('div'); p.id='subsPanel';
+   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
    document.body.appendChild(p);
    p.querySelector('#subsClose').onclick=()=>p.classList.remove('open');
-   p.querySelector('#subsHome').onclick=loadSubs;
    return p;
  }
+
  function getClientId(){
    let id=localStorage.getItem('ytOAuthClientId');
-   if(!id){id=prompt('Google OAuth 2.0 クライアントIDを入力してください');if(id)localStorage.setItem('ytOAuthClientId',id.trim())}
+   if(!id){
+     id=prompt('Google OAuth 2.0 クライアントIDを入力してください');
+     if(id) localStorage.setItem('ytOAuthClientId',id.trim());
+   }
    return id&&id.trim();
  }
+
+ function getCache(){
+   try{
+     const v=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
+     return v && Array.isArray(v.channels) ? v : null;
+   }catch(e){ return null; }
+ }
+ function saveCache(channels){
+   localStorage.setItem(CACHE_KEY,JSON.stringify({channels:channels,savedAt:Date.now()}));
+ }
+
+ function esc2(x){
+   return String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ }
+
+ function renderChannels(channels){
+   const list=document.getElementById('subsList'), title=document.getElementById('subsTitle');
+   title.textContent='登録チャンネル';
+   list.innerHTML='';
+   channels.forEach(ch=>{
+     const b=document.createElement('button');
+     b.className='subCard';
+     b.dataset.channelId=ch.id;
+     b.innerHTML=(ch.thumb?'<img src="'+esc2(ch.thumb)+'">':'')+'<span>'+esc2(ch.title)+'</span>';
+     b.onclick=()=>loadChannelPublic(ch.id,ch.title);
+     list.appendChild(b);
+   });
+   if(!channels.length) list.textContent='登録チャンネルがありません。';
+ }
+
+ async function publicApi(url){
+   const key=localStorage.getItem('yt-api-key')||'';
+   if(!key) throw new Error('API key missing');
+   const sep=url.includes('?')?'&':'?';
+   const r=await fetch(url+sep+'key='+encodeURIComponent(key));
+   if(!r.ok) throw new Error('YouTube API '+r.status);
+   return r.json();
+ }
+
+ async function loadChannelPublic(id,name){
+   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
+   title.textContent=name; list.innerHTML='動画を読み込み中…';
+   try{
+     const c=await publicApi('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
+     const pl=c.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+     if(!pl) throw 0;
+     const d=await publicApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
+     list.innerHTML='';
+     (d.items||[]).forEach(it=>{
+       const sn=it.snippet,vid=sn.resourceId?.videoId;
+       if(!vid) return;
+       const b=document.createElement('button');
+       b.className='subCard vidCard';
+       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc2(sn.thumbnails.medium.url)+'">':'')+'<span>'+esc2(sn.title)+'</span>';
+       b.onclick=()=>{ if(typeof playVideo==='function') playVideo(vid,sn.title); panel().classList.remove('open'); };
+       list.appendChild(b);
+     });
+   }catch(e){
+     list.textContent='動画を取得できませんでした。YouTube APIキーを確認してください。';
+   }
+ }
+
  function auth(cb,forceAccountSwitch){
-   if(accessToken && !forceAccountSwitch){cb();return}
-   const id=getClientId();if(!id)return;
-   if(!window.google||!google.accounts||!google.accounts.oauth2){alert('Google認証を読み込み中です。数秒後にもう一度押してください。');return}
+   const id=getClientId(); if(!id)return;
+   if(!window.google||!google.accounts||!google.accounts.oauth2){
+     alert('Google認証を読み込み中です。数秒後にもう一度押してください。'); return;
+   }
    tokenClient=google.accounts.oauth2.initTokenClient({
      client_id:id,scope:SCOPE,
-     callback:r=>{if(r&&r.access_token){accessToken=r.access_token;localStorage.setItem('ytPreviouslyAuthorized','1');cb()}},
+     callback:r=>{
+       if(r&&r.access_token){
+         accessToken=r.access_token;
+         localStorage.setItem('ytPreviouslyAuthorized','1');
+         cb();
+       }
+     },
      error_callback:()=>{}
    });
    tokenClient.requestAccessToken({prompt:forceAccountSwitch?'select_account':''});
  }
-  async function api(url){
+
+ async function api(url){
    const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-   if(!r.ok)throw new Error('YouTube API '+r.status);
+   if(!r.ok) throw new Error('YouTube API '+r.status);
    return r.json();
  }
- function openSubs(){panel().classList.add('open');auth(loadSubs,false)}
+
+ // Normal tap: never re-authenticate or change account when a saved list exists.
+ function openSubs(){
+   panel().classList.add('open');
+   const cached=getCache();
+   if(cached){
+     renderChannels(cached.channels);
+     return;
+   }
+   auth(loadSubs,false);
+ }
+
+ // Long press only: explicitly show Google account chooser and replace saved list.
  function switchSubsAccount(){
    accessToken='';
    panel().classList.add('open');
+   const list=document.getElementById('subsList');
+   if(list) list.textContent='切り替えるGoogleアカウントを選択してください…';
    auth(loadSubs,true);
  }
+
  window.switchSubscriptionsAccount=switchSubsAccount;
- /* Connect the visible blue registration button directly to the original
-    OAuth/subscription function. */
  window.openSubscriptions=openSubs;
+
  async function loadSubs(){
    const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
-   title.textContent='登録チャンネル';list.innerHTML='読み込み中…';
+   title.textContent='登録チャンネル'; list.innerHTML='読み込み中…';
    try{
      let items=[],page='';
      do{
        const d=await api('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical'+(page?'&pageToken='+encodeURIComponent(page):''));
-       items.push(...(d.items||[]));page=d.nextPageToken||'';
+       items.push(...(d.items||[])); page=d.nextPageToken||'';
      }while(page);
-     list.innerHTML='';
-     items.forEach(it=>{
-       const sn=it.snippet,ch=sn.resourceId.channelId,b=document.createElement('button');
-       b.className='subCard';b.innerHTML=(sn.thumbnails?.default?.url?'<img src="'+sn.thumbnails.default.url+'">':'')+'<span>'+esc(sn.title)+'</span>';
-       b.onclick=()=>loadChannel(ch,sn.title);list.appendChild(b);
-     });
-   }catch(e){list.textContent='取得できませんでした。Google認証設定を確認してください。'}
+     const channels=items.map(it=>({
+       id:it.snippet?.resourceId?.channelId||'',
+       title:it.snippet?.title||'',
+       thumb:it.snippet?.thumbnails?.default?.url||''
+     })).filter(ch=>ch.id);
+     saveCache(channels);
+     renderChannels(channels);
+   }catch(e){
+     const cached=getCache();
+     if(cached) renderChannels(cached.channels);
+     else list.textContent='取得できませんでした。Google認証設定を確認してください。';
+   }
  }
- async function loadChannel(id,name){
-   const list=document.getElementById('subsList'),title=document.getElementById('subsTitle');
-   title.textContent=name;list.innerHTML='動画を読み込み中…';
-   try{
-     const c=await api('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
-     const pl=c.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;if(!pl)throw 0;
-     const d=await api('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
-     list.innerHTML='';
-     d.items.forEach(it=>{
-       const sn=it.snippet,vid=sn.resourceId.videoId,b=document.createElement('button');
-       b.className='subCard vidCard';b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+sn.thumbnails.medium.url+'">':'')+'<span>'+esc(sn.title)+'</span>';
-       b.onclick=()=>playVideo(vid,sn.title);list.appendChild(b);
-     });
-   }catch(e){list.textContent='動画を取得できませんでした。'}
- }
- function playVideo(id,title){
-   const p=document.getElementById('subsPanel');p.classList.remove('open');
-   const input=document.querySelector('.urlrow input');if(input)input.value=title||'';
-   try{
-     if(window.player&&typeof player.loadVideoById==='function'){player.loadVideoById(id);return}
-   }catch(e){}
-   const frame=document.querySelector('.video iframe, iframe');
-   if(frame)frame.src='https://www.youtube.com/embed/'+encodeURIComponent(id)+'?autoplay=1&enablejsapi=1';
- }
- function esc(x){const d=document.createElement('div');d.textContent=x||'';return d.innerHTML}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',row);else row();
 })();
 </script>
 
@@ -3192,42 +3253,6 @@ input[type="range"]{
 })();
 </script>
 
-
-<script id="youtube-account-channel-persistence">
-(function(){
-  const KEY='clickerMasterSavedYouTubeAccount';
-
-  function saveCurrentChannelSet(){
-    try{
-      const cards=[...document.querySelectorAll('#subsList [data-channel-id], #subsList a[href*="/channel/"]')];
-      const ids=cards.map(function(el){
-        if(el.dataset && el.dataset.channelId) return el.dataset.channelId;
-        const h=el.getAttribute && el.getAttribute('href');
-        const m=h && h.match(/\/channel\/([^/?#]+)/);
-        return m ? m[1] : '';
-      }).filter(Boolean);
-      if(ids.length){
-        localStorage.setItem(KEY,JSON.stringify({channelIds:ids,savedAt:Date.now()}));
-      }
-    }catch(e){}
-  }
-
-  const obs=new MutationObserver(saveCurrentChannelSet);
-  function watch(){
-    const list=document.getElementById('subsList');
-    if(list) obs.observe(list,{childList:true,subtree:true});
-  }
-
-  const oldSwitch=window.switchSubscriptionsAccount;
-  window.switchSubscriptionsAccount=function(){
-    localStorage.removeItem(KEY);
-    if(typeof oldSwitch==='function') return oldSwitch();
-  };
-
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',watch);
-  else watch();
-})();
-</script>
 
 </body>
 </html>
