@@ -803,29 +803,25 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 
 
 <style id="requested-ui-adjustments-v11">
-@media (orientation: portrait) {
+@media (orientation:portrait){
   #subsPanel #subsClose,
   #subsPanel .subs-close,
-  #subsPanel button[aria-label="閉じる"] {
-    margin-top:max(14px,env(safe-area-inset-top)) !important;
+  #subsPanel button[aria-label="閉じる"]{
+    margin-top:max(14px,env(safe-area-inset-top))!important;
   }
 }
 #landscapeClickerV11{display:none}
 @media (orientation:landscape){
  #landscapeClickerV11{
-   display:block;position:fixed;
-   left:8.4vw; top:5.2vh;
-   width:70px;height:48px;object-fit:contain;
-   z-index:4;pointer-events:none;
+   display:block;position:fixed;left:8.4vw;top:5.2vh;
+   width:70px;height:48px;object-fit:contain;z-index:4;pointer-events:none;
  }
 }
-.fe-scale-wrap-v11{position:relative!important;padding-bottom:14px!important}
+.fe-scale-wrap-v11{position:relative!important;padding-bottom:11px!important}
 .fe-scale-v11{
- position:absolute;
- left:5px;right:5px;bottom:1px;height:12px;
+ position:absolute;left:5px;right:5px;bottom:3px;height:8px;
  display:flex;justify-content:space-between;align-items:flex-end;
- font-size:6px;line-height:6px;opacity:.85;pointer-events:none;
- overflow:hidden;
+ pointer-events:none;overflow:visible;color:#ddd;
 }
 .fe-scale-v11 span{
  position:relative;display:block;width:9px;text-align:center;
@@ -833,16 +829,24 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 }
 .fe-scale-v11 span:before{
  content:"";position:absolute;left:50%;transform:translateX(-50%);
- top:-6px;width:1px;height:5px;background:currentColor;opacity:.75;
+ top:-5px;width:1px;height:4px;background:#ddd;opacity:.9;
 }
 @media (orientation:portrait){
- .fe-scale-wrap-v11{padding-bottom:15px!important}
- .fe-scale-v11{left:7px;right:7px;bottom:1px;font-size:6px}
+ .fe-scale-wrap-v11{padding-bottom:10px!important}
+ .fe-scale-v11{left:7px;right:7px;bottom:3px}
 }
 @media (orientation:landscape){
- .fe-scale-wrap-v11{padding-bottom:12px!important}
- .fe-scale-v11{left:4px;right:4px;bottom:0;font-size:5px}
- .fe-scale-v11 span{font-size:5px;width:7px}
+ .fe-scale-wrap-v11{padding-bottom:9px!important}
+ .fe-scale-v11{left:4px;right:4px;bottom:2px}
+ .fe-scale-v11 span{font-size:5px;line-height:5px;width:7px}
+}
+
+/* landscape: keep the same blue filled bar appearance as portrait */
+@media (orientation:landscape){
+ input[type="range"][min="0"][max="10"]{
+   --fe-fill:0%;
+   background:linear-gradient(to right,#0a9cff 0%,#0a9cff var(--fe-fill),#29292e var(--fe-fill),#29292e 100%)!important;
+ }
 }
 </style>
 
@@ -3292,26 +3296,35 @@ input[type="range"]{
 
 <script id="fe-scale-v11">
 (function(){
+ function paint(r){
+   var v=Math.max(0,Math.min(10,Number(r.value||0)));
+   r.style.setProperty('--fe-fill',(v*10)+'%');
+ }
  function addScales(){
    document.querySelectorAll('input[type="range"]').forEach(function(r){
-     if(Number(r.min||0)!==0 || Number(r.max||10)!==10) return;
+     if(Number(r.min||0)!==0 || Number(r.max||10)!==10)return;
      var p=r.parentElement;if(!p)return;
      p.classList.add('fe-scale-wrap-v11');
-     var old=p.querySelector('.fe-scale-v11');
-     if(old) old.remove();
-     var scale=document.createElement('div');
-     scale.className='fe-scale-v11';
+     var old=p.querySelector('.fe-scale-v11');if(old)old.remove();
+     var scale=document.createElement('div');scale.className='fe-scale-v11';
      for(var i=0;i<=10;i++){
-       var x=document.createElement('span');
-       x.textContent=String(i);
-       scale.appendChild(x);
+       var x=document.createElement('span');x.textContent=String(i);scale.appendChild(x);
      }
      p.appendChild(scale);
+     paint(r);
+     if(!r.dataset.paintV13){
+       r.dataset.paintV13='1';
+       r.addEventListener('input',function(){paint(r)});
+       r.addEventListener('change',function(){paint(r)});
+     }
    });
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addScales,{once:true});
  else addScales();
  window.addEventListener('orientationchange',function(){setTimeout(addScales,150)});
+ setInterval(function(){
+   document.querySelectorAll('input[type="range"][min="0"][max="10"]').forEach(paint);
+ },250);
 })();
 </script>
 
