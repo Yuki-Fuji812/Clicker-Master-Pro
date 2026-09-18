@@ -932,6 +932,20 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 .fe-hidden-v17{display:none!important;}
 </style>
 
+
+<style id="contest-mode-v19-fixes">
+@media (orientation:landscape){
+ #contestModeV17{
+   width:150px!important;
+   min-width:150px!important;
+   max-width:150px!important;
+   box-sizing:border-box!important;
+   text-align:center!important;
+   white-space:nowrap!important;
+ }
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -3428,7 +3442,7 @@ input[type="range"]{
 
 
 
-<script id="contest-mode-script-v18">
+<script id="contest-mode-script-v19">
 (function(){
  var mode='final', timer=null;
  var keep={EXE:1,CTR:1,CHG:1,BDY:1};
@@ -3436,8 +3450,6 @@ input[type="range"]{
 
  function findCards(){
    var result={};
-   /* Directly identify each FE item by its visible code, then choose the smallest
-      ancestor that contains that item's 0..10 range input. */
    document.querySelectorAll('*').forEach(function(el){
      if(el.children.length!==0)return;
      var code=(el.textContent||'').trim();
@@ -3445,10 +3457,7 @@ input[type="range"]{
      var n=el.parentElement;
      for(var i=0;i<6 && n;i++,n=n.parentElement){
        var rs=n.querySelectorAll('input[type="range"][min="0"][max="10"]');
-       if(rs.length===1){
-         result[code]={card:n,range:rs[0]};
-         break;
-       }
+       if(rs.length===1){ result[code]={card:n,range:rs[0]}; break; }
      }
    });
    return result;
@@ -3458,11 +3467,10 @@ input[type="range"]{
    cards=cards||findCards();
    var sum=0;
    codes.forEach(function(c){
-     var x=cards[c];
-     if(!x)return;
-     if(mode==='final' || keep[c])sum+=Number(x.range.value||0);
+     var x=cards[c]; if(!x)return;
+     if(mode==='final' || keep[c]) sum+=Number(x.range.value||0);
    });
-   var total=mode==='final'?sum/2:sum;
+   var total = mode==='final' ? sum/2 : sum;  // prelim: 4 x 10 = 40
 
    document.querySelectorAll('*').forEach(function(el){
      if(el.children.length)return;
@@ -3483,26 +3491,26 @@ input[type="range"]{
        'important'
      );
    });
+
    var b=document.getElementById('contestModeV17');
-   b.textContent=mode==='final'?'予選・準決勝':'決勝';
-   b.style.background=mode==='final'?'#29292e':'#168cf5';
+   /* Requested reversed label:
+      finals selected -> button says 決勝
+      prelim selected -> button says 予選・準決勝 */
+   b.textContent = mode==='final' ? '決勝' : '予選・準決勝';
+
+   /* No mode-dependent color change. */
+   b.style.setProperty('background','#29292e','important');
+   b.style.setProperty('border-color','#777','important');
+
    updateTotal(cards);
  }
 
- function toggle(){
-   mode=mode==='final'?'prelim':'final';
-   apply();
- }
-
- function start(){
-   clearTimeout(timer);
-   timer=setTimeout(function(){toggle();},1000);
- }
- function cancel(){clearTimeout(timer);timer=null;}
+ function toggle(){ mode=mode==='final'?'prelim':'final'; apply(); }
+ function start(){ clearTimeout(timer); timer=setTimeout(toggle,1000); }
+ function cancel(){ clearTimeout(timer); timer=null; }
 
  function place(){
-   var b=document.getElementById('contestModeV17');
-   if(!b)return;
+   var b=document.getElementById('contestModeV17'); if(!b)return;
    if(matchMedia('(orientation: portrait)').matches){
      var csv=Array.from(document.querySelectorAll('button')).find(function(x){
        return /CSV保存/.test(x.textContent||'');
@@ -3515,10 +3523,7 @@ input[type="range"]{
  }
 
  function init(){
-   var b=document.getElementById('contestModeV17');
-   if(!b)return;
-
-   /* Pointer Events only: avoid pointerdown + touchstart double timers on iPhone. */
+   var b=document.getElementById('contestModeV17'); if(!b)return;
    b.addEventListener('pointerdown',start);
    b.addEventListener('pointerup',cancel);
    b.addEventListener('pointercancel',cancel);
@@ -3530,15 +3535,10 @@ input[type="range"]{
      cards[c].range.addEventListener('input',function(){updateTotal(findCards());});
      cards[c].range.addEventListener('change',function(){updateTotal(findCards());});
    });
-
-   place();
-   apply();
+   place(); apply();
  }
-
- if(document.readyState==='loading'){
-   document.addEventListener('DOMContentLoaded',init,{once:true});
- }else init();
-
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
+ else init();
  window.addEventListener('orientationchange',function(){
    setTimeout(function(){place();apply();},200);
  });
