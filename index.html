@@ -1370,7 +1370,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
      renderSaved(saved.channels);
      return;
    }
-   oauth(fetchSubscriptionsForSelection,false);
+   oauth(fetchSubscriptionsForSelection,true);
  }
 
  // Only explicit long press can discard the fixed snapshot.
@@ -3200,47 +3200,44 @@ input[type="range"]{
 
 <script id="registration-final-v8">
 (function(){
-  function getButton(){ return document.getElementById('subsLauncherV61'); }
-  function getPanel(){ return document.getElementById('subsPanel'); }
-
-  function openRegistration(){
-    var p=getPanel();
-    if(!p){ alert('登録チャンネル画面が見つかりません。'); return; }
-
-    p.classList.add('open');
-    p.style.display='flex';
-    p.style.visibility='visible';
-    p.style.opacity='1';
-
-    // Run the original data/OAuth logic after the panel has definitely opened.
-    setTimeout(function(){
-      if(typeof window.openSubscriptions==='function'){
-        try{ window.openSubscriptions(); }
-        catch(err){ console.error(err); }
-      }
-    },0);
-  }
-
   function bind(){
-    var b=getButton();
-    if(!b || b.dataset.finalV8==='1') return;
-    b.dataset.finalV8='1';
+    var b=document.getElementById('subsLauncherV61');
+    if(!b || b.dataset.finalV9==='1') return;
+    b.dataset.finalV9='1';
+
     b.onclick=function(e){
       e.preventDefault();
       e.stopPropagation();
-      openRegistration();
+
+      var p=document.getElementById('subsPanel');
+      if(p) p.classList.add('open');
+
+      if(typeof window.openSubscriptions==='function'){
+        window.openSubscriptions();
+      }else{
+        alert('登録チャンネル機能の読み込みに失敗しました。ページを再読み込みしてください。');
+      }
       return false;
     };
   }
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',bind,{once:true});
-  }else{
-    bind();
-  }
-  window.addEventListener('load',bind,{once:true});
-  setTimeout(bind,100);
-  setTimeout(bind,500);
+  }else bind();
+})();
+</script>
+
+
+<script id="registration-error-surface-v10">
+(function(){
+ window.addEventListener('unhandledrejection',function(ev){
+   var p=document.getElementById('subsPanel');
+   if(!p || !p.classList.contains('open')) return;
+   var list=document.getElementById('subsList');
+   if(!list) return;
+   var msg=(ev.reason && ev.reason.message) ? ev.reason.message : String(ev.reason||'取得エラー');
+   list.textContent='登録チャンネル取得エラー: '+msg;
+ });
 })();
 </script>
 
