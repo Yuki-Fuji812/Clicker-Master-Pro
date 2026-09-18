@@ -807,7 +807,7 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 <div class="urlrow landscape-search">
 <input id="searchQ" placeholder="YouTubeで動画を検索">
 <button class="load" onclick="searchVideo()">検索</button>
-<button id="subsLauncherV61" type="button" onclick="window.openSubscriptions&&window.openSubscriptions()">登録</button>
+<button id="subsLauncherV61" type="button">登録チャンネル</button>
 
 <label class="filebtn">ファイル<input id="localVideoFile" type="file" accept="video/*" onchange="playLocalVideo(this)"></label>
 </div>
@@ -2706,7 +2706,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
 }
 </style>
-<script id="v61-subs-launcher-script">/* disabled: registration handler consolidated */</script>
+<script id="v61-subs-launcher-script">/* disabled */</script>
 
 
 <style id="v62-layout-safety">
@@ -3187,42 +3187,60 @@ input[type="range"]{
  setTimeout(clean,100); setTimeout(clean,500); setTimeout(clean,1500);
 })();
 </script>
-<script id="registration-reopen-fix">/* disabled: registration handler consolidated */</script>
+<script id="registration-reopen-fix">/* disabled */</script>
 
-<script id="registration-longpress-account-switch-final">/* disabled: registration handler consolidated */</script>
-
-
-<script id="registration-authoritative-handler-v5">/* disabled: direct button binding used */</script>
+<script id="registration-longpress-account-switch-final">/* disabled */</script>
 
 
-<script id="registration-longpress-v7">
+<script id="registration-authoritative-handler-v5">/* disabled */</script>
+
+
+<script id="registration-longpress-v7">/* disabled */</script>
+
+
+<script id="registration-final-v8">
 (function(){
-  function bind(){
-    var b=document.getElementById('subsLauncherV61');
-    if(!b || b.dataset.lp7==='1') return;
-    b.dataset.lp7='1';
-    var timer=null, fired=false;
-    function start(){
-      fired=false;
-      clearTimeout(timer);
-      timer=setTimeout(function(){
-        fired=true;
-        if(typeof window.switchSubscriptionsAccount==='function'){
-          window.switchSubscriptionsAccount();
-        }
-      },800);
-    }
-    function stop(){ clearTimeout(timer); }
-    b.addEventListener('touchstart',start,{passive:true});
-    b.addEventListener('touchend',stop,{passive:true});
-    b.addEventListener('touchcancel',stop,{passive:true});
-    b.addEventListener('pointerdown',function(e){ if(e.pointerType!=='touch') start(); });
-    b.addEventListener('pointerup',function(e){ if(e.pointerType!=='touch') stop(); });
-    b.addEventListener('pointercancel',stop);
-    b.addEventListener('contextmenu',function(e){e.preventDefault();});
+  function getButton(){ return document.getElementById('subsLauncherV61'); }
+  function getPanel(){ return document.getElementById('subsPanel'); }
+
+  function openRegistration(){
+    var p=getPanel();
+    if(!p){ alert('登録チャンネル画面が見つかりません。'); return; }
+
+    p.classList.add('open');
+    p.style.display='flex';
+    p.style.visibility='visible';
+    p.style.opacity='1';
+
+    // Run the original data/OAuth logic after the panel has definitely opened.
+    setTimeout(function(){
+      if(typeof window.openSubscriptions==='function'){
+        try{ window.openSubscriptions(); }
+        catch(err){ console.error(err); }
+      }
+    },0);
   }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
-  else bind();
+
+  function bind(){
+    var b=getButton();
+    if(!b || b.dataset.finalV8==='1') return;
+    b.dataset.finalV8='1';
+    b.onclick=function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      openRegistration();
+      return false;
+    };
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',bind,{once:true});
+  }else{
+    bind();
+  }
+  window.addEventListener('load',bind,{once:true});
+  setTimeout(bind,100);
+  setTimeout(bind,500);
 })();
 </script>
 
