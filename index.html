@@ -2339,64 +2339,10 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     font-size:7px!important;
   }
 
-  /* Make sure the subscription/registered-channel button remains visible. */
-  #subsBtn,#subscriptionBtn,#registeredChannelsBtn,
-  .urlrow button[id*="subs"],.urlrow button[id*="register"]{
-    display:inline-flex!important;
-    visibility:visible!important;
-    opacity:1!important;
-    align-items:center!important;
-    justify-content:center!important;
-  }
 }
 </style>
 
-<script id="v56-subscription-button-restore">
-(function(){
-  function restore(){
-    const row=document.querySelector('.urlrow');
-    if(!row) return;
 
-    let btn =
-      document.getElementById('subsBtn') ||
-      document.getElementById('subscriptionBtn') ||
-      document.getElementById('registeredChannelsBtn');
-
-    if(!btn){
-      btn=[...row.querySelectorAll('button')].find(b =>
-        /登録|チャンネル/.test((b.textContent||'').trim())
-      );
-    }
-
-    /* If an earlier layout accidentally removed the button, recreate it and
-       trigger the existing subscription flow where possible. */
-    if(!btn){
-      btn=document.createElement('button');
-      btn.type='button';
-      btn.id='subsBtnLegacyDisabled';btn.style.display='none';
-      btn.textContent='登録';
-      btn.addEventListener('click',function(){
-        const panel=document.getElementById('subsPanel');
-        if(panel){
-          panel.style.display='block';
-          const existing=[...document.querySelectorAll('button')].find(b =>
-            b!==btn && /登録チャンネル/.test((b.textContent||''))
-          );
-          if(existing) existing.click();
-          return;
-        }
-        if(typeof window.openSubscriptions==='function') window.openSubscriptions();
-        else if(typeof window.loadSubscriptions==='function') window.loadSubscriptions();
-        else alert('登録チャンネルを開けませんでした。');
-      });
-      row.appendChild(btn);
-    }
-    btn.style.display='inline-flex';
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore);
-  else restore();
-})();
-</script>
 
 
 <style id="landscape-v57-footer-score-fix">
@@ -3130,5 +3076,19 @@ input[type="range"]{
   color: inherit !important;
 }
 </style>
+
+<script id="single-registration-final-guard">
+(function(){
+  function removeDuplicates(){
+    document.querySelectorAll('#subsBtn,#subscriptionBtn,#registeredChannelsBtn,#subsBtnLegacyDisabled').forEach(function(el){el.remove();});
+    document.querySelectorAll('.urlrow button').forEach(function(el){
+      if(el.id !== 'subsLauncherV61' && /登録チャンネル/.test((el.textContent||'').trim())) el.remove();
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeDuplicates); else removeDuplicates();
+  setTimeout(removeDuplicates,300);
+  setTimeout(removeDuplicates,1200);
+})();
+</script>
 </body>
 </html>
