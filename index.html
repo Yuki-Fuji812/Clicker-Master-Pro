@@ -3192,5 +3192,42 @@ input[type="range"]{
 })();
 </script>
 
+
+<script id="youtube-account-channel-persistence">
+(function(){
+  const KEY='clickerMasterSavedYouTubeAccount';
+
+  function saveCurrentChannelSet(){
+    try{
+      const cards=[...document.querySelectorAll('#subsList [data-channel-id], #subsList a[href*="/channel/"]')];
+      const ids=cards.map(function(el){
+        if(el.dataset && el.dataset.channelId) return el.dataset.channelId;
+        const h=el.getAttribute && el.getAttribute('href');
+        const m=h && h.match(/\/channel\/([^/?#]+)/);
+        return m ? m[1] : '';
+      }).filter(Boolean);
+      if(ids.length){
+        localStorage.setItem(KEY,JSON.stringify({channelIds:ids,savedAt:Date.now()}));
+      }
+    }catch(e){}
+  }
+
+  const obs=new MutationObserver(saveCurrentChannelSet);
+  function watch(){
+    const list=document.getElementById('subsList');
+    if(list) obs.observe(list,{childList:true,subtree:true});
+  }
+
+  const oldSwitch=window.switchSubscriptionsAccount;
+  window.switchSubscriptionsAccount=function(){
+    localStorage.removeItem(KEY);
+    if(typeof oldSwitch==='function') return oldSwitch();
+  };
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',watch);
+  else watch();
+})();
+</script>
+
 </body>
 </html>
