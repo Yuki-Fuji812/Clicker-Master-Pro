@@ -3292,5 +3292,51 @@ input[type="range"]{
 })();
 </script>
 
+<script id="safe-subscription-switch-v2">
+(function(){
+ const K='clickerMasterFixedSubscriptionsV1', B='clickerMasterFixedSubscriptionsBackupV1';
+ const backup=()=>{const v=localStorage.getItem(K);if(v)localStorage.setItem(B,v)};
+ const restore=()=>{const v=localStorage.getItem(B);if(v)localStorage.setItem(K,v)};
+ function bind(){
+  const old=document.getElementById('subsLauncherV61');
+  if(!old||old.dataset.safeSwitchV2)return;
+  const b=old.cloneNode(true); b.dataset.safeSwitchV2='1'; old.replaceWith(b);
+  let timer,long=false;
+  b.addEventListener('pointerdown',()=>{
+   long=false; clearTimeout(timer);
+   timer=setTimeout(()=>{
+    long=true; backup();
+    const before=localStorage.getItem(K);
+    if(typeof window.switchSubscriptionsAccount==='function') window.switchSubscriptionsAccount();
+    if(before)localStorage.setItem(K,before); // long press alone cannot erase current set
+   },800);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(x=>b.addEventListener(x,()=>clearTimeout(timer)));
+  b.addEventListener('contextmenu',e=>e.preventDefault());
+  b.addEventListener('click',e=>{
+   e.preventDefault();e.stopImmediatePropagation();
+   if(long){long=false;return}
+   restore();
+   if(typeof window.openSubscriptions==='function')window.openSubscriptions();
+  },true);
+ }
+ function protect(){
+  new MutationObserver(()=>{
+   const p=document.getElementById('subsPanel');
+   if(!p||p.dataset.safeConfirmV2)return;
+   p.dataset.safeConfirmV2='1';
+   p.addEventListener('click',e=>{
+    const x=e.target.closest('button');if(!x)return;
+    const t=(x.textContent||'').replace(/\s+/g,'');
+    if(t.includes('閉じる')||t.includes('キャンセル'))restore();
+    if(t.includes('固定')||t.includes('このチャンネルに変更'))
+      setTimeout(()=>{const v=localStorage.getItem(K);if(v)localStorage.setItem(B,v)},0);
+   },true);
+  }).observe(document.documentElement,{childList:true,subtree:true});
+ }
+ const go=()=>{setTimeout(bind,100);protect()};
+ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',go):go();
+})();
+</script>
 </body>
 </html>
