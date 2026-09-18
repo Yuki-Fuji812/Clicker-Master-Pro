@@ -1204,7 +1204,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  function panel(){
    if(document.getElementById('subsPanel'))return document.getElementById('subsPanel');
    const p=document.createElement('div');p.id='subsPanel';
-   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="ytAccountSwitchBtn" type="button">OAuth ID再設定</button><button id="subsHome">登録チャンネル</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
+   p.innerHTML='<div id="subsTop"><button id="subsClose">閉じる</button><button id="ytAccountSwitchBtn" type="button">OAuth ID再設定</button><b id="subsTitle">登録チャンネル</b></div><div id="subsList"></div>';
    document.body.appendChild(p);
    p.querySelector('#subsClose').onclick=()=>p.classList.remove('open');
    p.querySelector('#subsHome').onclick=loadSubs;
@@ -3150,5 +3150,47 @@ input[type="range"]{
   else bindReopen();
 })();
 </script>
+
+<script id="registration-longpress-account-switch-final">
+(function(){
+  function bind(){
+    const b=document.getElementById('subsLauncherV61');
+    if(!b || b.dataset.accountSwitchBound==='1') return;
+    b.dataset.accountSwitchBound='1';
+
+    let timer=null, fired=false;
+    const start=function(e){
+      fired=false;
+      clearTimeout(timer);
+      timer=setTimeout(function(){
+        fired=true;
+        if(typeof window.switchSubscriptionsAccount==='function'){
+          window.switchSubscriptionsAccount();
+        }
+      },800);
+    };
+    const cancel=function(){ clearTimeout(timer); };
+
+    b.addEventListener('pointerdown',start);
+    b.addEventListener('pointerup',cancel);
+    b.addEventListener('pointercancel',cancel);
+    b.addEventListener('pointerleave',cancel);
+    b.addEventListener('contextmenu',function(e){e.preventDefault();});
+    b.addEventListener('click',function(e){
+      if(fired){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        fired=false;
+      }
+    },true);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(bind,0);});
+  }else{
+    setTimeout(bind,0);
+  }
+})();
+</script>
+
 </body>
 </html>
