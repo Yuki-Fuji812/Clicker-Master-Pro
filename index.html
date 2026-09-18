@@ -2367,7 +2367,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     if(!btn){
       btn=document.createElement('button');
       btn.type='button';
-      btn.id='subsBtn';
+      btn.id='subsBtnLegacyDisabled';btn.style.display='none';
       btn.textContent='登録';
       btn.addEventListener('click',function(){
         const panel=document.getElementById('subsPanel');
