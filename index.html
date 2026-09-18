@@ -796,6 +796,10 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 .vidCard img{width:100%;height:auto;border-radius:7px;display:block;margin-bottom:5px}
 
 </style>
+
+<style id="single-registration-launcher-fix">
+#subsBtn,#subscriptionBtn,#registeredChannelsBtn,#subsBtnLegacyDisabled{display:none!important;visibility:hidden!important;}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -1191,9 +1195,11 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  const SCOPE='https://www.googleapis.com/auth/youtube.readonly';
  let tokenClient=null,accessToken='';
  function row(){
-   const r=document.querySelector('.urlrow'); if(!r||document.getElementById('subsBtn'))return;
-   const b=document.createElement('button');b.id='subsBtn';b.textContent='登録';b.type='button';r.appendChild(b);
-   b.onclick=openSubs;
+   const r=document.querySelector('.urlrow'); if(!r)return;
+   /* Legacy duplicate launcher disabled. Blue #subsLauncherV61 remains the only launcher. */
+   const oldBtn=document.getElementById('subsBtn');
+   if(oldBtn) oldBtn.remove();
+   return;
  }
  function panel(){
    if(document.getElementById('subsPanel'))return document.getElementById('subsPanel');
@@ -2605,26 +2611,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
 }
 </style>
-<script id="v60-registered-channels-restore">
-(function(){
- function restore(){
-   const row=document.querySelector('.urlrow');
-   if(!row) return;
-   let b=document.getElementById('subsBtn') ||
-         document.getElementById('subscriptionBtn') ||
-         document.getElementById('registeredChannelsBtn') ||
-         [...row.querySelectorAll('button')].find(x=>/登録チャンネル|登録/.test(x.textContent||''));
-   if(b){
-     b.style.setProperty('display','inline-flex','important');
-     b.style.setProperty('visibility','visible','important');
-     b.style.setProperty('opacity','1','important');
-     if((b.textContent||'').trim()==='登録') b.textContent='登録チャンネル';
-   }
- }
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',restore);
- else restore();
-})();
-</script>
+<script id="v60-registered-channels-restore">/* legacy duplicate restore disabled */</script>
 
 
 <style id="v61-subs-launcher">
