@@ -961,6 +961,45 @@ h1{font-size:9px!important;gap:2px!important;padding:0!important;white-space:now
 }
 </style>
 
+
+<style id="responsive-uniform-fit-v26">
+html,body{
+  width:100%;
+  min-width:0 !important;
+  overflow-x:hidden !important;
+}
+
+/* Keep the existing Clicker Master layout intact internally.
+   Only scale the finished layout uniformly when the viewport is too small. */
+@media (orientation: landscape){
+  :root{
+    --cm-base-w: 1180;
+    --cm-base-h: 650;
+    --cm-fit: min(calc(100vw / (var(--cm-base-w) * 1px)),
+                  calc(100vh / (var(--cm-base-h) * 1px)),
+                  1);
+  }
+}
+
+@media (orientation: portrait){
+  body{
+    max-width:100vw;
+  }
+  img,video,iframe{
+    max-width:100%;
+  }
+}
+
+/* Prevent controls from being enlarged by mobile Safari text autosizing. */
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+button,input,select,textarea{
+  box-sizing:border-box;
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
