@@ -1137,11 +1137,11 @@ function downloadExcel(displayName){
     ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0)
     : FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2;
   const clickerValue=plus-minus;
-  const headers=["名称","加点","減点","クリッカー値","EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW","FE合計","停止","放棄","切断"];
+  const headers=["名称","加点","減点","クリッカー値","ｴｸｽｷｭｰｼｮﾝ","ｺﾝﾄﾛｰﾙ","ﾄﾘｯｸ･ﾀﾞｲﾊﾞｰｼﾃｨ","ｽﾍﾟｰｽﾕｰｽ/ｴﾝﾌｧｼｽ","ｺﾚｵｸﾞﾗﾌｨ","ｺﾝｽﾄﾗｸｼｮﾝ","ﾎﾞﾃﾞｨ･ｺﾝﾄﾛｰﾙ","ｼｮｰﾏﾝｼｯﾌﾟ","FE合計","停止-1","放棄-3","切断-5"];
   const vals=[displayName,plus,minus,clickerValue,...FE_CODES.map(k=>Number(feScores[k])||0),feTotal,stop,change,cut];
   const headerRow='<Row ss:Height="24">'+headers.map(v=>'<Cell ss:StyleID="Header"><Data ss:Type="String">'+String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</Data></Cell>').join("")+"</Row>";
   const valueRow='<Row ss:Height="22">'+vals.map((v,i)=>'<Cell ss:StyleID="'+(i===0?"Name":"Score")+'"><Data ss:Type="'+(i===0?"String":"Number")+'">'+String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</Data></Cell>').join("")+"</Row>";
-  const columns='<Column ss:Width="180"/>'+headers.slice(1).map(()=>'<Column ss:Width="58"/>').join("");
+  const columns='<Column ss:Width="180"/>'+headers.slice(1).map((h)=>'<Column ss:Width="'+(String(h).length>=8?105:String(h).length>=5?82:58)+'"/>').join("");
   const styles='<Styles>'
     +'<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Arial" ss:Size="11"/></Style>'
     +'<Style ss:ID="Header"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1"/><Interior ss:Color="#D9EAF7" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>'
