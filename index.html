@@ -1000,6 +1000,14 @@ button,input,select,textarea{
 }
 </style>
 
+
+<style id="landscape-score-swap-fix-v27">
+@media (orientation:landscape){
+  body.cm-score-swapped button#minusBtn{grid-area:plus!important;}
+  body.cm-score-swapped button#plusBtn{grid-area:minus!important;}
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -1115,34 +1123,65 @@ function renderFE(){
   const el=document.getElementById("feTotal"); if(el)el.textContent=raw.toFixed(1);
 }
 
-function csvCell(value){
-  const text=String(value ?? "");
-  return '"' + text.replace(/"/g,'""') + '"';
+function xmlCell(v,type){
+  const esc=String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return '<Cell><Data ss:Type="'+(type||"String")+'">'+esc+'</Data></Cell>';
 }
-function saveCsv(){
+function downloadExcel(displayName){
   const plus=events.filter(e=>!e.special && e.value>0).reduce((a,e)=>a+e.value,0);
   const minus=Math.abs(events.filter(e=>!e.special && e.value<0).reduce((a,e)=>a+e.value,0));
   const stop=events.filter(e=>e.special==="停止").length;
   const change=events.filter(e=>e.special==="放棄").length;
   const cut=events.filter(e=>e.special==="切断").length;
-  const title=currentVideoTitle || "動画タイトル未設定";
-  const rows=[
-    ["動画タイトル","加点","減点","停止","放棄","切断","EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW","FE合計"],
-    [title,plus,minus,stop,change,cut,...FE_CODES.map(k=>Number(feScores[k])||0),
-      window.clickerContestMode==="prelim"
-        ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0)
-        : FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2]
-  ];
-  const csv="\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\r\n");
-  const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
+  const feTotal=window.clickerContestMode==="prelim"
+    ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0)
+    : FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2;
+  const headers=["名称","加点","減点","停止","放棄","切断","EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW","FE合計"];
+  const vals=[displayName,plus,minus,stop,change,cut,...FE_CODES.map(k=>Number(feScores[k])||0),feTotal];
+  const headerRow='<Row ss:Height="24">'+headers.map(v=>'<Cell ss:StyleID="Header"><Data ss:Type="String">'+String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</Data></Cell>').join("")+"</Row>";
+  const valueRow='<Row ss:Height="22">'+vals.map((v,i)=>'<Cell ss:StyleID="'+(i===0?"Name":"Score")+'"><Data ss:Type="'+(i===0?"String":"Number")+'">'+String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</Data></Cell>').join("")+"</Row>";
+  const columns='<Column ss:Width="180"/>'+headers.slice(1).map(()=>'<Column ss:Width="58"/>').join("");
+  const styles='<Styles>'
+    +'<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Arial" ss:Size="11"/></Style>'
+    +'<Style ss:ID="Header"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Bold="1"/><Interior ss:Color="#D9EAF7" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>'
+    +'<Style ss:ID="Name"><Alignment ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>'
+    +'<Style ss:ID="Score"><Alignment ss:Horizontal="Center" ss:Vertical="Center"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style>'
+    +'</Styles>';
+  const xml='<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>'
+    +'<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" '
+    +'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">'+styles
+    +'<Worksheet ss:Name="点数表"><Table>'+columns+headerRow+valueRow+'</Table></Worksheet></Workbook>';
+  const blob=new Blob(["\ufeff"+xml],{type:"application/vnd.ms-excel;charset=utf-8"});
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
   a.href=url;
-  a.download="ClickerMaster_点数表_"+new Date().toISOString().slice(0,10)+".csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.download="ClickerMaster_点数表_"+new Date().toISOString().slice(0,10)+".xls";
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function saveCsv(){
+  const fallback=currentVideoTitle || "動画タイトル未設定";
+  const shade=document.createElement("div");
+  shade.id="nameExportPopupV27";
+  shade.style.cssText="position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px";
+  const box=document.createElement("div");
+  box.style.cssText="width:min(420px,92vw);background:#202126;color:#fff;border:1px solid #777;border-radius:14px;padding:18px;box-sizing:border-box";
+  box.innerHTML='<div style="font-weight:800;font-size:18px;margin-bottom:10px">名称を記入しますか？</div>'
+    +'<input id="exportNameV27" type="text" placeholder="名称を入力" style="width:100%;height:42px;padding:8px 10px;box-sizing:border-box;border-radius:8px;border:1px solid #888;font-size:16px">'
+    +'<div style="display:flex;gap:10px;margin-top:14px">'
+    +'<button id="exportWriteV27" style="flex:1;height:42px">記入する</button>'
+    +'<button id="exportNoWriteV27" style="flex:1;height:42px">記入しない</button></div>';
+  shade.appendChild(box); document.body.appendChild(shade);
+  const input=box.querySelector("#exportNameV27");
+  box.querySelector("#exportWriteV27").onclick=function(){
+    const name=input.value.trim();
+    if(!name){input.focus();return;}
+    shade.remove(); downloadExcel(name);
+  };
+  box.querySelector("#exportNoWriteV27").onclick=function(){
+    shade.remove(); downloadExcel(fallback);
+  };
+  shade.addEventListener("click",function(e){if(e.target===shade)shade.remove()});
+  setTimeout(()=>input.focus(),50);
 }
 
 function render(){
@@ -1344,10 +1383,13 @@ function pollGamepad(){
       lrResetFired = false;
     }
 
-    if(pressed(4) && !now[5]) addEvent("+1",1);        // L: immediate
-    if(pressed(5) && !now[4]) addEvent("-1",-1);       // R: immediate
-    if(pressed(6)) undoBySign(1);                     // ZL: last normal + undo
-    if(pressed(7)) undoBySign(-1);                    // ZR: last normal - undo
+    const scoreOrder=(localStorage.getItem("cmScoreOrder")||"plus,minus").split(",");
+    const leftSign=scoreOrder[0]==="minus" ? -1 : 1;
+    const rightSign=scoreOrder[1]==="plus" ? 1 : -1;
+    if(pressed(4) && !now[5]) addEvent(leftSign>0?"+1":"-1",leftSign);   // L = left button
+    if(pressed(5) && !now[4]) addEvent(rightSign>0?"+1":"-1",rightSign);// R = right button
+    if(pressed(6)) undoBySign(leftSign);                                // ZL = undo left
+    if(pressed(7)) undoBySign(rightSign);                               // ZR = undo right
     if(pressed(2)) specialNamed("停止", -1);          // X
     if(pressed(0)) specialNamed("放棄", -3);          // A
     if(pressed(1)) specialNamed("切断", -5);          // B
@@ -1383,7 +1425,12 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
  const KEY='cmScoreOrder'; let held=null,timer=null,sx=0,sy=0;
  function get(){let g=document.querySelector('.grid');if(!g)return null;let a=Array.from(g.children).filter(e=>e.classList.contains('big')).slice(0,2);return a.length===2?[g,a]:null}
  function type(e){let t=e.textContent||'';return /[+＋]/.test(t)?'plus':'minus'}
- function save(){let x=get();if(x)localStorage.setItem(KEY,x[1].map(type).join(','))}
+ function applyVisual(){
+  let x=get(); if(!x)return;
+  let order=x[1].map(type);
+  document.body.classList.toggle('cm-score-swapped',order[0]==='minus');
+ }
+ function save(){let x=get();if(x){localStorage.setItem(KEY,x[1].map(type).join(','));applyVisual()}}
  function swap(a,b){let p=a.parentNode,m=document.createTextNode('');p.insertBefore(m,a);p.insertBefore(a,b);p.insertBefore(b,m);m.remove();save()}
  function setup(){let x=get();if(!x)return;let [g,a]=x,o=localStorage.getItem(KEY);if(o){let w=o.split(','),m={};a.forEach(e=>m[type(e)]=e);if(w.length===2&&m[w[0]]&&type(a[0])!==w[0])swap(a[0],a[1]);x=get();a=x[1]}
  a.forEach(el=>{el.draggable=true;
@@ -1396,7 +1443,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   el.addEventListener('touchmove',e=>{let t=e.touches[0];if(!held&&Math.hypot(t.clientX-sx,t.clientY-sy)>12){clearTimeout(timer);return}if(held){e.preventDefault();a.forEach(b=>b.classList.remove('score-drop-target'));let q=document.elementFromPoint(t.clientX,t.clientY),b=a.find(z=>z===q||z.contains(q));if(b&&b!==held)b.classList.add('score-drop-target')}},{passive:false});
   el.addEventListener('touchend',e=>{clearTimeout(timer);if(held){let t=e.changedTouches[0],q=document.elementFromPoint(t.clientX,t.clientY),b=a.find(z=>z===q||z.contains(q));if(b&&b!==held)swap(held,b);a.forEach(z=>z.classList.remove('score-dragging','score-drop-target'));held=null}})
  })}
- document.readyState==='loading'?document.addEventListener('DOMContentLoaded',setup):setup();
+ document.readyState==='loading'?document.addEventListener('DOMContentLoaded',function(){setup();applyVisual()}):(setup(),applyVisual());
 })();
 </script>
 
