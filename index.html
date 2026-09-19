@@ -3529,5 +3529,31 @@ input[type="range"]{
 })();
 </script>
 
+
+<script id="prelim-double-final-v23">
+(function(){
+  function correctPrelimTotal(){
+    if(window.clickerContestMode!=="prelim") return;
+    var el=document.getElementById("feTotal");
+    if(!el) return;
+    var n=Number(el.textContent);
+    if(Number.isFinite(n)){
+      el.textContent=(n*2).toFixed(1);
+    }
+  }
+  document.addEventListener("input",function(e){
+    if(e.target && e.target.matches('input[type="range"][min="0"][max="10"]')){
+      setTimeout(correctPrelimTotal,0);
+    }
+  },true);
+  document.addEventListener("change",function(e){
+    if(e.target && e.target.matches('input[type="range"][min="0"][max="10"]')){
+      setTimeout(correctPrelimTotal,0);
+    }
+  },true);
+  setInterval(correctPrelimTotal,150);
+})();
+</script>
+
 </body>
 </html>
