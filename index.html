@@ -1046,6 +1046,11 @@ button,input,select,textarea{
 }
 </style>
 
+<style id="logo-accent-v34">
+h1{position:relative!important;text-shadow:0 0 10px rgba(255,255,255,.22)!important}
+h1::after{content:""!important;position:absolute!important;left:2px!important;bottom:0!important;width:42%!important;height:2px!important;border-radius:2px!important;background:linear-gradient(90deg,#22c55e,#ef4444,transparent)!important;pointer-events:none!important}
+@media (orientation:landscape){h1::after{width:58%!important;height:1px!important}}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -3707,5 +3712,44 @@ input[type="range"]{
 })();
 </script>
 
+
+<script id="fe-visual-reset-v35">
+(function(){
+  function clearFeVisuals(){
+    document.querySelectorAll('input[type="range"]').forEach(function(sl){
+      sl.value=0;
+      sl.setAttribute("value","0");
+      sl.style.removeProperty("background");
+      sl.style.setProperty("--value","0");
+      sl.style.setProperty("--val","0");
+      sl.style.setProperty("--pct","0%");
+      try{
+        sl.dispatchEvent(new Event("input",{bubbles:true}));
+        sl.dispatchEvent(new Event("change",{bubbles:true}));
+      }catch(e){}
+      var old=sl.style.display;
+      sl.style.display="none";
+      void sl.offsetHeight;
+      sl.style.display=old;
+    });
+  }
+
+  var btn=document.getElementById("contestModeV17");
+  if(!btn) return;
+
+  /* Works in portrait and landscape, including the 1-second long-press switch. */
+  new MutationObserver(function(){
+    clearFeVisuals();
+    setTimeout(clearFeVisuals,80);
+    setTimeout(clearFeVisuals,220);
+  }).observe(btn,{childList:true,subtree:true,characterData:true});
+
+  ["click","pointerup","touchend"].forEach(function(type){
+    btn.addEventListener(type,function(){
+      setTimeout(clearFeVisuals,1100);
+    },true);
+  });
+})();
+</script>
 </body>
 </html>
