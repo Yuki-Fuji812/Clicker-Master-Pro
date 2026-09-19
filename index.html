@@ -1009,18 +1009,40 @@ button,input,select,textarea{
 </style>
 
 
-<style id="clicker-art-half-size-v32">
-.title-clickers{
-  width:60px !important;
-  height:auto !important;
-  max-width:60px !important;
-  transform:none !important;
-}
-#landscapeClickerV11{
-  width:42px !important;
-  height:auto !important;
-  max-width:42px !important;
-  transform:none !important;
+<style id="landscape-brand-row-v33">
+/* Landscape: Clicker Master + clicker artwork on one row, clear of search field. */
+@media (orientation:landscape){
+  h1{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:4px !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:34px !important;
+    min-height:34px !important;
+    margin:0 !important;
+    padding:0 2px !important;
+    overflow:hidden !important;
+    white-space:nowrap !important;
+    font-size:8px !important;
+    box-sizing:border-box !important;
+  }
+  h1 .title-clickers{
+    display:block !important;
+    position:static !important;
+    width:22px !important;
+    height:16px !important;
+    max-width:22px !important;
+    flex:0 0 22px !important;
+    object-fit:contain !important;
+    transform:none !important;
+    margin:0 !important;
+  }
+  #landscapeClickerV11{
+    display:none !important;
+  }
 }
 </style>
 
