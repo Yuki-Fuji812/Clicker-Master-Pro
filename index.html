@@ -1089,7 +1089,10 @@ function saveCsv(){
   const title=currentVideoTitle || "動画タイトル未設定";
   const rows=[
     ["動画タイトル","加点","減点","停止","放棄","切断","EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW","FE合計"],
-    [title,plus,minus,stop,change,cut,...FE_CODES.map(k=>Number(feScores[k])||0),FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2]
+    [title,plus,minus,stop,change,cut,...FE_CODES.map(k=>Number(feScores[k])||0),
+      window.clickerContestMode==="prelim"
+        ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0)
+        : FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2]
   ];
   const csv="\uFEFF"+rows.map(row=>row.map(csvCell).join(",")).join("\r\n");
   const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
@@ -3530,28 +3533,52 @@ input[type="range"]{
 </script>
 
 
-<script id="prelim-double-final-v23">
+<script id="prelim-direct-total-v24">
 (function(){
-  function correctPrelimTotal(){
-    if(window.clickerContestMode!=="prelim") return;
-    var el=document.getElementById("feTotal");
-    if(!el) return;
-    var n=Number(el.textContent);
-    if(Number.isFinite(n)){
-      el.textContent=(n*2).toFixed(1);
-    }
+  var CODES=["EXE","CTR","TRV","SUE","CHG","CNS","BDY","SHW"];
+
+  function rangesByCode(){
+    var out={};
+    document.querySelectorAll("*").forEach(function(el){
+      if(el.children.length!==0) return;
+      var code=(el.textContent||"").trim();
+      if(CODES.indexOf(code)<0 || out[code]) return;
+      var n=el.parentElement;
+      for(var i=0;i<6 && n;i++,n=n.parentElement){
+        var r=n.querySelectorAll('input[type="range"][min="0"][max="10"]');
+        if(r.length===1){ out[code]=r[0]; break; }
+      }
+    });
+    return out;
   }
+
+  function correct(){
+    if(window.clickerContestMode!=="prelim") return;
+    var r=rangesByCode();
+    var total=["EXE","CTR","CHG","BDY"].reduce(function(sum,k){
+      return sum + (r[k] ? (Number(r[k].value)||0) : 0);
+    },0);
+    var el=document.getElementById("feTotal");
+    if(el) el.textContent=total.toFixed(1);
+  }
+
   document.addEventListener("input",function(e){
     if(e.target && e.target.matches('input[type="range"][min="0"][max="10"]')){
-      setTimeout(correctPrelimTotal,0);
+      setTimeout(correct,0);
+      setTimeout(correct,30);
     }
   },true);
+
   document.addEventListener("change",function(e){
     if(e.target && e.target.matches('input[type="range"][min="0"][max="10"]')){
-      setTimeout(correctPrelimTotal,0);
+      setTimeout(correct,0);
+      setTimeout(correct,50);
     }
   },true);
-  setInterval(correctPrelimTotal,150);
+
+  /* Legacy renderer may run after input/change, so re-assert the value from source sliders.
+     This does NOT multiply the displayed value, so it cannot grow exponentially. */
+  setInterval(correct,200);
 })();
 </script>
 
