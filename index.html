@@ -1069,8 +1069,11 @@ function renderFE(){
     const el=document.getElementById("fe_"+code); if(el)el.textContent=v;
     const range=document.querySelector('.fe-range[data-fe="'+code+'"]'); if(range)range.value=v;
   });
-  const raw=FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0);
-  const el=document.getElementById("feTotal"); if(el)el.textContent=(raw/2).toFixed(1);
+  const isPrelim=(window.clickerContestMode==="prelim");
+  const raw=isPrelim
+    ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0)
+    : (window.clickerContestMode==="prelim" ? ["EXE","CTR","CHG","BDY"].reduce((a,k)=>a+(Number(feScores[k])||0),0) : FE_CODES.reduce((a,k)=>a+(Number(feScores[k])||0),0)/2);
+  const el=document.getElementById("feTotal"); if(el)el.textContent=raw.toFixed(1);
 }
 
 function csvCell(value){
@@ -3457,9 +3460,10 @@ input[type="range"]{
 
 
 
-<script id="contest-mode-script-v21">
+<script id="contest-mode-script-v22">
 (function(){
- var mode='final', timer=null;
+ window.clickerContestMode='final';
+ var timer=null;
  var keep={EXE:1,CTR:1,CHG:1,BDY:1};
  var codes=['EXE','CTR','TRV','SUE','CHG','CNS','BDY','SHW'];
 
@@ -3468,71 +3472,39 @@ input[type="range"]{
    document.querySelectorAll('*').forEach(function(el){
      if(el.children.length!==0)return;
      var code=(el.textContent||'').trim();
-     if(codes.indexOf(code)<0 || result[code])return;
+     if(codes.indexOf(code)<0||result[code])return;
      var n=el.parentElement;
-     for(var i=0;i<6 && n;i++,n=n.parentElement){
+     for(var i=0;i<6&&n;i++,n=n.parentElement){
        var rs=n.querySelectorAll('input[type="range"][min="0"][max="10"]');
        if(rs.length===1){result[code]={card:n,range:rs[0]};break;}
      }
    });
    return result;
  }
- function calc(){
-   var c=findCards(),sum=0;
-   if(mode==='prelim'){
-     ['EXE','CTR','CHG','BDY'].forEach(function(k){if(c[k])sum+=+c[k].range.value||0;});
-     return sum;
-   }
-   codes.forEach(function(k){if(c[k])sum+=+c[k].range.value||0;});
-   return sum/2;
- }
- function writeTotal(){
-   var v=calc().toFixed(1);
-   document.querySelectorAll('*').forEach(function(el){
-     if(el.children.length)return;
-     var t=(el.textContent||'').trim();
-     if(/\/\s*40/.test(t)&&/(合計|FE)/.test(t))el.textContent='合計 '+v+' / 40';
-   });
- }
- function resetAll(){
-   /* use existing app reset where available */
-   var rb=Array.from(document.querySelectorAll('button')).find(function(b){return /リセット/.test(b.textContent||'');});
-   if(rb){
-     /* reset FE directly as the existing reset is long-press based */
-     var cards=findCards();
-     Object.keys(cards).forEach(function(k){
-       cards[k].range.value=0;
-       cards[k].range.dispatchEvent(new Event('input',{bubbles:true}));
-       cards[k].range.dispatchEvent(new Event('change',{bubbles:true}));
-     });
-   }
-   /* reset normal/special scores through known visible counters/data where app reset handlers may be inaccessible */
-   try{
-     if(typeof window.resetAll==='function') window.resetAll();
-     else if(typeof window.resetScores==='function') window.resetScores();
-   }catch(e){}
-   /* clicker/special visible reset: invoke the existing long-reset pointer path */
-   if(rb){
-     try{
-       rb.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));
-       setTimeout(function(){rb.dispatchEvent(new PointerEvent('pointerup',{bubbles:true}));},1050);
-     }catch(e){}
-   }
+ function resetDirect(){
+   events=[];
+   feScores=Object.fromEntries(FE_CODES.map(function(k){return [k,0];}));
+   started=Date.now();
+   localStorage.setItem("yoyo-events","[]");
+   localStorage.setItem("yoyo-started",started);
+   localStorage.setItem("yoyo-fe-scores",JSON.stringify(feScores));
+   render();
+   renderFE();
  }
  function apply(){
-   var cards=findCards();
+   var cards=findCards(),pre=window.clickerContestMode==='prelim';
    codes.forEach(function(k){
-     if(cards[k])cards[k].card.style.setProperty('display',(mode==='prelim'&&!keep[k])?'none':'','important');
+     if(cards[k])cards[k].card.style.setProperty('display',(pre&&!keep[k])?'none':'','important');
    });
    var b=document.getElementById('contestModeV17');
-   b.textContent=mode==='final'?'決勝':'予選・準決勝';
+   b.textContent=pre?'予選・準決勝':'決勝';
    b.style.setProperty('background','#29292e','important');
-   writeTotal();
+   renderFE();
  }
  function toggle(){
-   mode=mode==='final'?'prelim':'final';
-   resetAll();
-   setTimeout(function(){apply();writeTotal();},1100);
+   window.clickerContestMode=window.clickerContestMode==='final'?'prelim':'final';
+   resetDirect();
+   apply();
  }
  function start(){clearTimeout(timer);timer=setTimeout(toggle,1000);}
  function cancel(){clearTimeout(timer);timer=null;}
@@ -3550,18 +3522,6 @@ input[type="range"]{
    b.addEventListener('pointercancel',cancel);
    b.addEventListener('pointerleave',cancel);
    b.addEventListener('click',function(e){e.preventDefault();});
-   document.addEventListener('input',function(e){
-     if(e.target&&e.target.matches('input[type="range"][min="0"][max="10"]')){
-       setTimeout(writeTotal,0);setTimeout(writeTotal,20);setTimeout(writeTotal,100);
-     }
-   },true);
-   document.addEventListener('change',function(e){
-     if(e.target&&e.target.matches('input[type="range"][min="0"][max="10"]')){
-       setTimeout(writeTotal,0);setTimeout(writeTotal,50);setTimeout(writeTotal,250);
-     }
-   },true);
-   /* prevent legacy Mutation/interval calculations from remaining visible */
-   setInterval(writeTotal,200);
    place();apply();
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
