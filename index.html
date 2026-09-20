@@ -1323,7 +1323,7 @@ input.fe-range[type="range"]::-moz-range-thumb{
 </div></div>
 <div class="fe-total compact-total landscape-total">FE合計 <b id="feTotal">0.0</b> / 40</div>
 <div class="bottom-actions landscape-actions">
-<button id="resetHoldBtn">リセット(長押し)</button>
+<button id="resetHoldBtn">リセット</button>
 <button id="csvSaveBtn" class="csv-save" onclick="saveCsv()">CSV保存</button>
 </div>
 
@@ -3934,6 +3934,14 @@ input[type="range"]{
 }
 </style>
 <!-- fe-orientation-persist-v79 removed: no re-entry needed; FE state is retained directly -->
+
+<style id="portrait-fe-marker-final-v81">
+/* Portrait only: place the white pointer lower, at the score/tick side of the blue FE track. Landscape unchanged. */
+@media (orientation:portrait){
+  .fe-marker-v78{top:28px!important;}
+}
+</style>
+
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
