@@ -3858,7 +3858,11 @@ input[type="range"]{
    if(matchMedia('(orientation:portrait)').matches){
      var csv=Array.from(document.querySelectorAll('button')).find(function(x){return /CSV保存/.test(x.textContent||'');});
      if(csv){var row=csv.parentElement;if(row&&row.parentElement)row.parentElement.insertBefore(b,row.nextSibling);}
-   }else document.body.appendChild(b);
+   }else{
+     var special=document.querySelector('.special-row.landscape-special');
+     var stop=document.getElementById('stopBtn');
+     if(special){ if(stop) special.insertBefore(b,stop); else special.prepend(b); }
+   }
  }
  function init(){
    var b=document.getElementById('contestModeV17');if(!b)return;
@@ -3942,6 +3946,13 @@ input[type="range"]{
 }
 </style>
 
+
+<style id="landscape-contest-order-v82">
+@media (orientation:landscape){
+ #contestModeV17{position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:82px!important;min-width:82px!important;max-width:82px!important;height:30px!important;min-height:30px!important;margin:0!important;padding:1px!important;font-size:9px!important;}
+ .special-row.landscape-special{padding-top:0!important;}
+}
+</style>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4033,5 +4044,36 @@ input.fe-range[type="range"]::-moz-range-thumb{
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(all,0);setTimeout(all,200);});else{setTimeout(all,0);setTimeout(all,200);}
   window.cmRefreshFeMarkersV78=all;
   setInterval(all,500);
+})();
+</script>
+
+<style id="landscape-contest-special-order-fix">
+@media (orientation:landscape){
+  .special-row.landscape-special #contestModeV17{
+    position:static!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;
+    width:82px!important;min-width:82px!important;max-width:82px!important;
+    height:30px!important;min-height:30px!important;margin:0!important;padding:1px!important;
+    font-size:9px!important;box-sizing:border-box!important;
+  }
+  .special-row.landscape-special{padding-top:0!important;}
+}
+</style>
+<script id="landscape-contest-special-order-fix-js">
+(function(){
+ function placeContestButton(){
+   var b=document.getElementById('contestModeV17'); if(!b)return;
+   if(matchMedia('(orientation:landscape)').matches){
+     var special=document.querySelector('.special-row.landscape-special');
+     var stop=document.getElementById('stopBtn');
+     if(special){ if(stop) special.insertBefore(b,stop); else special.prepend(b); }
+   }else{
+     var csv=Array.from(document.querySelectorAll('button')).find(function(x){return /CSV保存/.test(x.textContent||'');});
+     if(csv){var row=csv.parentElement;if(row&&row.parentElement)row.parentElement.insertBefore(b,row.nextSibling);}
+   }
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(placeContestButton,0);setTimeout(placeContestButton,300);});
+ else {setTimeout(placeContestButton,0);setTimeout(placeContestButton,300);}
+ window.addEventListener('orientationchange',function(){setTimeout(placeContestButton,350);});
+ window.addEventListener('resize',function(){setTimeout(placeContestButton,50);});
 })();
 </script>
