@@ -1051,6 +1051,31 @@ h1{position:relative!important;text-shadow:0 0 10px rgba(255,255,255,.22)!import
 h1::after{content:""!important;position:absolute!important;left:2px!important;bottom:0!important;width:42%!important;height:2px!important;border-radius:2px!important;background:linear-gradient(90deg,#22c55e,#ef4444,transparent)!important;pointer-events:none!important}
 @media (orientation:landscape){h1::after{width:58%!important;height:1px!important}}
 </style>
+
+<style id="button-border-background-v36">
+/* Search / subscriptions / file: same white outline treatment as other action buttons. */
+.urlrow .load,
+.urlrow .filebtn,
+#subsLauncherV61{
+  border:3px solid rgba(255,255,255,.82) !important;
+  box-sizing:border-box !important;
+}
+
+/* Keep the dark theme, but add restrained depth instead of flat pure black. */
+html,body,.wrap{
+  background-color:#050608 !important;
+}
+body{
+  background-image:
+    radial-gradient(circle at 50% 38%, rgba(35,45,62,.24) 0, rgba(12,15,21,.16) 28%, rgba(0,0,0,0) 58%),
+    linear-gradient(135deg, rgba(34,197,94,.035) 0%, rgba(0,0,0,0) 38%, rgba(239,68,68,.03) 100%) !important;
+  background-attachment:fixed !important;
+}
+.wrap{
+  background:transparent !important;
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
