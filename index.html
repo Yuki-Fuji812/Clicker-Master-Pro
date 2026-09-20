@@ -1246,6 +1246,23 @@ body::after{
 }
 </style>
 
+
+<style id="fe-marker-thumb-vfinal">
+/* FE cursor: compact marker/pointer shape; layout dimensions unchanged. */
+input.fe-range[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none!important; appearance:none!important;
+  border-radius:2px 2px 7px 2px!important;
+  transform:rotate(45deg)!important;
+  background:#fff!important; border:1px solid rgba(10,156,255,.95)!important;
+  box-shadow:0 0 0 1px rgba(0,0,0,.35)!important;
+}
+input.fe-range[type="range"]::-moz-range-thumb{
+  border-radius:2px 2px 7px 2px!important;
+  transform:rotate(45deg)!important;
+  background:#fff!important; border:1px solid rgba(10,156,255,.95)!important;
+  box-shadow:0 0 0 1px rgba(0,0,0,.35)!important;
+}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -1304,7 +1321,7 @@ body::after{
 <div class="fe-label"><b>SHW</b><span>ショーマンシップ</span><strong id="fe_SHW">0</strong></div>
 <input class="fe-range" data-fe="SHW" type="range" min="0" max="10" step="1" value="0" oninput="setFEInline('SHW',this.value)">
 </div></div>
-<div class="fe-total compact-total landscape-total">合計 <b id="feTotal">0.0</b> / 40</div>
+<div class="fe-total compact-total landscape-total">FE合計 <b id="feTotal">0.0</b> / 40</div>
 <div class="bottom-actions landscape-actions">
 <button id="resetHoldBtn">リセット(長押し)</button>
 <button id="csvSaveBtn" class="csv-save" onclick="saveCsv()">CSV保存</button>
@@ -1352,7 +1369,7 @@ function renderFE(){
   FE_CODES.forEach(code=>{
     const v=Number(feScores[code])||0;
     const el=document.getElementById("fe_"+code); if(el)el.textContent=v;
-    const range=document.querySelector('.fe-range[data-fe="'+code+'"]'); if(range)range.value=v;
+    const range=document.querySelector('.fe-range[data-fe="'+code+'"]'); if(range){ range.value=v; range.style.setProperty("--fe-fill",(v*10)+"%"); }
   });
   const isPrelim=(window.clickerContestMode==="prelim");
   const raw=isPrelim
