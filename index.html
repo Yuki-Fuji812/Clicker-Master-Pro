@@ -3998,3 +3998,54 @@ input.fe-range[type="range"]::-moz-range-thumb{
 </style>
 </html>
 <style id="clicker-real-transparency-v43">.title-clickers,#landscapeClickerV11{mix-blend-mode:normal!important;background:transparent!important}</style>
+
+<style id="v78-fe-marker-exact-alignment">
+/* Exact FE marker/scale alignment in portrait + landscape. Native thumb is hidden; custom marker is white. */
+.fe-scale-wrap-v11{position:relative!important;}
+input.fe-range[type="range"]::-webkit-slider-thumb{
+  opacity:0!important; background:transparent!important; filter:none!important; clip-path:none!important; -webkit-clip-path:none!important;
+}
+input.fe-range[type="range"]::-moz-range-thumb{
+  opacity:0!important; background:transparent!important; filter:none!important; clip-path:none!important;
+}
+.fe-marker-v78{
+  position:absolute!important; z-index:20!important; pointer-events:none!important;
+  width:16px!important; height:14px!important;
+  background:#fff!important;
+  clip-path:polygon(0 0,100% 0,50% 100%)!important;
+  -webkit-clip-path:polygon(0 0,100% 0,50% 100%)!important;
+  transform:translateX(-50%)!important;
+  top:20px!important;
+  filter:drop-shadow(0 0 1px rgba(0,0,0,.9))!important;
+}
+.fe-scale-v11{left:0!important;right:0!important;}
+.fe-scale-v11 span{position:absolute!important;transform:translateX(-50%)!important;}
+@media (orientation:landscape){
+  .fe-marker-v78{width:11px!important;height:9px!important;top:12px!important;}
+  .fe-scale-v11{left:0!important;right:0!important;}
+}
+</style>
+<script id="v78-fe-marker-exact-alignment-js">
+(function(){
+  function half(){return matchMedia('(orientation:landscape)').matches?5.5:8;}
+  function pos(v,h){v=Math.max(0,Math.min(10,Number(v)||0));return 'calc('+(v*10)+'% + '+(h*(1-2*v/10))+'px)';}
+  function setup(r){
+    if(!r.classList.contains('fe-range'))return;
+    var w=r.parentElement;if(!w)return;
+    var m=w.querySelector('.fe-marker-v78');
+    if(!m){m=document.createElement('span');m.className='fe-marker-v78';w.appendChild(m);}
+    var h=half(),v=Number(r.value||0);m.style.left=pos(v,h);
+    var sc=w.querySelector('.fe-scale-v11');
+    if(sc){Array.from(sc.children).forEach(function(sp,i){sp.style.left=pos(i,h);});}
+  }
+  function all(){document.querySelectorAll('input.fe-range[type="range"]').forEach(setup);}
+  document.addEventListener('input',function(e){if(e.target&&e.target.matches('input.fe-range[type="range"]'))setup(e.target);},true);
+  document.addEventListener('change',function(e){if(e.target&&e.target.matches('input.fe-range[type="range"]'))setup(e.target);},true);
+  window.addEventListener('resize',all);
+  window.addEventListener('orientationchange',function(){setTimeout(all,100);});
+  new MutationObserver(all).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['value']});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(all,0);setTimeout(all,200);});else{setTimeout(all,0);setTimeout(all,200);}
+  window.cmRefreshFeMarkersV78=all;
+  setInterval(all,500);
+})();
+</script>
