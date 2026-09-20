@@ -3963,6 +3963,44 @@ input[type="range"]{
   });
 })();
 </script>
+
+<style id="portrait-fe-marker-lower-v79">
+/* Portrait only: lower the FE pointer so its tip sits closer to the score ticks. */
+@media (orientation:portrait){
+  .fe-marker-v78{top:24px!important;}
+}
+</style>
+<script id="fe-orientation-persist-v79">
+(function(){
+  var CODES=['EXE','CTR','TRV','SUE','CHG','CNS','BDY','SHW'];
+  var snap=null;
+  function capture(){
+    snap={};
+    CODES.forEach(function(code){
+      var r=document.querySelector('input.fe-range[data-fe="'+code+'"]');
+      var v=(window.feScores&&window.feScores[code]!=null)?window.feScores[code]:(r?Number(r.value):0);
+      snap[code]=Number(v)||0;
+    });
+  }
+  function restore(){
+    if(!snap)return;
+    CODES.forEach(function(code){
+      var v=Number(snap[code])||0;
+      if(typeof feScores!=='undefined') feScores[code]=v;
+      var r=document.querySelector('input.fe-range[data-fe="'+code+'"]');
+      if(r){r.value=v;r.style.setProperty('--fe-fill',(v*10)+'%');}
+      var n=document.getElementById('fe_'+code);if(n)n.textContent=v;
+    });
+    try{localStorage.setItem('yoyo-fe-scores',JSON.stringify(typeof feScores!=='undefined'?feScores:snap));}catch(e){}
+    if(typeof renderFE==='function')renderFE();
+    if(typeof window.cmRefreshFeMarkersV78==='function')window.cmRefreshFeMarkersV78();
+  }
+  window.addEventListener('orientationchange',function(){
+    capture();
+    [50,180,400,800].forEach(function(ms){setTimeout(restore,ms);});
+  },true);
+})();
+</script>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
