@@ -3964,5 +3964,37 @@ input[type="range"]{
 })();
 </script>
 </body>
+
+<style id="v77-fe-triangle-marker-unified">
+/* FE marker: same downward pointer design in portrait and landscape. */
+input.fe-range[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none!important; appearance:none!important;
+  width:16px!important; height:14px!important; min-width:16px!important; min-height:14px!important;
+  border:0!important; border-radius:0!important;
+  background:#0a9cff!important;
+  clip-path:polygon(0 0,100% 0,50% 100%)!important;
+  -webkit-clip-path:polygon(0 0,100% 0,50% 100%)!important;
+  filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff)!important;
+  transform:none!important; padding:0!important; box-sizing:border-box!important;
+  margin-top:-5.5px!important;
+}
+input.fe-range[type="range"]::-moz-range-thumb{
+  width:16px!important; height:14px!important; min-width:16px!important; min-height:14px!important;
+  border:0!important; border-radius:0!important;
+  background:#0a9cff!important;
+  clip-path:polygon(0 0,100% 0,50% 100%)!important;
+  filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff)!important;
+  transform:none!important; padding:0!important; box-sizing:border-box!important;
+}
+@media (orientation:landscape){
+  input.fe-range[type="range"]::-webkit-slider-thumb{
+    width:11px!important; height:9px!important; min-width:11px!important; min-height:9px!important;
+    margin-top:-3px!important;
+  }
+  input.fe-range[type="range"]::-moz-range-thumb{
+    width:11px!important; height:9px!important; min-width:11px!important; min-height:9px!important;
+  }
+}
+</style>
 </html>
 <style id="clicker-real-transparency-v43">.title-clickers,#landscapeClickerV11{mix-blend-mode:normal!important;background:transparent!important}</style>
