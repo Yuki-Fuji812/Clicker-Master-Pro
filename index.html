@@ -3925,44 +3925,7 @@ input[type="range"]{
 </script>
 
 
-<script id="fe-visual-reset-v35">
-(function(){
-  function clearFeVisuals(){
-    document.querySelectorAll('input[type="range"]').forEach(function(sl){
-      sl.value=0;
-      sl.setAttribute("value","0");
-      sl.style.removeProperty("background");
-      sl.style.setProperty("--value","0");
-      sl.style.setProperty("--val","0");
-      sl.style.setProperty("--pct","0%");
-      try{
-        sl.dispatchEvent(new Event("input",{bubbles:true}));
-        sl.dispatchEvent(new Event("change",{bubbles:true}));
-      }catch(e){}
-      var old=sl.style.display;
-      sl.style.display="none";
-      void sl.offsetHeight;
-      sl.style.display=old;
-    });
-  }
-
-  var btn=document.getElementById("contestModeV17");
-  if(!btn) return;
-
-  /* Works in portrait and landscape, including the 1-second long-press switch. */
-  new MutationObserver(function(){
-    clearFeVisuals();
-    setTimeout(clearFeVisuals,80);
-    setTimeout(clearFeVisuals,220);
-  }).observe(btn,{childList:true,subtree:true,characterData:true});
-
-  ["click","pointerup","touchend"].forEach(function(type){
-    btn.addEventListener(type,function(){
-      setTimeout(clearFeVisuals,1100);
-    },true);
-  });
-})();
-</script>
+<!-- fe-visual-reset-v35 removed: it reset FE during orientation-only UI updates -->
 
 <style id="portrait-fe-marker-lower-v79">
 /* Portrait only: lower the FE pointer so its tip sits closer to the score ticks. */
@@ -3970,37 +3933,7 @@ input[type="range"]{
   .fe-marker-v78{top:24px!important;}
 }
 </style>
-<script id="fe-orientation-persist-v79">
-(function(){
-  var CODES=['EXE','CTR','TRV','SUE','CHG','CNS','BDY','SHW'];
-  var snap=null;
-  function capture(){
-    snap={};
-    CODES.forEach(function(code){
-      var r=document.querySelector('input.fe-range[data-fe="'+code+'"]');
-      var v=(window.feScores&&window.feScores[code]!=null)?window.feScores[code]:(r?Number(r.value):0);
-      snap[code]=Number(v)||0;
-    });
-  }
-  function restore(){
-    if(!snap)return;
-    CODES.forEach(function(code){
-      var v=Number(snap[code])||0;
-      if(typeof feScores!=='undefined') feScores[code]=v;
-      var r=document.querySelector('input.fe-range[data-fe="'+code+'"]');
-      if(r){r.value=v;r.style.setProperty('--fe-fill',(v*10)+'%');}
-      var n=document.getElementById('fe_'+code);if(n)n.textContent=v;
-    });
-    try{localStorage.setItem('yoyo-fe-scores',JSON.stringify(typeof feScores!=='undefined'?feScores:snap));}catch(e){}
-    if(typeof renderFE==='function')renderFE();
-    if(typeof window.cmRefreshFeMarkersV78==='function')window.cmRefreshFeMarkersV78();
-  }
-  window.addEventListener('orientationchange',function(){
-    capture();
-    [50,180,400,800].forEach(function(ms){setTimeout(restore,ms);});
-  },true);
-})();
-</script>
+<!-- fe-orientation-persist-v79 removed: no re-entry needed; FE state is retained directly -->
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4032,6 +3965,13 @@ input.fe-range[type="range"]::-moz-range-thumb{
   input.fe-range[type="range"]::-moz-range-thumb{
     width:11px!important; height:9px!important; min-width:11px!important; min-height:9px!important;
   }
+}
+</style>
+
+<style id="portrait-fe-marker-lower-v80">
+/* Portrait only: final override. Lower pointer so the triangle tip aligns with the score tick area. */
+@media (orientation:portrait){
+  .fe-marker-v78{top:28px!important;}
 }
 </style>
 </html>
