@@ -1234,6 +1234,18 @@ body::after{
 }
 </style>
 
+
+<!-- v-next: landscape YouTube-only additional left shift; local file video unchanged -->
+<style id="youtube-landscape-left-shift-vnext">
+@media (orientation:landscape){
+  .video iframe{
+    position:relative!important;
+    left:-12px!important;
+    width:calc(100% + 12px)!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
