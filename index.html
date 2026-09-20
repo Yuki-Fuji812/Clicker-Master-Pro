@@ -1224,6 +1224,16 @@ body::after{
 }
 </style>
 
+
+<style id="youtube-landscape-left-adjust-v1">
+/* 横画面のみ：ファイル動画・背景枠はそのまま、YouTube iframeだけ左へ微調整 */
+@media (orientation:landscape){
+  .video.landscape-video iframe{
+    transform:translateX(-18px)!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
