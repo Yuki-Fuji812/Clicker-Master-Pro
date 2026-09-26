@@ -4042,82 +4042,94 @@ input[type="range"]{
 }
 </style>
 
-<style id="fe-hysteresis-touch-v4-css">
+
+
+
+<style id="fe-hold-lock-v6-css">
 input.fe-range[type="range"]{touch-action:none!important}
 </style>
-<script id="fe-hysteresis-touch-v4-js">
+<script id="fe-hold-lock-v6-js">
 (function(){
-  function setup(r){
-    if(r.dataset.feHysteresisV4)return;
-    r.dataset.feHysteresisV4='1';
+  const HOLD_MS=500;
+  document.querySelectorAll('input.fe-range[type="range"]').forEach(function(r){
+    if(r.dataset.feHoldLockV6)return;
+    r.dataset.feHoldLockV6='1';
 
-    var active=false,startX=0,startV=0,currentV=0,pid=null;
+    let active=false, locked=false, pid=null;
+    let candidate=Number(r.value)||0, lockedValue=candidate;
+    let holdTimer=null;
 
     function commit(v){
       v=Math.max(0,Math.min(10,Math.round(v)));
-      if(Number(r.value)===v)return;
       r.value=String(v);
       r.dispatchEvent(new Event('input',{bubbles:true}));
       r.dispatchEvent(new Event('change',{bubbles:true}));
     }
+    function valueAt(x){
+      const b=r.getBoundingClientRect();
+      if(!b.width)return Number(r.value)||0;
+      return Math.max(0,Math.min(10,Math.round(((x-b.left)/b.width)*10)));
+    }
+    function cancelTimer(){
+      if(holdTimer){clearTimeout(holdTimer);holdTimer=null;}
+    }
+    function arm(v){
+      cancelTimer();
+      candidate=v;
+      holdTimer=setTimeout(function(){
+        if(!active || candidate!==v)return;
+        locked=true;
+        lockedValue=v;
+        commit(lockedValue);
+      },HOLD_MS);
+    }
 
     r.addEventListener('pointerdown',function(e){
       if(e.pointerType==='mouse' && e.button!==0)return;
-      active=true; pid=e.pointerId;
-      startX=e.clientX;
-      startV=currentV=Number(r.value)||0;
+      active=true; locked=false; pid=e.pointerId;
+      const v=valueAt(e.clientX);
+      commit(v);
+      arm(v);
       try{r.setPointerCapture(pid)}catch(_){}
-      e.preventDefault();
-      e.stopImmediatePropagation();
+      e.preventDefault(); e.stopImmediatePropagation();
     },true);
 
     r.addEventListener('pointermove',function(e){
       if(!active || e.pointerId!==pid)return;
-      var w=r.getBoundingClientRect().width;
-      if(!w)return;
-
-      // 0～10 = 10 intervals. 1目盛りの実幅を算出。
-      var one=w/10;
-      var dx=e.clientX-startX;
-
-      // 1点目は0.65目盛り、以後は1目盛りごと。
-      // 小さな手ブレ・指を離す直前の揺れでは値を変えない。
-      var steps=0;
-      if(Math.abs(dx)>=one*0.65){
-        steps=(dx>0?1:-1) * (1+Math.floor((Math.abs(dx)-one*0.65)/one));
+      if(locked){
+        commit(lockedValue);
+      }else{
+        const v=valueAt(e.clientX);
+        if(v!==candidate){
+          commit(v);
+          arm(v); // 新しい数値で0.5秒カウントをやり直す
+        }
       }
-      var next=Math.max(0,Math.min(10,startV+steps));
-      if(next!==currentV){
-        currentV=next;
-        commit(currentV);
-      }
-      e.preventDefault();
-      e.stopImmediatePropagation();
+      e.preventDefault(); e.stopImmediatePropagation();
     },true);
 
-    function end(e){
+    function finish(e){
       if(!active || e.pointerId!==pid)return;
-      // pointerup座標では再計算しない。最後に安定していた値を確定。
-      const stableV=currentV;
-      commit(stableV);
-      active=false; pid=null;
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      /* iOS/PWA再起動後も、pointerup後にnative changeが遅れて入るのを打ち消す */
-      requestAnimationFrame(()=>commit(stableV));
-      setTimeout(()=>commit(stableV),0);
-      setTimeout(()=>commit(stableV),80);
+      cancelTimer();
+      if(locked){
+        // 離した瞬間にズレても、0.5秒保持して固定した値へ必ず補正
+        commit(lockedValue);
+        requestAnimationFrame(()=>commit(lockedValue));
+        setTimeout(()=>commit(lockedValue),0);
+        setTimeout(()=>commit(lockedValue),80);
+      }else{
+        // 0.5秒保持前に離した場合は、最後に表示されていた整数値を維持
+        const v=candidate;
+        commit(v);
+        requestAnimationFrame(()=>commit(v));
+        setTimeout(()=>commit(v),0);
+      }
+      active=false; locked=false; pid=null;
+      e.preventDefault(); e.stopImmediatePropagation();
     }
-    r.addEventListener('pointerup',end,true);
-    r.addEventListener('pointercancel',end,true);
-  }
-
-  function init(){
-    document.querySelectorAll('input.fe-range[type="range"]').forEach(setup);
-  }
-  if(document.readyState==='loading')
-    document.addEventListener('DOMContentLoaded',init,{once:true});
-  else init();
+    r.addEventListener('pointerup',finish,true);
+    r.addEventListener('pointercancel',finish,true);
+  });
 })();
 </script>
 
