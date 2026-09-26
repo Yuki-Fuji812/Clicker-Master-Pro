@@ -2063,7 +2063,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     }
   }
   function bind(){
-    document.querySelectorAll('input[type="range"]:not(.fe-range)').forEach(el=>{
+    document.querySelectorAll('input[type="range"]').forEach(el=>{
       if(el.dataset.touchEnhanced) return;
       el.dataset.touchEnhanced='1';
       el.addEventListener('pointerdown',e=>{
@@ -3529,7 +3529,7 @@ input[type="range"]{
   }
 
   function init(){
-    document.querySelectorAll('input[type="range"]:not(.fe-range)').forEach(bindSmoothRange);
+    document.querySelectorAll('input[type="range"]').forEach(bindSmoothRange);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
@@ -4042,66 +4042,126 @@ input[type="range"]{
 }
 </style>
 
-<style id="fe-touch-overlay-only-css">
-.fe-scale-wrap-v11{position:relative!important}
-.fe-touch-overlay-v2{
-  position:absolute!important;
-  left:0!important; right:0!important;
-  top:0!important; height:32px!important;
-  z-index:8!important;
+<style id="fe-ios-stable-touch-v3-css">
+input.fe-range[type="range"]{
+  pointer-events:none!important;
+}
+.fe-touch-hit-v3{
+  position:fixed!important;
+  z-index:2147483000!important;
   background:transparent!important;
   touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
 }
 </style>
-<script id="fe-touch-overlay-only-js">
+<script id="fe-ios-stable-touch-v3-js">
 (function(){
- function setValue(r,x){
-   const b=r.getBoundingClientRect();
-   if(!b.width)return;
-   const min=Number(r.min||0), max=Number(r.max||10);
-   const p=Math.max(0,Math.min(1,(x-b.left)/b.width));
-   const v=Math.max(min,Math.min(max,Math.round(min+p*(max-min))));
-   if(Number(r.value)!==v){
-     r.value=String(v);
-     r.style.setProperty('--fe-fill',(v*10)+'%');
-     r.dispatchEvent(new Event('input',{bubbles:true}));
-     r.dispatchEvent(new Event('change',{bubbles:true}));
-   }
- }
- function bind(){
-   document.querySelectorAll('input.fe-range[type="range"]').forEach(function(r){
-     const host=r.parentElement;
-     if(!host || host.querySelector('.fe-touch-overlay-v2'))return;
-     const o=document.createElement('div');
-     o.className='fe-touch-overlay-v2';
-     let active=false,lastX=0;
-     o.addEventListener('pointerdown',function(e){
-       if(e.pointerType==='mouse' && e.button!==0)return;
-       active=true; lastX=e.clientX;
-       try{o.setPointerCapture(e.pointerId)}catch(_){}
-       setValue(r,lastX);
-       e.preventDefault();
-     },{passive:false});
-     o.addEventListener('pointermove',function(e){
-       if(!active)return;
-       lastX=e.clientX;
-       setValue(r,lastX);
-       e.preventDefault();
-     },{passive:false});
-     function end(e){
-       if(!active)return;
-       active=false;
-       /* Important: do not read release coordinates. Keep the last displayed value. */
-       e.preventDefault();
-     }
-     o.addEventListener('pointerup',end,{passive:false});
-     o.addEventListener('pointercancel',end,{passive:false});
-     host.appendChild(o);
-   });
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bind,0));
- else setTimeout(bind,0);
- window.addEventListener('orientationchange',()=>setTimeout(bind,250));
+  var hits=[];
+
+  function apply(r,v){
+    v=Math.max(0,Math.min(10,Math.round(v)));
+    if(Number(r.value)===v)return;
+    r.value=String(v);
+    r.style.setProperty('--fe-fill',(v*10)+'%');
+    r.dispatchEvent(new Event('input',{bubbles:true}));
+    r.dispatchEvent(new Event('change',{bubbles:true}));
+  }
+
+  function fromX(r,x){
+    var b=r.getBoundingClientRect();
+    if(!b.width)return Number(r.value)||0;
+    var p=Math.max(0,Math.min(1,(x-b.left)/b.width));
+    return Math.round(p*10);
+  }
+
+  function place(h,r){
+    var b=r.getBoundingClientRect();
+    h.style.left=b.left+'px';
+    h.style.width=b.width+'px';
+    h.style.top=(b.top-14)+'px';
+    h.style.height=(b.height+28)+'px';
+    h.style.display=(b.width>0 && b.height>0)?'block':'none';
+  }
+
+  function build(){
+    hits.forEach(function(x){x.h.remove();});
+    hits=[];
+    document.querySelectorAll('input.fe-range[type="range"]').forEach(function(r){
+      var h=document.createElement('div');
+      h.className='fe-touch-hit-v3';
+      document.body.appendChild(h);
+      place(h,r);
+
+      var active=false, last=Number(r.value)||0;
+
+      function startX(x,e){
+        active=true;
+        last=fromX(r,x);
+        apply(r,last);
+        if(e)e.preventDefault();
+      }
+      function moveX(x,e){
+        if(!active)return;
+        var next=fromX(r,x);
+        if(next!==last){
+          last=next;
+          apply(r,last);
+        }
+        if(e)e.preventDefault();
+      }
+      function finish(e){
+        if(!active)return;
+        active=false;
+        /* Crucial: never recalculate from touchend/pointerup coordinates. */
+        apply(r,last);
+        if(e)e.preventDefault();
+      }
+
+      h.addEventListener('touchstart',function(e){
+        if(!e.touches.length)return;
+        startX(e.touches[0].clientX,e);
+      },{passive:false});
+      h.addEventListener('touchmove',function(e){
+        if(!e.touches.length)return;
+        moveX(e.touches[0].clientX,e);
+      },{passive:false});
+      h.addEventListener('touchend',finish,{passive:false});
+      h.addEventListener('touchcancel',finish,{passive:false});
+
+      h.addEventListener('pointerdown',function(e){
+        if(e.pointerType==='touch')return; // touch handled above on iOS
+        if(e.pointerType==='mouse' && e.button!==0)return;
+        active=true; last=fromX(r,e.clientX); apply(r,last);
+        try{h.setPointerCapture(e.pointerId)}catch(_){}
+        e.preventDefault();
+      },{passive:false});
+      h.addEventListener('pointermove',function(e){
+        if(e.pointerType==='touch' || !active)return;
+        last=fromX(r,e.clientX); apply(r,last); e.preventDefault();
+      },{passive:false});
+      h.addEventListener('pointerup',function(e){
+        if(e.pointerType==='touch')return;
+        finish(e);
+      },{passive:false});
+      h.addEventListener('pointercancel',function(e){
+        if(e.pointerType==='touch')return;
+        finish(e);
+      },{passive:false});
+
+      hits.push({h:h,r:r});
+    });
+  }
+
+  function reposition(){hits.forEach(function(x){place(x.h,x.r);});}
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(build,0);});
+  }else setTimeout(build,0);
+
+  window.addEventListener('resize',reposition);
+  window.addEventListener('scroll',reposition,true);
+  window.addEventListener('orientationchange',function(){setTimeout(reposition,250);});
 })();
 </script>
 
