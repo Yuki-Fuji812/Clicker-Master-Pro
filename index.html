@@ -1257,11 +1257,17 @@ body::after{
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=6">
 
 
-<style id="landscape-pro-search-no-overlap">
-@media (orientation: landscape){
-  .search-area{
-    left:22%!important;
-    width:72%!important;
+<style id="landscape-pro-brand-column-final-fix">
+@media (orientation:landscape){
+  .wrap{
+    grid-template-columns:220px minmax(0,1fr) 118px!important;
+  }
+  h1{
+    grid-area:brand!important;
+    font-size:14px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
   }
 }
 </style>
