@@ -1276,6 +1276,14 @@ input.fe-range[type="range"]::-moz-range-thumb{
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=8">
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=8">
 
+<style id="portrait-only-two-point-fix">
+@media (orientation:portrait){
+ h1 .title-clickers{width:72px!important;height:58px!important;flex:0 0 72px!important;object-fit:contain!important}
+ .urlrow.landscape-search{gap:6px!important}
+ .urlrow.landscape-search>input#searchQ{min-width:0!important;padding:0 8px!important;font-size:13px!important}
+ .urlrow.landscape-search>.load,.urlrow.landscape-search>#subsLauncherV61,.urlrow.landscape-search>.filebtn{min-width:0!important;padding-left:8px!important;padding-right:8px!important;font-size:13px!important;white-space:nowrap!important}
+}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
