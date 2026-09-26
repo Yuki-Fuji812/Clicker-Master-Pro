@@ -1351,6 +1351,12 @@ input.fe-range[type="range"]::-moz-range-thumb{
 }
 </style>
 
+
+<style id="registered-channel-playlist-ui">
+.channelMediaTabs{display:flex;gap:8px;position:sticky;top:46px;z-index:1;background:#111;padding:2px 0 8px}
+.channelMediaTab{padding:8px 12px;border-radius:9px;border:1px solid #777;background:#26262c;color:#fff;font-weight:700}
+.channelMediaTab.active{border-color:#fff;background:#3a3a42}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -1900,7 +1906,35 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
    return r.json();
  }
 
+ async function fetchAllKeyApi(baseUrl){
+   let items=[],page='';
+   do{
+     const d=await keyApi(baseUrl+(page?'&pageToken='+encodeURIComponent(page):''));
+     items.push(...(d.items||[]));
+     page=d.nextPageToken||'';
+   }while(page);
+   return items;
+ }
+
+ function addChannelTabs(id,name,active){
+   const list=document.getElementById('subsList');
+   const tabs=document.createElement('div');
+   tabs.className='channelMediaTabs';
+   tabs.style.gridColumn='1/-1';
+   const videos=document.createElement('button');
+   videos.type='button'; videos.className='channelMediaTab'+(active==='videos'?' active':''); videos.textContent='動画';
+   const playlists=document.createElement('button');
+   playlists.type='button'; playlists.className='channelMediaTab'+(active==='playlists'?' active':''); playlists.textContent='プレイリスト';
+   videos.onclick=()=>loadChannelVideos(id,name);
+   playlists.onclick=()=>loadChannelPlaylists(id,name);
+   tabs.append(videos,playlists); list.appendChild(tabs);
+ }
+
  async function loadChannel(id,name){
+   return loadChannelVideos(id,name);
+ }
+
+ async function loadChannelVideos(id,name){
    const list=document.getElementById('subsList');
    document.getElementById('subsTitle').textContent=name;
    list.textContent='動画を読み込み中…';
@@ -1908,24 +1942,58 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
      const c=await keyApi('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id='+encodeURIComponent(id));
      const pl=c.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
      if(!pl) throw new Error('uploads');
-     const d=await keyApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
-     list.innerHTML='';
-     (d.items||[]).forEach(it=>{
+     const items=await fetchAllKeyApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pl));
+     list.innerHTML=''; addChannelTabs(id,name,'videos');
+     items.forEach(it=>{
        const sn=it.snippet, vid=sn.resourceId?.videoId;
        if(!vid) return;
        const b=document.createElement('button');
        b.className='subCard vidCard';
-       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc(sn.thumbnails.medium.url)+'">':'')+
-                   '<span>'+esc(sn.title)+'</span>';
-       b.onclick=()=>{
-         if(typeof playVideo==='function') playVideo(vid,sn.title);
-         panel().classList.remove('open');
-       };
+       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc(sn.thumbnails.medium.url)+'">':'')+'<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>{ if(typeof playVideo==='function') playVideo(vid,sn.title); panel().classList.remove('open'); };
        list.appendChild(b);
      });
-   }catch(e){
-     list.textContent='動画を取得できませんでした。YouTube APIキーを確認してください。';
-   }
+   }catch(e){ list.textContent='動画を取得できませんでした。YouTube APIキーを確認してください。'; }
+ }
+
+ async function loadChannelPlaylists(id,name){
+   const list=document.getElementById('subsList');
+   document.getElementById('subsTitle').textContent=name;
+   list.textContent='プレイリストを読み込み中…';
+   try{
+     const items=await fetchAllKeyApi('https://www.googleapis.com/youtube/v3/playlists?part=snippet&maxResults=50&channelId='+encodeURIComponent(id));
+     list.innerHTML=''; addChannelTabs(id,name,'playlists');
+     if(!items.length){
+       const msg=document.createElement('div'); msg.style.gridColumn='1/-1'; msg.textContent='公開プレイリストがありません。'; list.appendChild(msg); return;
+     }
+     items.forEach(it=>{
+       const sn=it.snippet||{}, pid=it.id;
+       if(!pid) return;
+       const b=document.createElement('button'); b.className='subCard vidCard';
+       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc(sn.thumbnails.medium.url)+'">':'')+'<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>loadPlaylistItems(pid,sn.title,id,name);
+       list.appendChild(b);
+     });
+   }catch(e){ list.textContent='プレイリストを取得できませんでした。YouTube APIキーを確認してください。'; }
+ }
+
+ async function loadPlaylistItems(pid,playlistTitle,channelId,channelName){
+   const list=document.getElementById('subsList');
+   document.getElementById('subsTitle').textContent=playlistTitle;
+   list.textContent='プレイリストの動画を読み込み中…';
+   try{
+     const items=await fetchAllKeyApi('https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId='+encodeURIComponent(pid));
+     list.innerHTML='';
+     const back=document.createElement('button'); back.type='button'; back.className='channelMediaTab'; back.style.gridColumn='1/-1'; back.textContent='← プレイリスト一覧に戻る'; back.onclick=()=>loadChannelPlaylists(channelId,channelName); list.appendChild(back);
+     items.forEach(it=>{
+       const sn=it.snippet||{}, vid=sn.resourceId?.videoId;
+       if(!vid) return;
+       const b=document.createElement('button'); b.className='subCard vidCard';
+       b.innerHTML=(sn.thumbnails?.medium?.url?'<img src="'+esc(sn.thumbnails.medium.url)+'">':'')+'<span>'+esc(sn.title)+'</span>';
+       b.onclick=()=>{ if(typeof playVideo==='function') playVideo(vid,sn.title); panel().classList.remove('open'); };
+       list.appendChild(b);
+     });
+   }catch(e){ list.textContent='プレイリストの動画を取得できませんでした。YouTube APIキーを確認してください。'; }
  }
 
  function oauth(cb,chooseAccount){
