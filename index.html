@@ -2063,7 +2063,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     }
   }
   function bind(){
-    document.querySelectorAll('input[type="range"]').forEach(el=>{
+    document.querySelectorAll('input[type="range"]:not(.fe-range)').forEach(el=>{
       if(el.dataset.touchEnhanced) return;
       el.dataset.touchEnhanced='1';
       el.addEventListener('pointerdown',e=>{
@@ -3529,7 +3529,7 @@ input[type="range"]{
   }
 
   function init(){
-    document.querySelectorAll('input[type="range"]').forEach(bindSmoothRange);
+    document.querySelectorAll('input[type="range"]:not(.fe-range)').forEach(bindSmoothRange);
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
   else init();
@@ -4042,68 +4042,66 @@ input[type="range"]{
 }
 </style>
 
-<script id="fe-touch-stability-only">
+<style id="fe-touch-overlay-only-css">
+.fe-scale-wrap-v11{position:relative!important}
+.fe-touch-overlay-v2{
+  position:absolute!important;
+  left:0!important; right:0!important;
+  top:0!important; height:32px!important;
+  z-index:8!important;
+  background:transparent!important;
+  touch-action:none!important;
+}
+</style>
+<script id="fe-touch-overlay-only-js">
 (function(){
-  const active=new WeakMap();
-
-  function valueFromX(r,x){
-    const b=r.getBoundingClientRect();
-    if(!b.width) return Number(r.value)||0;
-    const min=Number(r.min||0), max=Number(r.max||10), step=Number(r.step||1);
-    let p=Math.max(0,Math.min(1,(x-b.left)/b.width));
-    return Math.max(min,Math.min(max,Math.round((min+p*(max-min)-min)/step)*step+min));
-  }
-  function commit(r,v){
-    v=Math.round(v);
-    if(Number(r.value)===v) return;
-    r.value=String(v);
-    r.dispatchEvent(new Event('input',{bubbles:true}));
-    r.dispatchEvent(new Event('change',{bubbles:true}));
-  }
-
-  document.addEventListener('pointerdown',function(e){
-    const r=e.target && e.target.closest && e.target.closest('input.fe-range[type="range"]');
-    if(!r || (e.pointerType!=='touch' && e.pointerType!=='pen')) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    try{r.setPointerCapture(e.pointerId)}catch(_){}
-    const v=valueFromX(r,e.clientX);
-    active.set(r,{id:e.pointerId,last:v});
-    commit(r,v);
-  },true);
-
-  document.addEventListener('pointermove',function(e){
-    const r=e.target && e.target.closest && e.target.closest('input.fe-range[type="range"]');
-    if(!r || (e.pointerType!=='touch' && e.pointerType!=='pen')) return;
-    const st=active.get(r);
-    if(!st || st.id!==e.pointerId) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-
-    const wanted=valueFromX(r,e.clientX);
-    let next=wanted;
-    // One pointer event may advance at most one score step.
-    // This prevents release-time micro movement from jumping 4 -> 2/6, etc.
-    if(wanted>st.last+1) next=st.last+1;
-    else if(wanted<st.last-1) next=st.last-1;
-
-    st.last=next;
-    commit(r,next);
-  },true);
-
-  function finish(e){
-    const r=e.target && e.target.closest && e.target.closest('input.fe-range[type="range"]');
-    if(!r || (e.pointerType!=='touch' && e.pointerType!=='pen')) return;
-    const st=active.get(r);
-    if(!st || st.id!==e.pointerId) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    // Do not recalculate from release coordinates: keep the last displayed integer.
-    commit(r,st.last);
-    active.delete(r);
-  }
-  document.addEventListener('pointerup',finish,true);
-  document.addEventListener('pointercancel',finish,true);
+ function setValue(r,x){
+   const b=r.getBoundingClientRect();
+   if(!b.width)return;
+   const min=Number(r.min||0), max=Number(r.max||10);
+   const p=Math.max(0,Math.min(1,(x-b.left)/b.width));
+   const v=Math.max(min,Math.min(max,Math.round(min+p*(max-min))));
+   if(Number(r.value)!==v){
+     r.value=String(v);
+     r.style.setProperty('--fe-fill',(v*10)+'%');
+     r.dispatchEvent(new Event('input',{bubbles:true}));
+     r.dispatchEvent(new Event('change',{bubbles:true}));
+   }
+ }
+ function bind(){
+   document.querySelectorAll('input.fe-range[type="range"]').forEach(function(r){
+     const host=r.parentElement;
+     if(!host || host.querySelector('.fe-touch-overlay-v2'))return;
+     const o=document.createElement('div');
+     o.className='fe-touch-overlay-v2';
+     let active=false,lastX=0;
+     o.addEventListener('pointerdown',function(e){
+       if(e.pointerType==='mouse' && e.button!==0)return;
+       active=true; lastX=e.clientX;
+       try{o.setPointerCapture(e.pointerId)}catch(_){}
+       setValue(r,lastX);
+       e.preventDefault();
+     },{passive:false});
+     o.addEventListener('pointermove',function(e){
+       if(!active)return;
+       lastX=e.clientX;
+       setValue(r,lastX);
+       e.preventDefault();
+     },{passive:false});
+     function end(e){
+       if(!active)return;
+       active=false;
+       /* Important: do not read release coordinates. Keep the last displayed value. */
+       e.preventDefault();
+     }
+     o.addEventListener('pointerup',end,{passive:false});
+     o.addEventListener('pointercancel',end,{passive:false});
+     host.appendChild(o);
+   });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bind,0));
+ else setTimeout(bind,0);
+ window.addEventListener('orientationchange',()=>setTimeout(bind,250));
 })();
 </script>
 
