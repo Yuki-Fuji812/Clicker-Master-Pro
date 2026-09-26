@@ -4098,10 +4098,15 @@ input.fe-range[type="range"]{touch-action:none!important}
     function end(e){
       if(!active || e.pointerId!==pid)return;
       // pointerup座標では再計算しない。最後に安定していた値を確定。
-      commit(currentV);
+      const stableV=currentV;
+      commit(stableV);
       active=false; pid=null;
       e.preventDefault();
       e.stopImmediatePropagation();
+      /* iOS/PWA再起動後も、pointerup後にnative changeが遅れて入るのを打ち消す */
+      requestAnimationFrame(()=>commit(stableV));
+      setTimeout(()=>commit(stableV),0);
+      setTimeout(()=>commit(stableV),80);
     }
     r.addEventListener('pointerup',end,true);
     r.addEventListener('pointercancel',end,true);
