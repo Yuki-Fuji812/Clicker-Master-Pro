@@ -1694,6 +1694,12 @@ if(resetHoldBtn){
 let previousButtons = [];
 let lrHoldStart = null;
 let lrResetFired = false;
+let minusHoldStart = null;
+let minusResetFired = false;
+let zlzrHoldStart = null;
+let zlzrModeFired = false;
+let zlPendingUndo = false;
+let zrPendingUndo = false;
 
 window.addEventListener("gamepadconnected", e => {
   document.getElementById("controllerStatus") && (document.getElementById("controllerStatus").textContent =
@@ -1732,8 +1738,39 @@ function pollGamepad(){
     const rightSign=scoreOrder[1]==="plus" ? 1 : -1;
     if(pressed(4) && !now[5]) addEvent(leftSign>0?"+1":"-1",leftSign);   // L = left button
     if(pressed(5) && !now[4]) addEvent(rightSign>0?"+1":"-1",rightSign);// R = right button
-    if(pressed(6)) undoBySign(leftSign);                                // ZL = undo left
-    if(pressed(7)) undoBySign(rightSign);                               // ZR = undo right
+    // ZL / ZR: single press = undo. ZL + ZR hold 1 second = contest mode toggle.
+    // Single undo is committed on release so a simultaneous hold never causes an accidental undo.
+    if(pressed(6) && !now[7]) zlPendingUndo = true;
+    if(pressed(7) && !now[6]) zrPendingUndo = true;
+    if(now[6] && now[7]){
+      zlPendingUndo = false; zrPendingUndo = false;
+      if(zlzrHoldStart === null) zlzrHoldStart = performance.now();
+      if(!zlzrModeFired && performance.now() - zlzrHoldStart >= 1000){
+        if(typeof window.toggleContestModeGamepad === "function") window.toggleContestModeGamepad();
+        zlzrModeFired = true;
+      }
+    } else {
+      zlzrHoldStart = null;
+      zlzrModeFired = false;
+      if(!now[6] && previousButtons[6] && zlPendingUndo){ undoBySign(leftSign); zlPendingUndo=false; }
+      if(!now[7] && previousButtons[7] && zrPendingUndo){ undoBySign(rightSign); zrPendingUndo=false; }
+    }
+
+    // Switch Pro Controller: Minus=8, Plus=9 in the standard Gamepad mapping.
+    // Minus hold 1 second = reset.
+    if(now[8]){
+      if(minusHoldStart === null) minusHoldStart = performance.now();
+      if(!minusResetFired && performance.now() - minusHoldStart >= 1000){
+        performReset();
+        minusResetFired = true;
+      }
+    } else {
+      minusHoldStart = null;
+      minusResetFired = false;
+    }
+    // Plus press = CSV save.
+    if(pressed(9)) saveCsv();
+
     if(pressed(2)) specialNamed("停止", -1);          // X
     if(pressed(0)) specialNamed("放棄", -3);          // A
     if(pressed(1)) specialNamed("切断", -5);          // B
@@ -3939,6 +3976,7 @@ input[type="range"]{
    resetDirect();
    apply();
  }
+ window.toggleContestModeGamepad=toggle;
  function start(){clearTimeout(timer);timer=setTimeout(toggle,1000);}
  function cancel(){clearTimeout(timer);timer=null;}
  function place(){
