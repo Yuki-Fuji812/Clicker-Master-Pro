@@ -1225,26 +1225,11 @@ body::after{
 </style>
 
 
-<style id="youtube-landscape-left-adjust-v1">
-/* 横画面のみ：ファイル動画・背景枠はそのまま、YouTube iframeだけ左へ微調整 */
-@media (orientation:landscape){
-  .video.landscape-video iframe{
-    transform:translateX(-38px)!important;
-  }
-}
-</style>
+
 
 
 <!-- v-next: landscape YouTube-only additional left shift; local file video unchanged -->
-<style id="youtube-landscape-left-shift-vnext">
-@media (orientation:landscape){
-  .video iframe{
-    position:relative!important;
-    left:-48px!important;
-    width:calc(100% + 28px)!important;
-  }
-}
-</style>
+
 
 
 <style id="fe-marker-thumb-vfinal">
