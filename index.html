@@ -4282,44 +4282,103 @@ input.fe-range[type="range"]::-moz-range-thumb{
 })();
 </script>
 
-<style id="landscape-video-geometry-canonical-v3">
+<style id="landscape-video-geometry-canonical-v1">
+/* Canonical landscape geometry. Parent: extend left edge 30px with original right/top/bottom preserved. YouTube: extend left edge 50px with original right edge preserved; grow downward at 16:9. */
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
-    position:relative!important;
-    left:10px!important;
-    top:5px!important;
-    width:calc(100% + 30px)!important;
-    margin-left:-30px!important;
-    overflow:hidden!important;
+    position:fixed!important;
+    left:calc(50% + 10px - 15px)!important;
+    right:auto!important;
+    top:calc(13% + 5px)!important;
+    bottom:auto!important;
+    width:calc(min(54vw, calc(68vh * 16 / 9)) + 30px)!important;
+    height:calc(min(54vw, calc(68vh * 16 / 9)) * 9 / 16)!important;
+    aspect-ratio:auto!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+    overflow:visible!important;
     background:#000!important;
-    box-sizing:border-box!important;
+    z-index:1!important;
+    display:block!important;
   }
+  /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
   #video.video.landscape-video > #cmYoutubePlayer{
     position:absolute!important;
-    left:-50px!important;
+    left:-20px!important;
+    right:auto!important;
     top:0!important;
-    width:calc(100% + 50px)!important;
-    height:calc(100% + 28.125px)!important;
-    margin:0!important;
+    bottom:auto!important;
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
     transform:none!important;
+    margin:0!important;
     overflow:hidden!important;
   }
   #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;inset:0!important;
-    width:100%!important;height:100%!important;
-    max-width:none!important;max-height:none!important;
-    border:0!important;margin:0!important;transform:none!important;
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    border:0!important;
+    margin:0!important;
+    transform:none!important;
   }
   #video.video.landscape-video > iframe{
     position:absolute!important;
-    left:-50px!important;top:0!important;
-    width:calc(100% + 50px)!important;
-    height:calc(100% + 28.125px)!important;
-    max-width:none!important;max-height:none!important;
-    border:0!important;margin:0!important;transform:none!important;
+    left:-20px!important;
+    top:0!important;
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    border:0!important;
+    margin:0!important;
+    transform:none!important;
   }
   #video.video.landscape-video > video{
-    width:100%!important;height:100%!important;object-fit:contain!important;
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    margin:0!important;
+    transform:none!important;
   }
+}
+@media (orientation:landscape) and (min-width:1000px){
+  #video.video.landscape-video{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:10%!important;
+    bottom:auto!important;
+    width:min(64vw, calc(76vh * 16 / 9))!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+    z-index:1!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > video,
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    margin:0!important;
+    transform:none!important;
+    object-fit:contain!important;
+  }
+}
+@media (orientation:landscape){
+  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{z-index:5!important;}
 }
 </style>
