@@ -4742,3 +4742,17 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="iphone-video-region-right10-player-left10-final">
+@media (orientation:landscape) and (max-width:999px){
+  /* Move the visible video region 10px right, preserving its size. */
+  #video.video.landscape-video{
+    left:calc(22% - 25px)!important;
+    right:calc(22% + 25px)!important;
+  }
+  /* Move only the YouTube player itself 10px left inside that region. */
+  #video.video.landscape-video > #cmYoutubePlayer{
+    transform:translateX(-10px)!important;
+  }
+}
+</style>
