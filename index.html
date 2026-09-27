@@ -1432,6 +1432,84 @@ input.fe-range[type="range"]::-moz-range-thumb{
 }
 </style>
 
+
+<style id="landscape-video-fit-center-final-v2">
+/* Final landscape video geometry: preserve 16:9, never crop, and center the visible stage. */
+@media (orientation:landscape) and (max-width:999px){
+  #video.video.landscape-video{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:13%!important;
+    bottom:auto!important;
+    width:min(54vw, calc(68vh * 16 / 9))!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > video{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    margin:0!important;
+    transform:none!important;
+    object-fit:contain!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    border:0!important;
+    transform:none!important;
+  }
+}
+@media (orientation:landscape) and (min-width:1000px){
+  #video.video.landscape-video{
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
+    top:10%!important;
+    bottom:auto!important;
+    width:min(64vw, calc(76vh * 16 / 9))!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > video{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    margin:0!important;
+    transform:none!important;
+    object-fit:contain!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    border:0!important;
+    transform:none!important;
+  }
+}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
