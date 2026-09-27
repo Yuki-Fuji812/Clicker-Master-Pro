@@ -4282,18 +4282,21 @@ input.fe-range[type="range"]::-moz-range-thumb{
 })();
 </script>
 
-<style id="landscape-video-geometry-canonical-v1">
-/* Single source of truth for landscape video geometry. Old experimental video-position blocks removed. */
+<style id="landscape-video-geometry-canonical-v2">
+/* iPhone landscape only:
+   - video REGION expands 30px to the LEFT (right edge stays fixed)
+   - YouTube picture expands 50px to the LEFT
+   - YouTube height grows by 50*9/16 = 28.125px to preserve 16:9 */
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
     position:fixed!important;
-    left:calc(50% + 10px)!important;
+    left:calc(50% + 10px - 30px)!important;
     right:auto!important;
     top:calc(13% + 5px)!important;
     bottom:auto!important;
-    width:min(54vw, calc(68vh * 16 / 9))!important;
+    width:calc(min(54vw, calc(68vh * 16 / 9)) + 30px)!important;
     height:auto!important;
-    aspect-ratio:16 / 9!important;
+    aspect-ratio:auto!important;
     transform:translateX(-50%)!important;
     margin:0!important;
     overflow:hidden!important;
@@ -4301,17 +4304,16 @@ input.fe-range[type="range"]::-moz-range-thumb{
     z-index:1!important;
     display:block!important;
   }
-  /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
   #video.video.landscape-video > #cmYoutubePlayer{
     position:absolute!important;
-    left:50%!important;
+    left:0!important;
     right:auto!important;
     top:0!important;
-    bottom:0!important;
-    width:calc(100% - 20px)!important;
-    height:100%!important;
+    bottom:auto!important;
+    width:calc(100% - 20px + 50px)!important;
+    height:auto!important;
     aspect-ratio:16 / 9!important;
-    transform:translateX(calc(-50% - 10px))!important;
+    transform:translateX(-50px)!important;
     margin:0!important;
     overflow:hidden!important;
   }
@@ -4320,18 +4322,19 @@ input.fe-range[type="range"]::-moz-range-thumb{
     inset:0!important;
     width:100%!important;
     height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
     border:0!important;
     margin:0!important;
     transform:none!important;
   }
   #video.video.landscape-video > iframe{
     position:absolute!important;
-    left:0!important;
+    left:-50px!important;
     top:0!important;
-    width:calc(100% - 20px)!important;
-    height:100%!important;
+    width:calc(100% - 20px + 50px)!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
     border:0!important;
     margin:0!important;
     transform:none!important;
