@@ -4309,7 +4309,7 @@ input.fe-range[type="range"]::-moz-range-thumb{
 
 
 <style id="cm-video-single-authority-v1">
-@media (orientation:landscape) and (max-width:999px){
+@media (orientation:landscape){
   #video.video.landscape-video{
     position:fixed!important;
     left:20%!important; right:23%!important;
@@ -4335,15 +4335,7 @@ input.fe-range[type="range"]::-moz-range-thumb{
 }
 </style>
 
-<style id="cm-youtube-ipad-left-20-final">
-/* Landscape widths above 999px were excluded from the single-authority rule.
-   Move only the YouTube wrapper 20px left; parent video region is untouched. */
-@media (orientation:landscape) and (min-width:1000px){
-  #video.video.landscape-video > #cmYoutubePlayer{
-    transform:translateX(-20px)!important;
-  }
-}
-</style>
+
 <style id="cm-youtube-portrait-restore-final">
 @media (orientation:portrait){
   #video.video #cmYoutubePlayer{
@@ -4366,7 +4358,7 @@ input.fe-range[type="range"]::-moz-range-thumb{
     var host=document.getElementById('video');
     var wrap=host && host.querySelector('#cmYoutubePlayer');
     if(!host || !wrap) return;
-    if(!matchMedia('(orientation:landscape) and (max-width:999px)').matches){
+    if(!matchMedia('(orientation:landscape)').matches){
       if(matchMedia('(orientation:portrait)').matches){
         wrap.style.setProperty('width','100%','important');
         wrap.style.setProperty('height','100%','important');
