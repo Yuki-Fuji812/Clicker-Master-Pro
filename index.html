@@ -4305,152 +4305,83 @@ input.fe-range[type="range"]::-moz-range-thumb{
 
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
 
-<!-- FINAL OVERRIDE: landscape-only contained/centered YouTube; portrait cleanup -->
-
-
-<style id="cm-video-single-authority-v1">
+<!-- FINAL VIDEO AUTHORITY: one orientation-aware rule only -->
+<style id="cm-video-final-authority-v4">
 @media (orientation:landscape){
   #video.video.landscape-video{
     position:fixed!important;
-    left:20%!important; right:23%!important;
-    top:13%!important; bottom:11%!important;
-    width:auto!important; height:auto!important;
-    margin:0!important; transform:none!important;
-    overflow:hidden!important; background:#000!important;
-    z-index:1!important; display:block!important;
+    left:20%!important;right:23%!important;
+    top:13%!important;bottom:11%!important;
+    width:auto!important;height:auto!important;
+    margin:0!important;transform:none!important;
+    overflow:hidden!important;background:#000!important;
+    z-index:1!important;display:block!important;
   }
-  #video.video.landscape-video > #cmYoutubePlayer{
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > iframe#cmYoutubePlayer{
     position:absolute!important;
-    left:50%!important; top:50%!important;
-    right:auto!important; bottom:auto!important;
-    margin:0!important; transform:translate(calc(-50% - 30px),-50%)!important;
-    overflow:hidden!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important; inset:0!important;
-    width:100%!important; height:100%!important;
-    max-width:100%!important; max-height:100%!important;
-    margin:0!important; transform:none!important; border:0!important;
+    right:auto!important;bottom:auto!important;
+    margin:0!important;transform:none!important;
+    max-width:none!important;max-height:none!important;
+    border:0!important;display:block!important;
   }
 }
-</style>
-
-
-<style id="cm-youtube-portrait-restore-final">
 @media (orientation:portrait){
-  #video.video #cmYoutubePlayer{
-    width:100%!important;height:100%!important;
-    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-    transform:none!important;margin:0!important;
-  }
-  #video.video #cmYoutubePlayer > iframe{
-    position:static!important;
+  #video.video > iframe,
+  #video.video > iframe#cmYoutubePlayer{
+    position:static!important;display:block!important;
     width:100%!important;height:100%!important;
     max-width:100%!important;max-height:100%!important;
     left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-    transform:none!important;margin:0!important;
+    inset:auto!important;margin:0!important;transform:none!important;
+    border:0!important;
   }
 }
 </style>
-<script id="cm-video-single-authority-v1-js">
+<script id="cm-video-final-authority-v4-js">
 (function(){
-  function fitLandscapeYoutube(){
-    var host=document.getElementById('video');
-    var wrap=host && host.querySelector('#cmYoutubePlayer');
-    if(!host || !wrap) return;
-    if(!matchMedia('(orientation:landscape)').matches){
-      if(matchMedia('(orientation:portrait)').matches){
-        wrap.style.setProperty('width','100%','important');
-        wrap.style.setProperty('height','100%','important');
-        wrap.style.removeProperty('transform');
-        var pf=wrap.querySelector('iframe');
-        if(pf){
-          pf.style.setProperty('width','100%','important');
-          pf.style.setProperty('height','100%','important');
-          pf.style.removeProperty('inset');
-          pf.style.removeProperty('transform');
-          pf.style.removeProperty('left');
-          pf.style.removeProperty('position');
-        }
-      }
-      return;
-    }
-    var W=host.clientWidth, H=host.clientHeight;
-    if(W<2 || H<2) return;
-    var w=Math.min(W,H*16/9), h=w*9/16;
-    wrap.style.setProperty('width',w+'px','important');
-    wrap.style.setProperty('height',h+'px','important');
-    var f=wrap.querySelector('iframe');
-    if(f){
-      f.style.setProperty('width','100%','important');
-      f.style.setProperty('height','100%','important');
-      f.style.setProperty('inset','0','important');
-      f.style.setProperty('transform','none','important');
-    }
-  }
-  function run(){fitLandscapeYoutube();setTimeout(fitLandscapeYoutube,100);setTimeout(fitLandscapeYoutube,500);}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
-  addEventListener('resize',run); addEventListener('orientationchange',function(){setTimeout(run,350)});
-  var host=document.getElementById('video');
-  if(host) new MutationObserver(run).observe(host,{childList:true,subtree:true});
-})();
-</script>
-
-<style id="cm-youtube-orientation-hard-lock-v3">
-/* Final authority: portrait is always fully restored; landscape-only offsets cannot leak across rotation. */
-@media (orientation:portrait){
-  #video.video > #cmYoutubePlayer,
-  #video.video > iframe#cmYoutubePlayer{
-    position:static!important;
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    left:auto!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:auto!important;
-    inset:auto!important;
-    margin:0!important;
-    transform:none!important;
-  }
-  #video.video > #cmYoutubePlayer > iframe{
-    position:static!important;
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    left:auto!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:auto!important;
-    inset:auto!important;
-    margin:0!important;
-    transform:none!important;
-  }
-}
-</style>
-<script id="cm-youtube-orientation-hard-lock-v3-js">
-(function(){
-  function restorePortraitYoutube(){
-    if(!matchMedia('(orientation:portrait)').matches) return;
+  var SHIFT_LEFT=30;
+  function applyVideoGeometry(){
     var host=document.getElementById('video');
     if(!host) return;
-    var node=host.querySelector('#cmYoutubePlayer');
-    if(!node) return;
-    var props={position:'static',display:'block',width:'100%',height:'100%',maxWidth:'100%',maxHeight:'100%',left:'auto',right:'auto',top:'auto',bottom:'auto',inset:'auto',margin:'0',transform:'none'};
-    Object.keys(props).forEach(function(k){node.style.setProperty(k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),props[k],'important');});
-    var inner=node.tagName==='IFRAME'?null:node.querySelector('iframe');
-    if(inner) Object.keys(props).forEach(function(k){inner.style.setProperty(k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),props[k],'important');});
+    var frame=host.querySelector('iframe');
+    if(!frame) return;
+    if(matchMedia('(orientation:landscape)').matches){
+      var W=host.clientWidth,H=host.clientHeight;
+      if(W<2||H<2) return;
+      var w=Math.min(W,H*16/9),h=w*9/16;
+      var x=(W-w)/2-SHIFT_LEFT;
+      var y=(H-h)/2;
+      frame.style.setProperty('position','absolute','important');
+      frame.style.setProperty('width',w+'px','important');
+      frame.style.setProperty('height',h+'px','important');
+      frame.style.setProperty('left',x+'px','important');
+      frame.style.setProperty('top',y+'px','important');
+      frame.style.setProperty('right','auto','important');
+      frame.style.setProperty('bottom','auto','important');
+      frame.style.setProperty('inset','auto','important');
+      frame.style.setProperty('margin','0','important');
+      frame.style.setProperty('transform','none','important');
+      frame.style.setProperty('max-width','none','important');
+      frame.style.setProperty('max-height','none','important');
+    }else{
+      ['position','display','width','height','max-width','max-height','left','right','top','bottom','inset','margin','transform'].forEach(function(k){frame.style.removeProperty(k);});
+      frame.style.setProperty('position','static','important');
+      frame.style.setProperty('display','block','important');
+      frame.style.setProperty('width','100%','important');
+      frame.style.setProperty('height','100%','important');
+      frame.style.setProperty('max-width','100%','important');
+      frame.style.setProperty('max-height','100%','important');
+      frame.style.setProperty('margin','0','important');
+      frame.style.setProperty('transform','none','important');
+    }
   }
-  function settle(){restorePortraitYoutube();setTimeout(restorePortraitYoutube,80);setTimeout(restorePortraitYoutube,350);setTimeout(restorePortraitYoutube,800);}
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',settle); else settle();
+  function settle(){[0,80,200,450,800,1200].forEach(function(ms){setTimeout(applyVideoGeometry,ms);});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',settle);else settle();
   addEventListener('orientationchange',settle);
   addEventListener('resize',settle);
   var host=document.getElementById('video');
-  if(host) new MutationObserver(settle).observe(host,{childList:true,subtree:true});
+  if(host)new MutationObserver(settle).observe(host,{childList:true,subtree:true});
 })();
 </script>
 
