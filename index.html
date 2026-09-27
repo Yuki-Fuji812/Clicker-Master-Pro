@@ -4176,64 +4176,6 @@ input.fe-range[type="range"]{touch-action:none!important}
 }
 </style>
 
-<style id="youtube-centered-contain-final-v1">
-/* Landscape only: keep the video region geometry, and fit YouTube at the largest complete 16:9 size centered in it. */
-@media (orientation:landscape){
-  #video.video.landscape-video{overflow:hidden!important;}
-  #video.video.landscape-video > #cmYoutubePlayer{
-    position:absolute!important;
-    left:50%!important; top:50%!important; right:auto!important; bottom:auto!important;
-    transform:translate(-50%,-50%)!important;
-    margin:0!important; overflow:hidden!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important; inset:0!important;
-    width:100%!important; height:100%!important;
-    max-width:100%!important; max-height:100%!important;
-    margin:0!important; transform:none!important; border:0!important;
-    clip:auto!important; clip-path:none!important;
-  }
-}
-</style>
-<script id="youtube-centered-contain-final-v1-js">
-(function(){
-  function clearLandscapeInline(){
-    var host=document.getElementById('video'); if(!host) return;
-    var wrap=host.querySelector('#cmYoutubePlayer');
-    var iframe=wrap&&wrap.querySelector('iframe');
-    [host,wrap,iframe].forEach(function(el){ if(!el)return; ['left','right','top','bottom','width','height','transform','margin','max-width','max-height','aspect-ratio','overflow','position','inset'].forEach(function(p){el.style.removeProperty(p);}); });
-  }
-  function fit(){
-    if(!matchMedia('(orientation:landscape)').matches){ clearLandscapeInline(); return; }
-    var host=document.getElementById('video'); if(!host) return;
-    var wrap=host.querySelector('#cmYoutubePlayer'); if(!wrap) return;
-    var w=host.clientWidth, h=host.clientHeight; if(w<100||h<60) return;
-    var ratio=16/9, vw, vh;
-    if(w/h>ratio){ vh=h; vw=h*ratio; } else { vw=w; vh=w/ratio; }
-    wrap.style.setProperty('position','absolute','important');
-    wrap.style.setProperty('left','50%','important');
-    wrap.style.setProperty('top','50%','important');
-    wrap.style.setProperty('right','auto','important');
-    wrap.style.setProperty('bottom','auto','important');
-    wrap.style.setProperty('width',vw+'px','important');
-    wrap.style.setProperty('height',vh+'px','important');
-    wrap.style.setProperty('transform','translate(-50%,-50%)','important');
-    wrap.style.setProperty('margin','0','important');
-    wrap.style.setProperty('overflow','hidden','important');
-    var iframe=wrap.querySelector('iframe');
-    if(iframe){
-      iframe.style.setProperty('position','absolute','important'); iframe.style.setProperty('inset','0','important');
-      iframe.style.setProperty('width','100%','important'); iframe.style.setProperty('height','100%','important');
-      iframe.style.setProperty('transform','none','important'); iframe.style.setProperty('margin','0','important');
-      iframe.style.setProperty('max-width','100%','important'); iframe.style.setProperty('max-height','100%','important');
-    }
-  }
-  function schedule(){[0,80,250,600,1200].forEach(function(t){setTimeout(fit,t);});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
-  addEventListener('resize',schedule); addEventListener('orientationchange',function(){setTimeout(schedule,250);});
-  var host=document.getElementById('video'); if(host)new MutationObserver(schedule).observe(host,{childList:true,subtree:true});
-})();
-</script>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4359,123 +4301,26 @@ input.fe-range[type="range"]::-moz-range-thumb{
 })();
 </script>
 
-<style id="landscape-video-geometry-canonical-v1">
-/* Canonical landscape geometry. Parent: extend left edge 30px with original right/top/bottom preserved. YouTube: extend left edge 50px with original right edge preserved; grow downward at 16:9. */
-@media (orientation:landscape) and (max-width:999px){
-  #video.video.landscape-video{
-    position:fixed!important;
-    left:calc(50% + 10px - 15px)!important;
-    right:auto!important;
-    top:calc(13% + 5px)!important;
-    bottom:auto!important;
-    width:calc(min(54vw, calc(68vh * 16 / 9)) + 30px)!important;
-    height:calc(min(54vw, calc(68vh * 16 / 9)) * 9 / 16)!important;
-    aspect-ratio:auto!important;
-    transform:translateX(-50%)!important;
-    margin:0!important;
-    overflow:visible!important;
-    background:#000!important;
-    z-index:1!important;
-    display:block!important;
-  }
-  /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
-  #video.video.landscape-video > #cmYoutubePlayer{
-    position:absolute!important;
-    left:-20px!important;
-    right:auto!important;
-    top:0!important;
-    bottom:auto!important;
-    width:100%!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    transform:none!important;
-    margin:0!important;
-    overflow:hidden!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    border:0!important;
-    margin:0!important;
-    transform:none!important;
-  }
-  #video.video.landscape-video > iframe{
-    position:absolute!important;
-    left:-20px!important;
-    top:0!important;
-    width:100%!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    border:0!important;
-    margin:0!important;
-    transform:none!important;
-  }
-  #video.video.landscape-video > video{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    object-fit:contain!important;
-    margin:0!important;
-    transform:none!important;
-  }
-}
-@media (orientation:landscape) and (min-width:1000px){
-  #video.video.landscape-video{
-    position:fixed!important;
-    left:50%!important;
-    right:auto!important;
-    top:10%!important;
-    bottom:auto!important;
-    width:min(64vw, calc(76vh * 16 / 9))!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    transform:translateX(-50%)!important;
-    margin:0!important;
-    overflow:hidden!important;
-    background:#000!important;
-    z-index:1!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer,
-  #video.video.landscape-video > iframe,
-  #video.video.landscape-video > video,
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    margin:0!important;
-    transform:none!important;
-    object-fit:contain!important;
-  }
-}
-@media (orientation:landscape){
-  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{z-index:5!important;}
-}
-</style>
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
 
 <!-- FINAL OVERRIDE: landscape-only contained/centered YouTube; portrait cleanup -->
-<style id="cm-youtube-contain-center-v3">
+
+
+<style id="cm-video-single-authority-v1">
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
     position:fixed!important;
     left:20%!important; right:23%!important;
     top:13%!important; bottom:11%!important;
     width:auto!important; height:auto!important;
-    transform:none!important; margin:0!important;
+    margin:0!important; transform:none!important;
     overflow:hidden!important; background:#000!important;
-    z-index:1!important;
+    z-index:1!important; display:block!important;
   }
   #video.video.landscape-video > #cmYoutubePlayer{
     position:absolute!important;
-    left:50%!important; top:50%!important; right:auto!important; bottom:auto!important;
+    left:50%!important; top:50%!important;
+    right:auto!important; bottom:auto!important;
     margin:0!important; transform:translate(-50%,-50%)!important;
     overflow:hidden!important;
   }
@@ -4486,56 +4331,31 @@ input.fe-range[type="range"]::-moz-range-thumb{
     margin:0!important; transform:none!important; border:0!important;
   }
 }
-@media (orientation:portrait){
-  #video, #video > #cmYoutubePlayer, #video > #cmYoutubePlayer > iframe{
-    transform:none;
-  }
-}
 </style>
-<script id="cm-youtube-contain-center-v3-js">
+<script id="cm-video-single-authority-v1-js">
 (function(){
-  const props=['left','right','top','bottom','width','height','transform','margin','max-width','max-height','aspect-ratio','overflow','position','inset'];
-  function clearInline(el){ if(!el)return; props.forEach(p=>el.style.removeProperty(p)); }
-  function fit(){
-    const host=document.getElementById('video'); if(!host)return;
-    const wrap=host.querySelector('#cmYoutubePlayer');
-    const iframe=wrap&&wrap.querySelector('iframe');
-    if(!matchMedia('(orientation:landscape)').matches){
-      clearInline(host); clearInline(wrap); clearInline(iframe);
-      return;
-    }
-    if(!wrap)return;
-    const r=host.getBoundingClientRect(), W=r.width, H=r.height;
-    if(W<100||H<60)return;
-    const ratio=16/9;
-    let w=W, h=w/ratio;
-    if(h>H){ h=H; w=h*ratio; }
-    wrap.style.setProperty('position','absolute','important');
-    wrap.style.setProperty('left','50%','important');
-    wrap.style.setProperty('top','50%','important');
-    wrap.style.setProperty('right','auto','important');
-    wrap.style.setProperty('bottom','auto','important');
+  function fitLandscapeYoutube(){
+    if(!matchMedia('(orientation:landscape) and (max-width:999px)').matches) return;
+    var host=document.getElementById('video');
+    var wrap=host && host.querySelector('#cmYoutubePlayer');
+    if(!host || !wrap) return;
+    var W=host.clientWidth, H=host.clientHeight;
+    if(W<2 || H<2) return;
+    var w=Math.min(W,H*16/9), h=w*9/16;
     wrap.style.setProperty('width',w+'px','important');
     wrap.style.setProperty('height',h+'px','important');
-    wrap.style.setProperty('transform','translate(-50%,-50%)','important');
-    wrap.style.setProperty('margin','0','important');
-    wrap.style.setProperty('overflow','hidden','important');
-    if(iframe){
-      iframe.style.setProperty('position','absolute','important');
-      iframe.style.setProperty('inset','0','important');
-      iframe.style.setProperty('width','100%','important');
-      iframe.style.setProperty('height','100%','important');
-      iframe.style.setProperty('max-width','100%','important');
-      iframe.style.setProperty('max-height','100%','important');
-      iframe.style.setProperty('transform','none','important');
-      iframe.style.setProperty('margin','0','important');
+    var f=wrap.querySelector('iframe');
+    if(f){
+      f.style.setProperty('width','100%','important');
+      f.style.setProperty('height','100%','important');
+      f.style.setProperty('inset','0','important');
+      f.style.setProperty('transform','none','important');
     }
   }
-  function run(){ fit(); setTimeout(fit,80); setTimeout(fit,300); setTimeout(fit,800); }
+  function run(){fitLandscapeYoutube();setTimeout(fitLandscapeYoutube,100);setTimeout(fitLandscapeYoutube,500);}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
-  addEventListener('resize',run);
-  addEventListener('orientationchange',()=>setTimeout(run,300));
-  const host=document.getElementById('video');
+  addEventListener('resize',run); addEventListener('orientationchange',function(){setTimeout(run,350)});
+  var host=document.getElementById('video');
   if(host) new MutationObserver(run).observe(host,{childList:true,subtree:true});
 })();
 </script>
