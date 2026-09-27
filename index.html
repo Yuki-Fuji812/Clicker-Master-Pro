@@ -1622,9 +1622,48 @@ function changeApiKey(){
   localStorage.removeItem("yt-api-key");
   searchVideo();
 }
+// YouTube IFrame API player (also enables gamepad ±5 second seeking)
+let cmYouTubeApiPromise=null;
+function cmEnsureYouTubeApi(){
+  if(window.YT && window.YT.Player) return Promise.resolve();
+  if(cmYouTubeApiPromise) return cmYouTubeApiPromise;
+  cmYouTubeApiPromise=new Promise((resolve,reject)=>{
+    const prev=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=function(){
+      try{ if(typeof prev==='function') prev(); }catch(e){}
+      resolve();
+    };
+    if(!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')){
+      const sc=document.createElement('script');
+      sc.src='https://www.youtube.com/iframe_api';
+      sc.onerror=()=>reject(new Error('YouTube IFrame API load failed'));
+      document.head.appendChild(sc);
+    }
+  });
+  return cmYouTubeApiPromise;
+}
+function cmLoadYouTube(id){
+  const host=document.getElementById('video');
+  if(!host)return;
+  try{ if(window.player && typeof window.player.destroy==='function') window.player.destroy(); }catch(e){}
+  window.player=null;
+  host.innerHTML='<div id="cmYoutubePlayer" style="width:100%;height:100%"></div>';
+  cmEnsureYouTubeApi().then(()=>{
+    const target=document.getElementById('cmYoutubePlayer');
+    if(!target)return;
+    window.player=new YT.Player('cmYoutubePlayer',{
+      width:'100%',height:'100%',videoId:id,
+      playerVars:{playsinline:1},
+      events:{onReady:function(){}}
+    });
+  }).catch(()=>{
+    host.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1&enablejsapi=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  });
+}
+
 function playVideo(id,title){
    currentVideoTitle = title || currentVideoTitle || id;
-  document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  cmLoadYouTube(id);
   document.getElementById("searchResults").className="search-results";
   document.getElementById("video").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
@@ -1640,7 +1679,7 @@ function youtubeId(u){
 function loadVideo(){
  let id=youtubeId(document.getElementById("url").value.trim());
  if(!id){alert("YouTubeのURLを確認してください");return}
- document.getElementById("video").innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+ cmLoadYouTube(id);
  localStorage.setItem("yoyo-url",document.getElementById("url").value.trim());
 }
 
