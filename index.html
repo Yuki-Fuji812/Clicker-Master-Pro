@@ -4410,6 +4410,53 @@ input.fe-range[type="range"]{touch-action:none!important}
   }
 }
 </style>
+
+<style id="landscape-video-aspect-fit-v2">
+@media (orientation:landscape){
+  /* Keep the enlarged stage clear of left/right controls. */
+  #video.video.landscape-video{
+    left:25.5%!important;
+    right:22.5%!important;
+    top:12.5%!important;
+    bottom:13.5%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+
+  /* Enlarge the actual movie while preserving 16:9. */
+  #video.video.landscape-video > #cmYoutubePlayer{
+    position:relative!important;
+    inset:auto!important;
+    width:min(100%, calc((74vh) * 16 / 9))!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    flex:0 0 auto!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer > iframe,
+  #video.video.landscape-video > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    border:0!important;
+  }
+  #video.video.landscape-video > video{
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    object-fit:contain!important;
+  }
+}
+</style>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
