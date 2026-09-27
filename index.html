@@ -4621,3 +4621,23 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="landscape-device-video-tuning-v1">
+/* Final device-specific landscape tuning: keep iPhone centered; use more of iPad's larger canvas. */
+@media (orientation:landscape) and (max-width:999px){
+  #video.video.landscape-video{
+    left:22%!important;
+    right:22%!important;
+    top:12%!important;
+    bottom:12%!important;
+  }
+}
+@media (orientation:landscape) and (min-width:1000px){
+  #video.video.landscape-video{
+    left:18%!important;
+    right:15%!important;
+    top:10%!important;
+    bottom:10%!important;
+  }
+}
+</style>
