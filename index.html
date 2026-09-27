@@ -4176,6 +4176,8 @@ input.fe-range[type="range"]{touch-action:none!important}
 }
 </style>
 
+
+
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4457,5 +4459,37 @@ input.fe-range[type="range"]::-moz-range-thumb{
   addEventListener('resize',settle);
   var host=document.getElementById('video');
   if(host) new MutationObserver(settle).observe(host,{childList:true,subtree:true});
+})();
+</script>
+
+<script id="cm-portrait-rotation-scroll-restore-v1">
+(function(){
+  var wasPortrait=matchMedia('(orientation:portrait)').matches;
+  var portraitScrollY=window.scrollY||0;
+  var restoring=false;
+
+  function rememberPortraitScroll(){
+    if(!restoring && matchMedia('(orientation:portrait)').matches){
+      portraitScrollY=window.scrollY||0;
+    }
+  }
+  function restorePortraitViewport(){
+    var isPortrait=matchMedia('(orientation:portrait)').matches;
+    if(isPortrait && !wasPortrait){
+      restoring=true;
+      var y=portraitScrollY;
+      [0,80,220,500,900].forEach(function(ms){
+        setTimeout(function(){
+          window.scrollTo(0,y);
+          if(window.visualViewport && window.visualViewport.offsetTop>0){ window.scrollTo(0,y); }
+          if(ms===900) restoring=false;
+        },ms);
+      });
+    }
+    wasPortrait=isPortrait;
+  }
+  addEventListener('scroll',rememberPortraitScroll,{passive:true});
+  addEventListener('orientationchange',function(){setTimeout(restorePortraitViewport,30);});
+  addEventListener('resize',restorePortraitViewport);
 })();
 </script>
