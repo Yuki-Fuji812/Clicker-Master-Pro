@@ -1421,6 +1421,17 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="iphone-landscape-video-left-35px-v1">
+/* iPhone landscape only: move the existing video window 35px left without changing its size. */
+@media (orientation:landscape) and (max-width:999px){
+  #video.video.landscape-video{
+    left:calc(22% - 35px)!important;
+    right:calc(22% + 35px)!important;
+  }
+}
+</style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
