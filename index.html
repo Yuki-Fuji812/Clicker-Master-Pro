@@ -4333,11 +4333,11 @@ input.fe-range[type="range"]::-moz-range-thumb{
     if(matchMedia('(orientation:landscape)').matches){
       var W=host.clientWidth,H=host.clientHeight;
       if(W<2||H<2) return;
-      // Keep the approved video region fixed and keep the YouTube iframe fully inside it.
-      // Do not shift or oversize the video canvas; this prevents overlap with the left controls.
+      // Keep the approved video region itself completely fixed.
+      // Move only the landscape YouTube iframe 20px left.
       var w=Math.min(W,H*16/9);
       var h=w*9/16;
-      var x=(W-w)/2;
+      var x=(W-w)/2-20;
       var y=(H-h)/2;
       frame.style.setProperty('position','absolute','important');
       frame.style.setProperty('width',w+'px','important');
