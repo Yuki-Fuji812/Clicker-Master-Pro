@@ -4342,13 +4342,45 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+<style id="cm-youtube-portrait-restore-final">
+@media (orientation:portrait){
+  #video.video #cmYoutubePlayer{
+    width:100%!important;height:100%!important;
+    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    transform:none!important;margin:0!important;
+  }
+  #video.video #cmYoutubePlayer > iframe{
+    position:static!important;
+    width:100%!important;height:100%!important;
+    max-width:100%!important;max-height:100%!important;
+    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    transform:none!important;margin:0!important;
+  }
+}
+</style>
 <script id="cm-video-single-authority-v1-js">
 (function(){
   function fitLandscapeYoutube(){
-    if(!matchMedia('(orientation:landscape) and (max-width:999px)').matches) return;
     var host=document.getElementById('video');
     var wrap=host && host.querySelector('#cmYoutubePlayer');
     if(!host || !wrap) return;
+    if(!matchMedia('(orientation:landscape) and (max-width:999px)').matches){
+      if(matchMedia('(orientation:portrait)').matches){
+        wrap.style.setProperty('width','100%','important');
+        wrap.style.setProperty('height','100%','important');
+        wrap.style.removeProperty('transform');
+        var pf=wrap.querySelector('iframe');
+        if(pf){
+          pf.style.setProperty('width','100%','important');
+          pf.style.setProperty('height','100%','important');
+          pf.style.removeProperty('inset');
+          pf.style.removeProperty('transform');
+          pf.style.removeProperty('left');
+          pf.style.removeProperty('position');
+        }
+      }
+      return;
+    }
     var W=host.clientWidth, H=host.clientHeight;
     if(W<2 || H<2) return;
     var w=Math.min(W,H*16/9), h=w*9/16;
@@ -4367,5 +4399,63 @@ input.fe-range[type="range"]::-moz-range-thumb{
   addEventListener('resize',run); addEventListener('orientationchange',function(){setTimeout(run,350)});
   var host=document.getElementById('video');
   if(host) new MutationObserver(run).observe(host,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="cm-youtube-orientation-hard-lock-v3">
+/* Final authority: portrait is always fully restored; landscape-only offsets cannot leak across rotation. */
+@media (orientation:portrait){
+  #video.video > #cmYoutubePlayer,
+  #video.video > iframe#cmYoutubePlayer{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    inset:auto!important;
+    margin:0!important;
+    transform:none!important;
+  }
+  #video.video > #cmYoutubePlayer > iframe{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    inset:auto!important;
+    margin:0!important;
+    transform:none!important;
+  }
+}
+</style>
+<script id="cm-youtube-orientation-hard-lock-v3-js">
+(function(){
+  function restorePortraitYoutube(){
+    if(!matchMedia('(orientation:portrait)').matches) return;
+    var host=document.getElementById('video');
+    if(!host) return;
+    var node=host.querySelector('#cmYoutubePlayer');
+    if(!node) return;
+    var props={position:'static',display:'block',width:'100%',height:'100%',maxWidth:'100%',maxHeight:'100%',left:'auto',right:'auto',top:'auto',bottom:'auto',inset:'auto',margin:'0',transform:'none'};
+    Object.keys(props).forEach(function(k){node.style.setProperty(k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),props[k],'important');});
+    var inner=node.tagName==='IFRAME'?null:node.querySelector('iframe');
+    if(inner) Object.keys(props).forEach(function(k){inner.style.setProperty(k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),props[k],'important');});
+  }
+  function settle(){restorePortraitYoutube();setTimeout(restorePortraitYoutube,80);setTimeout(restorePortraitYoutube,350);setTimeout(restorePortraitYoutube,800);}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',settle); else settle();
+  addEventListener('orientationchange',settle);
+  addEventListener('resize',settle);
+  var host=document.getElementById('video');
+  if(host) new MutationObserver(settle).observe(host,{childList:true,subtree:true});
 })();
 </script>
