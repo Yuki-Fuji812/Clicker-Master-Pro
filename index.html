@@ -4332,6 +4332,16 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="cm-youtube-ipad-left-20-final">
+/* Landscape widths above 999px were excluded from the single-authority rule.
+   Move only the YouTube wrapper 20px left; parent video region is untouched. */
+@media (orientation:landscape) and (min-width:1000px){
+  #video.video.landscape-video > #cmYoutubePlayer{
+    transform:translateX(-20px)!important;
+  }
+}
+</style>
 <script id="cm-video-single-authority-v1-js">
 (function(){
   function fitLandscapeYoutube(){
