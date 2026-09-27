@@ -4372,6 +4372,44 @@ input.fe-range[type="range"]{touch-action:none!important}
  #searchResults.cm-search-overlay{width:94vw!important;height:72vh!important;max-height:72vh!important;}
 }
 </style>
+
+<style id="landscape-video-white-line-expand-final">
+@media (orientation:landscape){
+  /* Expand the actual center video window beyond its grid cell toward the side controls. */
+  #video.video.landscape-video{
+    position:relative!important;
+    left:-42px!important;
+    width:calc(100% + 84px)!important;
+    height:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    transform:none!important;
+    z-index:1!important;
+    overflow:hidden!important;
+  }
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > video,
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    transform:none!important;
+    object-fit:contain!important;
+  }
+  /* Keep all controls above the enlarged video. */
+  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{
+    position:relative!important;
+    z-index:5!important;
+  }
+}
+</style>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
