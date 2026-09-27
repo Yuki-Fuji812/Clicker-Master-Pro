@@ -4460,3 +4460,82 @@ input.fe-range[type="range"]::-moz-range-thumb{
 }
 </style>
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
+
+<!-- FINAL OVERRIDE: landscape-only contained/centered YouTube; portrait cleanup -->
+<style id="cm-youtube-contain-center-v3">
+@media (orientation:landscape) and (max-width:999px){
+  #video.video.landscape-video{
+    position:fixed!important;
+    left:20%!important; right:23%!important;
+    top:13%!important; bottom:11%!important;
+    width:auto!important; height:auto!important;
+    transform:none!important; margin:0!important;
+    overflow:hidden!important; background:#000!important;
+    z-index:1!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer{
+    position:absolute!important;
+    left:50%!important; top:50%!important; right:auto!important; bottom:auto!important;
+    margin:0!important; transform:translate(-50%,-50%)!important;
+    overflow:hidden!important;
+  }
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important; inset:0!important;
+    width:100%!important; height:100%!important;
+    max-width:100%!important; max-height:100%!important;
+    margin:0!important; transform:none!important; border:0!important;
+  }
+}
+@media (orientation:portrait){
+  #video, #video > #cmYoutubePlayer, #video > #cmYoutubePlayer > iframe{
+    transform:none;
+  }
+}
+</style>
+<script id="cm-youtube-contain-center-v3-js">
+(function(){
+  const props=['left','right','top','bottom','width','height','transform','margin','max-width','max-height','aspect-ratio','overflow','position','inset'];
+  function clearInline(el){ if(!el)return; props.forEach(p=>el.style.removeProperty(p)); }
+  function fit(){
+    const host=document.getElementById('video'); if(!host)return;
+    const wrap=host.querySelector('#cmYoutubePlayer');
+    const iframe=wrap&&wrap.querySelector('iframe');
+    if(!matchMedia('(orientation:landscape)').matches){
+      clearInline(host); clearInline(wrap); clearInline(iframe);
+      return;
+    }
+    if(!wrap)return;
+    const r=host.getBoundingClientRect(), W=r.width, H=r.height;
+    if(W<100||H<60)return;
+    const ratio=16/9;
+    let w=W, h=w/ratio;
+    if(h>H){ h=H; w=h*ratio; }
+    wrap.style.setProperty('position','absolute','important');
+    wrap.style.setProperty('left','50%','important');
+    wrap.style.setProperty('top','50%','important');
+    wrap.style.setProperty('right','auto','important');
+    wrap.style.setProperty('bottom','auto','important');
+    wrap.style.setProperty('width',w+'px','important');
+    wrap.style.setProperty('height',h+'px','important');
+    wrap.style.setProperty('transform','translate(-50%,-50%)','important');
+    wrap.style.setProperty('margin','0','important');
+    wrap.style.setProperty('overflow','hidden','important');
+    if(iframe){
+      iframe.style.setProperty('position','absolute','important');
+      iframe.style.setProperty('inset','0','important');
+      iframe.style.setProperty('width','100%','important');
+      iframe.style.setProperty('height','100%','important');
+      iframe.style.setProperty('max-width','100%','important');
+      iframe.style.setProperty('max-height','100%','important');
+      iframe.style.setProperty('transform','none','important');
+      iframe.style.setProperty('margin','0','important');
+    }
+  }
+  function run(){ fit(); setTimeout(fit,80); setTimeout(fit,300); setTimeout(fit,800); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run); else run();
+  addEventListener('resize',run);
+  addEventListener('orientationchange',()=>setTimeout(run,300));
+  const host=document.getElementById('video');
+  if(host) new MutationObserver(run).observe(host,{childList:true,subtree:true});
+})();
+</script>
