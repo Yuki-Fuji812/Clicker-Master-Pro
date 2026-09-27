@@ -4333,14 +4333,11 @@ input.fe-range[type="range"]::-moz-range-thumb{
     if(matchMedia('(orientation:landscape)').matches){
       var W=host.clientWidth,H=host.clientHeight;
       if(W<2||H<2) return;
-      // Keep the approved video region fixed.  A fit-sized iframe can make a left offset
-      // look unchanged because the host clips it.  Instead, oversize the YouTube canvas
-      // and crop equally by height, then bias the crop 36px to the right so the visible
-      // YouTube picture itself is 36px farther left inside the unchanged host.
-      var BIAS_LEFT=36;
-      var h=H;
-      var w=Math.max(W,H*16/9);
-      var x=(W-w)/2-BIAS_LEFT;
+      // Keep the approved video region fixed and keep the YouTube iframe fully inside it.
+      // Do not shift or oversize the video canvas; this prevents overlap with the left controls.
+      var w=Math.min(W,H*16/9);
+      var h=w*9/16;
+      var x=(W-w)/2;
       var y=(H-h)/2;
       frame.style.setProperty('position','absolute','important');
       frame.style.setProperty('width',w+'px','important');
