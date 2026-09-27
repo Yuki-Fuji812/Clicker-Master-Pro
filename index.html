@@ -4283,15 +4283,15 @@ input.fe-range[type="range"]::-moz-range-thumb{
 </script>
 
 <style id="landscape-video-geometry-canonical-v1">
-/* Canonical landscape geometry. Current adjustment: parent left edge +3px inward with right edge fixed; YouTube left edge extended 20px further left with right edge fixed and 16:9 height growing downward. */
+/* Canonical landscape geometry. Parent: extend left edge 30px with original right/top/bottom preserved. YouTube: extend left edge 50px with original right edge preserved; grow downward at 16:9. */
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
     position:fixed!important;
-    left:calc(50% + 10px - 13.5px)!important;
+    left:calc(50% + 10px - 15px)!important;
     right:auto!important;
     top:calc(13% + 5px)!important;
     bottom:auto!important;
-    width:calc(min(54vw, calc(68vh * 16 / 9)) + 27px)!important;
+    width:calc(min(54vw, calc(68vh * 16 / 9)) + 30px)!important;
     height:calc(min(54vw, calc(68vh * 16 / 9)) * 9 / 16)!important;
     aspect-ratio:auto!important;
     transform:translateX(-50%)!important;
@@ -4304,11 +4304,11 @@ input.fe-range[type="range"]::-moz-range-thumb{
   /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
   #video.video.landscape-video > #cmYoutubePlayer{
     position:absolute!important;
-    left:-43px!important;
+    left:-20px!important;
     right:auto!important;
     top:0!important;
     bottom:auto!important;
-    width:calc(100% + 23px)!important;
+    width:100%!important;
     height:auto!important;
     aspect-ratio:16 / 9!important;
     transform:none!important;
@@ -4328,9 +4328,9 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
   #video.video.landscape-video > iframe{
     position:absolute!important;
-    left:-43px!important;
+    left:-20px!important;
     top:0!important;
-    width:calc(100% + 23px)!important;
+    width:100%!important;
     height:auto!important;
     aspect-ratio:16 / 9!important;
     border:0!important;
@@ -4382,3 +4382,67 @@ input.fe-range[type="range"]::-moz-range-thumb{
   .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{z-index:5!important;}
 }
 </style>
+<style id="video-adjust-real-final-v1">
+@media (orientation:landscape) and (max-width:999px){
+  /* Parent: relative to index_fixed_expand baseline, keep right edge fixed and move only left edge 3px right. */
+  #video.video.landscape-video{
+    left:calc(50% - 3.5px)!important;
+    width:calc(min(54vw, calc(68vh * 16 / 9)) + 27px)!important;
+    overflow:visible!important;
+  }
+  /* YouTube: keep right edge fixed, extend left edge 20px; height follows 16:9 downward. */
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > iframe#cmYoutubePlayer{
+    position:absolute!important;
+    left:-43px!important;
+    right:auto!important;
+    top:0!important;
+    bottom:auto!important;
+    width:calc(100% + 23px)!important;
+    height:calc((100% + 23px) * 9 / 16)!important;
+    aspect-ratio:16 / 9!important;
+    transform:none!important;
+    margin:0!important;
+    max-width:none!important;
+    max-height:none!important;
+  }
+}
+</style>
+<script id="video-adjust-real-final-v1-js">
+(function(){
+  function apply(){
+    if(!window.matchMedia('(orientation:landscape) and (max-width:999px)').matches) return;
+    var host=document.getElementById('video');
+    if(!host) return;
+    host.style.setProperty('left','calc(50% - 3.5px)','important');
+    host.style.setProperty('width','calc(min(54vw, calc(68vh * 16 / 9)) + 27px)','important');
+    host.style.setProperty('overflow','visible','important');
+    var yt=host.querySelector('#cmYoutubePlayer');
+    if(!yt) return;
+    yt.style.setProperty('position','absolute','important');
+    yt.style.setProperty('left','-43px','important');
+    yt.style.setProperty('right','auto','important');
+    yt.style.setProperty('top','0','important');
+    yt.style.setProperty('bottom','auto','important');
+    yt.style.setProperty('width','calc(100% + 23px)','important');
+    yt.style.removeProperty('height');
+    /* Use measured width so Safari/YouTube cannot ignore aspect-ratio on iframe. */
+    requestAnimationFrame(function(){
+      var w=yt.getBoundingClientRect().width;
+      if(w>0) yt.style.setProperty('height',(w*9/16)+'px','important');
+    });
+    yt.style.setProperty('max-width','none','important');
+    yt.style.setProperty('max-height','none','important');
+    yt.style.setProperty('transform','none','important');
+  }
+  function start(){
+    apply();
+    var host=document.getElementById('video');
+    if(host) new MutationObserver(apply).observe(host,{childList:true,subtree:true});
+    [100,300,700,1200,2000].forEach(function(ms){setTimeout(apply,ms)});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+  addEventListener('resize',apply);
+  addEventListener('orientationchange',function(){setTimeout(apply,350)});
+})();
+</script>
