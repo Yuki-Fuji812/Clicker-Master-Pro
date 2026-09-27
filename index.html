@@ -4654,10 +4654,13 @@ input.fe-range[type="range"]::-moz-range-thumb{
 </style>
 
 <style id="iphone-landscape-video-position-final-fix">
-/* Final iPhone-only position correction. Placed last so older landscape rules cannot override it. */
+/* iPhone landscape: move the ENTIRE visible video region 35px left without changing its width.
+   Use the fixed region edges themselves (not transform on the YouTube iframe). */
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
-    transform:translateX(-35px)!important;
+    left:calc(22% - 35px)!important;
+    right:calc(22% + 35px)!important;
+    transform:none!important;
   }
 }
 </style>
