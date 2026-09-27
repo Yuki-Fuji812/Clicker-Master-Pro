@@ -4446,3 +4446,56 @@ input.fe-range[type="range"]::-moz-range-thumb{
   addEventListener('orientationchange',function(){setTimeout(apply,350)});
 })();
 </script>
+
+<!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
+<style id="trim-video-parent-without-resizing-youtube-v1">
+@media (orientation:landscape) and (max-width:999px){
+  /* Do not alter h1/logo. Give the unchanged logo a little clearance from search. */
+  .urlrow.landscape-search{
+    transform:translateX(18px)!important;
+    width:calc(100% - 18px)!important;
+  }
+}
+</style>
+<script id="trim-video-parent-without-resizing-youtube-v1-js">
+(function(){
+  function trimParent(){
+    if(!matchMedia('(orientation:landscape) and (max-width:999px)').matches) return;
+    var host=document.getElementById('video');
+    if(!host) return;
+    var yt=host.querySelector('#cmYoutubePlayer');
+    if(!yt) return;
+
+    /* Capture the currently rendered YouTube rectangle first. */
+    var r=yt.getBoundingClientRect();
+    if(!(r.width>20 && r.height>20)) return;
+
+    /* Parent becomes exactly the YouTube rectangle. */
+    host.style.setProperty('position','fixed','important');
+    host.style.setProperty('left',r.left+'px','important');
+    host.style.setProperty('top',r.top+'px','important');
+    host.style.setProperty('width',r.width+'px','important');
+    host.style.setProperty('height',r.height+'px','important');
+    host.style.setProperty('transform','none','important');
+    host.style.setProperty('overflow','hidden','important');
+    host.style.setProperty('margin','0','important');
+
+    /* Keep the YouTube picture at the same screen position and same size. */
+    yt.style.setProperty('position','absolute','important');
+    yt.style.setProperty('left','0','important');
+    yt.style.setProperty('top','0','important');
+    yt.style.setProperty('right','auto','important');
+    yt.style.setProperty('bottom','auto','important');
+    yt.style.setProperty('width','100%','important');
+    yt.style.setProperty('height','100%','important');
+    yt.style.setProperty('transform','none','important');
+    yt.style.setProperty('margin','0','important');
+    yt.style.setProperty('max-width','none','important');
+    yt.style.setProperty('max-height','none','important');
+  }
+  function schedule(){ [80,220,420,820,1350,2250].forEach(function(ms){setTimeout(trimParent,ms)}); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',schedule); else schedule();
+  addEventListener('resize',schedule);
+  addEventListener('orientationchange',function(){setTimeout(schedule,300)});
+})();
+</script>
