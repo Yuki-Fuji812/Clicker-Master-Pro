@@ -1357,159 +1357,6 @@ input.fe-range[type="range"]::-moz-range-thumb{
 .channelMediaTab{padding:8px 12px;border-radius:9px;border:1px solid #777;background:#26262c;color:#fff;font-weight:700}
 .channelMediaTab.active{border-color:#fff;background:#3a3a42}
 </style>
-
-<style id="landscape-video-expand-white-line-v1">
-@media (orientation:landscape){
-  /* Expand only the video window into the unused gaps shown by the white guide line. */
-  .video.landscape-video{
-    margin-left:-42px!important;
-    margin-top:-8px!important;
-    width:calc(100% + 84px)!important;
-    height:calc(100% + 16px)!important;
-    max-width:none!important;
-    max-height:none!important;
-    z-index:1!important;
-  }
-  .video.landscape-video iframe,
-  .video.landscape-video video,
-  .video.landscape-video #cmYoutubePlayer{
-    width:100%!important;
-    height:100%!important;
-    max-width:none!important;
-    max-height:none!important;
-    object-fit:contain!important;
-  }
-}
-</style>
-
-<style id="landscape-v61-aggressive-video-expand">
-@media (orientation:landscape){
-  /* Experimental: expand the actual video window to the user's white-line area. */
-  .video.landscape-video{
-    position:fixed!important;
-    left:23.5vw!important;
-    right:20vw!important;
-    top:11.5vh!important;
-    bottom:11vh!important;
-    width:auto!important;
-    height:auto!important;
-    min-width:0!important;
-    min-height:0!important;
-    max-width:none!important;
-    max-height:none!important;
-    margin:0!important;
-    transform:none!important;
-    z-index:5!important;
-    border-radius:14px!important;
-    overflow:hidden!important;
-    background:#000!important;
-  }
-  .video.landscape-video iframe,
-  .video.landscape-video video,
-  .video.landscape-video #cmYoutubePlayer,
-  .video.landscape-video #cmYoutubePlayer iframe{
-    position:absolute!important;
-    inset:0!important;
-    left:0!important;
-    transform:none!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:none!important;
-    max-height:none!important;
-    margin:0!important;
-    object-fit:contain!important;
-  }
-}
-</style>
-
-<style id="iphone-landscape-video-left-35px-v1">
-/* iPhone landscape only: move the existing video window 35px left without changing its size. */
-@media (orientation:landscape) and (max-width:999px){
-  #video.video.landscape-video{
-    left:calc(22% - 35px)!important;
-    right:calc(22% + 35px)!important;
-  }
-}
-</style>
-
-
-<style id="landscape-video-fit-center-final-v2">
-/* Final landscape video geometry: preserve 16:9, never crop, and center the visible stage. */
-@media (orientation:landscape) and (max-width:999px){
-  #video.video.landscape-video{
-    position:fixed!important;
-    left:50%!important;
-    right:auto!important;
-    top:13%!important;
-    bottom:auto!important;
-    width:min(54vw, calc(68vh * 16 / 9))!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    transform:translateX(-50%)!important;
-    margin:0!important;
-    overflow:hidden!important;
-    background:#000!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer,
-  #video.video.landscape-video > iframe,
-  #video.video.landscape-video > video{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    margin:0!important;
-    transform:none!important;
-    object-fit:contain!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    border:0!important;
-    transform:none!important;
-  }
-}
-@media (orientation:landscape) and (min-width:1000px){
-  #video.video.landscape-video{
-    position:fixed!important;
-    left:50%!important;
-    right:auto!important;
-    top:10%!important;
-    bottom:auto!important;
-    width:min(64vw, calc(76vh * 16 / 9))!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    transform:translateX(-50%)!important;
-    margin:0!important;
-    overflow:hidden!important;
-    background:#000!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer,
-  #video.video.landscape-video > iframe,
-  #video.video.landscape-video > video{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    margin:0!important;
-    transform:none!important;
-    object-fit:contain!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    border:0!important;
-    transform:none!important;
-  }
-}
-</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -2688,62 +2535,6 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
 }
 </style>
-
-
-<style id="landscape-v49-more-video">
-@media (orientation:landscape){
-  .wrap{
-    /* Give the video row more height; compress the two bottom rows. */
-    grid-template-rows:50px minmax(0,1fr) 42px 36px!important;
-    row-gap:5px!important;
-  }
-
-  .fe-summary-row.landscape-summary{
-    height:42px!important;
-    align-self:end!important;
-    gap:6px!important;
-  }
-  .fe-summary-row.landscape-summary > *{
-    min-height:38px!important;
-    height:38px!important;
-    padding-top:2px!important;
-    padding-bottom:2px!important;
-  }
-
-  .bottom-actions.landscape-actions{
-    height:36px!important;
-    align-self:end!important;
-    width:58%!important;
-  }
-  .bottom-actions.landscape-actions button{
-    height:34px!important;
-    min-height:34px!important;
-    padding-top:2px!important;
-    padding-bottom:2px!important;
-  }
-
-  .video.landscape-video{
-    height:100%!important;
-    min-height:0!important;
-    align-self:stretch!important;
-  }
-  .video.landscape-video iframe,
-  .video.landscape-video video{
-    width:100%!important;
-    height:100%!important;
-    max-height:none!important;
-  }
-
-  /* Keep all eight FE rows inside the taller video/FE area. */
-  .fe-grid.compact-fe.landscape-fe{
-    min-height:0!important;
-    height:100%!important;
-    grid-template-rows:repeat(8,minmax(0,1fr))!important;
-  }
-}
-</style>
-
-
 <style id="landscape-v50-balanced">
 @media (orientation:landscape){
   html,body{
@@ -2906,101 +2697,6 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   .search-results.landscape-results{display:none!important}
 }
 </style>
-
-
-<style id="landscape-v51-video-priority">
-@media (orientation:landscape){
-  .wrap{
-    /* Smaller side columns = larger centered video */
-    grid-template-columns:118px minmax(0,1fr) 118px!important;
-    grid-template-rows:46px minmax(0,1fr) 38px 34px!important;
-    column-gap:9px!important;
-    row-gap:4px!important;
-    padding-left:max(24px,env(safe-area-inset-left))!important;
-    padding-right:max(24px,env(safe-area-inset-right))!important;
-  }
-
-  h1{font-size:12px!important}
-
-  .urlrow.landscape-search{height:42px!important}
-  .urlrow.landscape-search button{
-    height:36px!important;
-    padding:2px 10px!important;
-    font-size:11px!important;
-  }
-
-  .special-row.landscape-special{
-    width:104px!important;
-    gap:6px!important;
-  }
-  .special-row.landscape-special .big{
-    width:104px!important;
-    height:40px!important;
-    min-height:40px!important;
-    padding:2px!important;
-    font-size:11px!important;
-  }
-
-  .grid.landscape-main .big:first-child,
-  .grid.landscape-main .big:nth-child(2){
-    width:92px!important;
-    height:52px!important;
-    font-size:21px!important;
-  }
-
-  .fe-grid.compact-fe.landscape-fe{
-    width:112px!important;
-  }
-
-  /* Smaller visible FE thumb, while retaining the enlarged touch area. */
-  .fe-range,input[type="range"]{
-    min-height:27px!important;
-    height:27px!important;
-    padding:8px 0!important;
-    margin:-6px 0!important;
-    touch-action:none!important;
-  }
-  .fe-range::-webkit-slider-thumb,input[type="range"]::-webkit-slider-thumb{
-    width:15px!important;
-    height:15px!important;
-  }
-  .fe-range::-moz-range-thumb,input[type="range"]::-moz-range-thumb{
-    width:15px!important;
-    height:15px!important;
-  }
-
-  .fe-summary-row.landscape-summary{
-    height:38px!important;
-    gap:5px!important;
-  }
-  .fe-summary-row.landscape-summary > *,
-  .fe-total.landscape-total{
-    height:36px!important;
-    min-height:36px!important;
-    padding:1px 4px!important;
-    font-size:11px!important;
-  }
-
-  .bottom-actions.landscape-actions{
-    height:32px!important;
-    width:52%!important;
-  }
-  .bottom-actions.landscape-actions button{
-    height:30px!important;
-    min-height:30px!important;
-    font-size:10px!important;
-    padding:1px 6px!important;
-  }
-
-  .video.landscape-video{
-    width:100%!important;
-    height:100%!important;
-    margin:0!important;
-  }
-}
-</style>
-
-
 <style id="landscape-v52-bottom-bar">
 @media (orientation:landscape){
   .wrap{
@@ -4461,91 +4157,6 @@ input.fe-range[type="range"]{touch-action:none!important}
  #searchResults.cm-search-overlay{width:94vw!important;height:72vh!important;max-height:72vh!important;}
 }
 </style>
-
-<style id="landscape-video-white-line-expand-final">
-@media (orientation:landscape){
-  /* Expand the actual center video window beyond its grid cell toward the side controls. */
-  #video.video.landscape-video{
-    position:relative!important;
-    left:-42px!important;
-    width:calc(100% + 84px)!important;
-    height:100%!important;
-    min-width:0!important;
-    max-width:none!important;
-    min-height:0!important;
-    max-height:none!important;
-    margin:0!important;
-    transform:none!important;
-    z-index:1!important;
-    overflow:hidden!important;
-  }
-  #video.video.landscape-video > iframe,
-  #video.video.landscape-video > video,
-  #video.video.landscape-video > #cmYoutubePlayer,
-  #video.video.landscape-video > #cmYoutubePlayer > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:none!important;
-    max-height:none!important;
-    transform:none!important;
-    object-fit:contain!important;
-  }
-  /* Keep all controls above the enlarged video. */
-  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{
-    position:relative!important;
-    z-index:5!important;
-  }
-}
-</style>
-
-<style id="landscape-video-aspect-fit-v2">
-@media (orientation:landscape){
-  /* Keep the enlarged stage clear of left/right controls. */
-  #video.video.landscape-video{
-    left:25.5%!important;
-    right:22.5%!important;
-    top:12.5%!important;
-    bottom:13.5%!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    overflow:hidden!important;
-  }
-
-  /* Enlarge the actual movie while preserving 16:9. */
-  #video.video.landscape-video > #cmYoutubePlayer{
-    position:relative!important;
-    inset:auto!important;
-    width:min(100%, calc((74vh) * 16 / 9))!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    flex:0 0 auto!important;
-  }
-  #video.video.landscape-video > #cmYoutubePlayer > iframe,
-  #video.video.landscape-video > iframe{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:none!important;
-    max-height:none!important;
-    border:0!important;
-  }
-  #video.video.landscape-video > video{
-    position:relative!important;
-    inset:auto!important;
-    width:100%!important;
-    height:100%!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    object-fit:contain!important;
-  }
-}
-</style>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4671,88 +4282,102 @@ input.fe-range[type="range"]::-moz-range-thumb{
 })();
 </script>
 
-<style id="landscape-video-medium-size-v1">
-@media (orientation:landscape){
+<style id="landscape-video-geometry-canonical-v1">
+/* Single source of truth for landscape video geometry. Old experimental video-position blocks removed. */
+@media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
     position:fixed!important;
-    left:24%!important;
-    right:20.5%!important;
-    top:12%!important;
-    bottom:12%!important;
-    width:auto!important;
+    left:calc(50% + 10px)!important;
+    right:auto!important;
+    top:13%!important;
+    bottom:auto!important;
+    width:min(54vw, calc(68vh * 16 / 9))!important;
     height:auto!important;
-    min-width:0!important;
-    min-height:0!important;
-    max-width:none!important;
-    max-height:none!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(-50%)!important;
     margin:0!important;
-    transform:none!important;
     overflow:hidden!important;
-    z-index:1!important;
     background:#000!important;
+    z-index:1!important;
+    display:block!important;
   }
-  #video.video.landscape-video > iframe,
-  #video.video.landscape-video > video,
-  #video.video.landscape-video > #cmYoutubePlayer,
+  /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
+  #video.video.landscape-video > #cmYoutubePlayer{
+    position:absolute!important;
+    left:50%!important;
+    right:auto!important;
+    top:0!important;
+    bottom:0!important;
+    width:calc(100% - 20px)!important;
+    height:100%!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(calc(-50% - 10px))!important;
+    margin:0!important;
+    overflow:hidden!important;
+  }
   #video.video.landscape-video > #cmYoutubePlayer > iframe{
     position:absolute!important;
     inset:0!important;
     width:100%!important;
     height:100%!important;
-    max-width:none!important;
-    max-height:none!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    border:0!important;
     margin:0!important;
     transform:none!important;
+  }
+  #video.video.landscape-video > iframe{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    width:calc(100% - 20px)!important;
+    height:100%!important;
+    border:0!important;
+    margin:0!important;
+    transform:none!important;
+  }
+  #video.video.landscape-video > video{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
     object-fit:contain!important;
-  }
-  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{
-    z-index:5!important;
-  }
-}
-</style>
-
-<style id="landscape-device-video-tuning-v1">
-/* Final device-specific landscape tuning: keep iPhone centered; use more of iPad's larger canvas. */
-@media (orientation:landscape) and (max-width:999px){
-  #video.video.landscape-video{
-    left:22%!important;
-    right:22%!important;
-    top:12%!important;
-    bottom:12%!important;
+    margin:0!important;
+    transform:none!important;
   }
 }
 @media (orientation:landscape) and (min-width:1000px){
   #video.video.landscape-video{
-    left:18%!important;
-    right:15%!important;
+    position:fixed!important;
+    left:50%!important;
+    right:auto!important;
     top:10%!important;
-    bottom:10%!important;
+    bottom:auto!important;
+    width:min(64vw, calc(76vh * 16 / 9))!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    transform:translateX(-50%)!important;
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+    z-index:1!important;
   }
-}
-</style>
-
-<style id="iphone-landscape-video-position-final-fix">
-/* iPhone landscape: move the ENTIRE visible video region 35px left without changing its width.
-   Use the fixed region edges themselves (not transform on the YouTube iframe). */
-@media (orientation:landscape) and (max-width:999px){
-  #video.video.landscape-video{
-    left:calc(22% - 35px)!important;
-    right:calc(22% + 35px)!important;
+  #video.video.landscape-video > #cmYoutubePlayer,
+  #video.video.landscape-video > iframe,
+  #video.video.landscape-video > video,
+  #video.video.landscape-video > #cmYoutubePlayer > iframe{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    margin:0!important;
     transform:none!important;
+    object-fit:contain!important;
   }
 }
-</style>
-
-<style id="iphone-video-region-right10-player-left10-final">
-@media (orientation:landscape) and (max-width:999px){
-  /* Move the visible video region 10px right, preserving its size. */
-  #video.video.landscape-video{
-    left:calc(22% - 25px)!important;
-    right:calc(22% + 25px)!important;
-  }
-  /* Move only the YouTube player itself 10px left inside that region. */
-  #video.video.landscape-video > #cmYoutubePlayer{
-    transform:translateX(-10px)!important;
-  }
+@media (orientation:landscape){
+  .landscape-special,.landscape-fe,.landscape-main,.landscape-summary,.landscape-actions,#subsLauncherV61{z-index:5!important;}
 }
 </style>
