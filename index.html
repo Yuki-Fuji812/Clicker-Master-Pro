@@ -4283,15 +4283,15 @@ input.fe-range[type="range"]::-moz-range-thumb{
 </script>
 
 <style id="landscape-video-geometry-canonical-v1">
-/* Canonical landscape geometry. Parent: extend left edge 30px with original right/top/bottom preserved. YouTube: extend left edge 50px with original right edge preserved; grow downward at 16:9. */
+/* Canonical landscape geometry. Current adjustment: parent left edge +3px inward with right edge fixed; YouTube left edge extended 20px further left with right edge fixed and 16:9 height growing downward. */
 @media (orientation:landscape) and (max-width:999px){
   #video.video.landscape-video{
     position:fixed!important;
-    left:calc(50% + 10px - 15px)!important;
+    left:calc(50% + 10px - 13.5px)!important;
     right:auto!important;
     top:calc(13% + 5px)!important;
     bottom:auto!important;
-    width:calc(min(54vw, calc(68vh * 16 / 9)) + 30px)!important;
+    width:calc(min(54vw, calc(68vh * 16 / 9)) + 27px)!important;
     height:calc(min(54vw, calc(68vh * 16 / 9)) * 9 / 16)!important;
     aspect-ratio:auto!important;
     transform:translateX(-50%)!important;
@@ -4304,11 +4304,11 @@ input.fe-range[type="range"]::-moz-range-thumb{
   /* YouTube: keep the full 16:9 picture visible, shifted 10px left inside the region. */
   #video.video.landscape-video > #cmYoutubePlayer{
     position:absolute!important;
-    left:-20px!important;
+    left:-43px!important;
     right:auto!important;
     top:0!important;
     bottom:auto!important;
-    width:100%!important;
+    width:calc(100% + 23px)!important;
     height:auto!important;
     aspect-ratio:16 / 9!important;
     transform:none!important;
@@ -4328,9 +4328,9 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
   #video.video.landscape-video > iframe{
     position:absolute!important;
-    left:-20px!important;
+    left:-43px!important;
     top:0!important;
-    width:100%!important;
+    width:calc(100% + 23px)!important;
     height:auto!important;
     aspect-ratio:16 / 9!important;
     border:0!important;
