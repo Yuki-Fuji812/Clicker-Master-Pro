@@ -1381,6 +1381,46 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="landscape-v61-aggressive-video-expand">
+@media (orientation:landscape){
+  /* Experimental: expand the actual video window to the user's white-line area. */
+  .video.landscape-video{
+    position:fixed!important;
+    left:23.5vw!important;
+    right:20vw!important;
+    top:11.5vh!important;
+    bottom:11vh!important;
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    transform:none!important;
+    z-index:5!important;
+    border-radius:14px!important;
+    overflow:hidden!important;
+    background:#000!important;
+  }
+  .video.landscape-video iframe,
+  .video.landscape-video video,
+  .video.landscape-video #cmYoutubePlayer,
+  .video.landscape-video #cmYoutubePlayer iframe{
+    position:absolute!important;
+    inset:0!important;
+    left:0!important;
+    transform:none!important;
+    width:100%!important;
+    height:100%!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    object-fit:contain!important;
+  }
+}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
