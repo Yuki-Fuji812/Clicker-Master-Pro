@@ -4652,3 +4652,12 @@ input.fe-range[type="range"]::-moz-range-thumb{
   }
 }
 </style>
+
+<style id="iphone-landscape-video-position-final-fix">
+/* Final iPhone-only position correction. Placed last so older landscape rules cannot override it. */
+@media (orientation:landscape) and (max-width:999px){
+  #video.video.landscape-video{
+    transform:translateX(-35px)!important;
+  }
+}
+</style>
