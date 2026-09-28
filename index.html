@@ -4290,8 +4290,8 @@ input.fe-range[type="range"]::-moz-range-thumb{
 
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
 
-<!-- FINAL VIDEO AUTHORITY: one orientation-aware rule only -->
-<style id="cm-video-final-authority-v5">
+<!-- FINAL VIDEO AUTHORITY: rebuilt YouTube screen after removing previous screen control -->
+<style id="cm-video-final-authority-v6">
 @media (orientation:landscape){
   #video.video.landscape-video{
     position:fixed!important;
@@ -4302,57 +4302,57 @@ input.fe-range[type="range"]::-moz-range-thumb{
     overflow:hidden!important;background:#000!important;
     z-index:1!important;display:block!important;
   }
-  #video.video.landscape-video > .cm-yt-shift-layer{
+  #video.video.landscape-video > iframe.cm-youtube-screen{
     position:absolute!important;
     left:0!important;top:0!important;
     width:100%!important;height:100%!important;
-    margin:0!important;padding:0!important;
-    overflow:hidden!important;
-    transform:none!important;
-  }
-  #video.video.landscape-video > .cm-yt-shift-layer > iframe{
-    position:absolute!important;
-    left:0!important;top:0!important;right:0!important;bottom:0!important;
-    width:100%!important;height:100%!important;
-    aspect-ratio:auto!important;
-    margin:0!important;transform:none!important;
+    min-width:100%!important;min-height:100%!important;
     max-width:none!important;max-height:none!important;
+    margin:0!important;padding:0!important;
+    transform:none!important;
     border:0!important;display:block!important;
   }
 }
 @media (orientation:portrait){
-  #video.video > .cm-yt-shift-layer{
-    position:static!important;width:100%!important;height:100%!important;
-    margin:0!important;transform:none!important;
-  }
-  #video.video > .cm-yt-shift-layer > iframe{
+  #video.video > iframe.cm-youtube-screen{
     position:static!important;display:block!important;
     width:100%!important;height:100%!important;
+    min-width:0!important;min-height:0!important;
     max-width:100%!important;max-height:100%!important;
     left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-    margin:0!important;transform:none!important;border:0!important;
+    margin:0!important;padding:0!important;transform:none!important;border:0!important;
   }
 }
 </style>
-<script id="cm-video-final-authority-v5-js">
+<script id="cm-video-final-authority-v6-js">
 (function(){
-  function wrapYoutubeIframe(){
+  function markYoutubeScreen(){
     var host=document.getElementById('video');
     if(!host) return;
-    var frame=host.querySelector(':scope > iframe');
-    if(!frame) return;
-    var src=frame.getAttribute('src')||'';
-    if(src.indexOf('youtube.com')===-1 && frame.id!=='cmYoutubePlayer') return;
-    var layer=document.createElement('div');
-    layer.className='cm-yt-shift-layer';
-    host.insertBefore(layer,frame);
-    layer.appendChild(frame);
+    /* Remove the old intermediate layer if an earlier runtime state left one behind. */
+    var old=host.querySelector(':scope > .cm-yt-shift-layer');
+    if(old){
+      var f=old.querySelector('iframe');
+      if(f) host.insertBefore(f,old);
+      old.remove();
+    }
+    var frames=host.querySelectorAll(':scope > iframe');
+    frames.forEach(function(frame){
+      var src=frame.getAttribute('src')||'';
+      if(src.indexOf('youtube.com')!==-1 || frame.id==='cmYoutubePlayer'){
+        frame.classList.add('cm-youtube-screen');
+        /* Clear geometry left by previous generations before v6 CSS takes authority. */
+        ['position','left','right','top','bottom','inset','width','height','min-width','min-height','max-width','max-height','margin','padding','transform','aspect-ratio'].forEach(function(k){
+          frame.style.removeProperty(k);
+        });
+      }
+    });
   }
   function init(){
     var host=document.getElementById('video');
     if(!host) return;
-    wrapYoutubeIframe();
-    new MutationObserver(function(){wrapYoutubeIframe();}).observe(host,{childList:true});
+    markYoutubeScreen();
+    new MutationObserver(markYoutubeScreen).observe(host,{childList:true,subtree:false});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
