@@ -2420,14 +2420,14 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
   .search-results.landscape-results{display:none!important}
 
-  .video.landscape-video{
+  .video.landscape-video-legacy-disabled{
     grid-area:video!important;position:static!important;
     width:100%!important;height:100%!important;
     min-width:0!important;min-height:0!important;max-width:none!important;
     margin:0!important;align-self:stretch!important;justify-self:stretch!important;
   }
-  .video.landscape-video iframe,
-  .video.landscape-video video{
+  .video.landscape-video-legacy-disabled iframe,
+  .video.landscape-video-legacy-disabled video{
     width:100%!important;height:100%!important;max-height:100%!important;
     object-fit:contain!important;
   }
@@ -2509,7 +2509,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     justify-self:start!important;
     margin-left:4px!important;
   }
-  .video.landscape-video{
+  .video.landscape-video-legacy-disabled{
     justify-self:stretch!important;
     margin-left:-10px!important;
     width:calc(100% + 10px)!important;
@@ -2584,15 +2584,15 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     margin:0!important;padding:3px!important;font-size:13px!important;
   }
 
-  .video.landscape-video{
+  .video.landscape-video-legacy-disabled{
     grid-area:video!important;position:static!important;
     width:100%!important;height:100%!important;
     min-width:0!important;min-height:0!important;
     max-width:none!important;margin:0!important;
     justify-self:stretch!important;align-self:stretch!important;
   }
-  .video.landscape-video iframe,
-  .video.landscape-video video{
+  .video.landscape-video-legacy-disabled iframe,
+  .video.landscape-video-legacy-disabled video{
     width:100%!important;height:100%!important;
     max-width:100%!important;max-height:100%!important;
     object-fit:contain!important;
@@ -4153,7 +4153,7 @@ input.fe-range[type="range"]{touch-action:none!important}
     width:calc(100% - 42px)!important;
   }
   /* Parent itself must not paint a large black area behind the left controls. */
-  #video.video.landscape-video{background:transparent!important;}
+  #video.video.landscape-video-legacy-disabled-legacy-disabled{background:transparent!important;}
 }
 @media (orientation:portrait){
   /* Explicitly cancel landscape-only offsets. */
@@ -4291,39 +4291,76 @@ input.fe-range[type="range"]::-moz-range-thumb{
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
 
 <!-- FINAL VIDEO AUTHORITY: rebuilt YouTube screen after removing previous screen control -->
-<style id="cm-video-final-authority-v6">
+
+
+<style id="cm-video-orientation-clean-authority-v2">
+@media (orientation:portrait){
+  #video.video > iframe.cm-youtube-screen{
+    position:static!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    margin:0!important;
+    padding:0!important;
+    transform:none!important;
+    border:0!important;
+  }
+}
+
+/* The only active landscape video geometry rule. */
 @media (orientation:landscape){
   #video.video.landscape-video{
     position:fixed!important;
-    left:20%!important;right:23%!important;
-    top:13%!important;bottom:11%!important;
-    width:auto!important;height:auto!important;
-    margin:0!important;transform:none!important;
-    overflow:hidden!important;background:#000!important;
-    z-index:1!important;display:block!important;
+
+    /* Portrait uses the base 16:9 video. Keep exactly that shape in landscape. */
+    width:min(100%,760px)!important;
+    height:auto!important;
+    aspect-ratio:16 / 9!important;
+    max-width:calc(100vw - 300px)!important;
+    max-height:calc(100dvh - 100px)!important;
+
+    left:50%!important;
+    right:auto!important;
+    top:50%!important;
+    bottom:auto!important;
+    transform:translate(-50%,-50%)!important;
+
+    margin:0!important;
+    overflow:hidden!important;
+    background:#000!important;
+    z-index:1!important;
+    display:block!important;
+    box-sizing:border-box!important;
   }
-  #video.video.landscape-video > iframe.cm-youtube-screen{
+
+  #video.video.landscape-video > iframe.cm-youtube-screen,
+  #video.video.landscape-video > video{
     position:absolute!important;
-    left:0!important;top:0!important;
-    width:100%!important;height:100%!important;
-    min-width:100%!important;min-height:100%!important;
-    max-width:none!important;max-height:none!important;
-    margin:0!important;padding:0!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    margin:0!important;
+    padding:0!important;
     transform:none!important;
-    border:0!important;display:block!important;
-  }
-}
-@media (orientation:portrait){
-  #video.video > iframe.cm-youtube-screen{
-    position:static!important;display:block!important;
-    width:100%!important;height:100%!important;
-    min-width:0!important;min-height:0!important;
-    max-width:100%!important;max-height:100%!important;
-    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
-    margin:0!important;padding:0!important;transform:none!important;border:0!important;
+    border:0!important;
+    display:block!important;
+    object-fit:contain!important;
   }
 }
 </style>
+
 <script id="cm-video-final-authority-v6-js">
 (function(){
   function markYoutubeScreen(){
@@ -4390,19 +4427,3 @@ input.fe-range[type="range"]::-moz-range-thumb{
   addEventListener('resize',restorePortraitViewport);
 })();
 </script>
-
-
-<style id="landscape-video-portrait-size-only-final">
-@media (orientation:landscape){
-  #video.video.landscape-video,
-  .video.landscape-video{
-    width:100%!important;
-    max-width:100%!important;
-    height:auto!important;
-    max-height:none!important;
-    aspect-ratio:auto!important;
-    object-fit:contain!important;
-  }
-}
-</style>
-
