@@ -1342,6 +1342,24 @@ input.fe-range[type="range"]::-moz-range-thumb{
 .channelMediaTab{padding:8px 12px;border-radius:9px;border:1px solid #777;background:#26262c;color:#fff;font-weight:700}
 .channelMediaTab.active{border-color:#fff;background:#3a3a42}
 </style>
+
+<style id="pure-black-background-final">
+/* FINAL: background only — force pure black in both orientations. */
+html, body, .wrap {
+  background: #000 !important;
+  background-color: #000 !important;
+}
+body {
+  background-image: none !important;
+  background-attachment: scroll !important;
+}
+body::before,
+body::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+</style>
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
