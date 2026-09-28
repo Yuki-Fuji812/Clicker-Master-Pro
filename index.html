@@ -4163,6 +4163,73 @@ input.fe-range[type="range"]{touch-action:none!important}
 
 
 
+
+<!-- TRUE FULL-LEFT TEST: force both video host and rendered media itself to viewport left -->
+<style id="cm-true-full-left-test-v1">
+@media (orientation:landscape){
+  html body #video.video.landscape-video{
+    position:fixed!important;
+    left:0!important;
+    right:auto!important;
+    top:50%!important;
+    transform:translateY(-50%)!important;
+    width:min(85vw,646px)!important;
+    height:auto!important;
+    aspect-ratio:16/9!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  html body #video.video.landscape-video > iframe,
+  html body #video.video.landscape-video > video{
+    position:absolute!important;
+    left:0!important;
+    right:auto!important;
+    top:0!important;
+    bottom:auto!important;
+    inset:auto!important;
+    transform:none!important;
+    width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    padding:0!important;
+    object-fit:fill!important;
+  }
+}
+</style>
+<script id="cm-true-full-left-test-v1-js">
+(function(){
+  function force(){
+    if(!matchMedia('(orientation:landscape)').matches) return;
+    var h=document.getElementById('video');
+    if(!h) return;
+    h.style.setProperty('position','fixed','important');
+    h.style.setProperty('left','0px','important');
+    h.style.setProperty('right','auto','important');
+    h.style.setProperty('top','50%','important');
+    h.style.setProperty('transform','translateY(-50%)','important');
+    h.style.setProperty('margin','0','important');
+    Array.from(h.children).forEach(function(el){
+      if(el.tagName==='IFRAME'||el.tagName==='VIDEO'){
+        el.style.setProperty('position','absolute','important');
+        el.style.setProperty('left','0px','important');
+        el.style.setProperty('right','auto','important');
+        el.style.setProperty('top','0px','important');
+        el.style.setProperty('bottom','auto','important');
+        el.style.setProperty('transform','none','important');
+        el.style.setProperty('width','100%','important');
+        el.style.setProperty('height','100%','important');
+        el.style.setProperty('margin','0','important');
+      }
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',force,{once:true}); else force();
+  addEventListener('resize',force);
+  addEventListener('orientationchange',function(){setTimeout(force,100);});
+  var h=document.getElementById('video');
+  if(h) new MutationObserver(force).observe(h,{childList:true});
+})();
+</script>
+
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
