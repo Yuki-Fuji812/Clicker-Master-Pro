@@ -1127,12 +1127,10 @@ body{
 
 <style id="blue-flow-gradient-v39">
 html,body{
-  background:#1764a8 !important;
+  background:#000000 !important;
 }
 body{
-  background-image:
-    radial-gradient(ellipse at 50% 28%, rgba(69,190,235,.68) 0%, rgba(45,132,204,.58) 27%, rgba(44,76,165,.52) 58%, rgba(67,45,132,.50) 100%),
-    linear-gradient(145deg, #0c8fc9 0%, #236fbd 42%, #3e55a6 72%, #65469b 100%) !important;
+  background-image:none !important;
   background-repeat:no-repeat !important;
   background-size:100% 100% !important;
   background-attachment:fixed !important;
@@ -1151,18 +1149,18 @@ body::before{
   top:42vh;
   height:18vh;
   transform:rotate(5deg);
-  background:linear-gradient(90deg,rgba(26,210,245,.42),rgba(75,171,244,.18),rgba(170,115,240,.28));
+  background:transparent;
   filter:blur(10px);
 }
 body::after{
   top:54vh;
   height:11vh;
   transform:rotate(-4deg);
-  background:linear-gradient(90deg,rgba(41,186,238,.25),rgba(74,123,220,.12),rgba(182,105,234,.24));
+  background:transparent;
   filter:blur(14px);
 }
 .wrap{
-  background:transparent !important;
+  background:#000000 !important;
   position:relative !important;
   z-index:1 !important;
 }
@@ -1172,12 +1170,10 @@ body::after{
 <style id="portrait-match-landscape-v41">
 @media (orientation:portrait){
   html,body{
-    background:#05070b !important;
+    background:#000000 !important;
   }
   body{
-    background-image:
-      radial-gradient(ellipse at 50% 40%, rgba(26,58,82,.34) 0%, rgba(12,27,42,.26) 34%, rgba(3,8,14,.18) 68%, rgba(0,0,0,.08) 100%),
-      linear-gradient(155deg,#06131f 0%,#0a2234 42%,#11182e 72%,#1c1530 100%) !important;
+    background-image:none !important;
     background-repeat:no-repeat !important;
     background-size:100% 100% !important;
     background-attachment:fixed !important;
@@ -1188,7 +1184,7 @@ body::after{
     width:185vw !important;
     height:13vh !important;
     transform:rotate(13deg) !important;
-    background:linear-gradient(90deg,rgba(24,183,220,.20),rgba(50,115,180,.10),rgba(130,82,190,.14)) !important;
+    background:transparent !important;
     filter:blur(12px) !important;
   }
   body::after{
@@ -1197,7 +1193,7 @@ body::after{
     width:180vw !important;
     height:8vh !important;
     transform:rotate(-9deg) !important;
-    background:linear-gradient(90deg,rgba(31,146,190,.13),rgba(57,91,164,.08),rgba(152,76,180,.13)) !important;
+    background:transparent !important;
     filter:blur(15px) !important;
   }
   .wrap{background:transparent !important;}
@@ -4163,6 +4159,14 @@ input.fe-range[type="range"]{touch-action:none!important}
 
 
 
+
+<style id="cm-final-stacking-order-v1">
+/* Stacking only: video at the back, every button at the front. No geometry changes. */
+#video.video{z-index:0!important;}
+#video.video > .cm-yt-shift-layer,
+#video.video > .cm-yt-shift-layer > iframe{z-index:0!important;}
+button{z-index:100001!important;}
+</style>
 </body>
 
 <style id="v77-fe-triangle-marker-unified">
@@ -4314,7 +4318,7 @@ input.fe-range[type="range"]::-moz-range-thumb{
     position:absolute!important;
     left:0!important;top:0!important;
     width:100%!important;height:100%!important;
-    margin:0!important;transform:none!important;
+    margin:0!important;transform:translateX(-20px)!important;
     max-width:none!important;max-height:none!important;
     border:0!important;display:block!important;
   }
