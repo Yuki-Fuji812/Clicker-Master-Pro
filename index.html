@@ -2420,14 +2420,14 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
   }
   .search-results.landscape-results{display:none!important}
 
-  .video.landscape-video-legacy-disabled{
+  .video.landscape-video{
     grid-area:video!important;position:static!important;
     width:100%!important;height:100%!important;
     min-width:0!important;min-height:0!important;max-width:none!important;
     margin:0!important;align-self:stretch!important;justify-self:stretch!important;
   }
-  .video.landscape-video-legacy-disabled iframe,
-  .video.landscape-video-legacy-disabled video{
+  .video.landscape-video iframe,
+  .video.landscape-video video{
     width:100%!important;height:100%!important;max-height:100%!important;
     object-fit:contain!important;
   }
@@ -2509,7 +2509,7 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     justify-self:start!important;
     margin-left:4px!important;
   }
-  .video.landscape-video-legacy-disabled{
+  .video.landscape-video{
     justify-self:stretch!important;
     margin-left:-10px!important;
     width:calc(100% + 10px)!important;
@@ -2584,15 +2584,15 @@ addEventListener('gamepadconnected',()=>hi(ranges()));requestAnimationFrame(loop
     margin:0!important;padding:3px!important;font-size:13px!important;
   }
 
-  .video.landscape-video-legacy-disabled{
+  .video.landscape-video{
     grid-area:video!important;position:static!important;
     width:100%!important;height:100%!important;
     min-width:0!important;min-height:0!important;
     max-width:none!important;margin:0!important;
     justify-self:stretch!important;align-self:stretch!important;
   }
-  .video.landscape-video-legacy-disabled iframe,
-  .video.landscape-video-legacy-disabled video{
+  .video.landscape-video iframe,
+  .video.landscape-video video{
     width:100%!important;height:100%!important;
     max-width:100%!important;max-height:100%!important;
     object-fit:contain!important;
@@ -4153,7 +4153,7 @@ input.fe-range[type="range"]{touch-action:none!important}
     width:calc(100% - 42px)!important;
   }
   /* Parent itself must not paint a large black area behind the left controls. */
-  #video.video.landscape-video-legacy-disabled-legacy-disabled{background:transparent!important;}
+  #video.video.landscape-video{background:transparent!important;}
 }
 @media (orientation:portrait){
   /* Explicitly cancel landscape-only offsets. */
@@ -4162,73 +4162,6 @@ input.fe-range[type="range"]{touch-action:none!important}
 </style>
 
 
-
-
-<!-- TRUE FULL-LEFT TEST: force both video host and rendered media itself to viewport left -->
-<style id="cm-true-full-left-test-v1">
-@media (orientation:landscape){
-  html body #video.video.landscape-video{
-    position:fixed!important;
-    left:305px!important;
-    right:auto!important;
-    top:50%!important;
-    transform:translateY(-50%)!important;
-    width:min(85vw,646px)!important;
-    height:auto!important;
-    aspect-ratio:16/9!important;
-    margin:0!important;
-    padding:0!important;
-  }
-  html body #video.video.landscape-video > iframe,
-  html body #video.video.landscape-video > video{
-    position:absolute!important;
-    left:305px!important;
-    right:auto!important;
-    top:0!important;
-    bottom:auto!important;
-    inset:auto!important;
-    transform:none!important;
-    width:100%!important;
-    height:100%!important;
-    margin:0!important;
-    padding:0!important;
-    object-fit:fill!important;
-  }
-}
-</style>
-<script id="cm-true-full-left-test-v1-js">
-(function(){
-  function force(){
-    if(!matchMedia('(orientation:landscape)').matches) return;
-    var h=document.getElementById('video');
-    if(!h) return;
-    h.style.setProperty('position','fixed','important');
-    h.style.setProperty('left','305px','important');
-    h.style.setProperty('right','auto','important');
-    h.style.setProperty('top','50%','important');
-    h.style.setProperty('transform','translateY(-50%)','important');
-    h.style.setProperty('margin','0','important');
-    Array.from(h.children).forEach(function(el){
-      if(el.tagName==='IFRAME'||el.tagName==='VIDEO'){
-        el.style.setProperty('position','absolute','important');
-        el.style.setProperty('left','0px','important');
-        el.style.setProperty('right','auto','important');
-        el.style.setProperty('top','0px','important');
-        el.style.setProperty('bottom','auto','important');
-        el.style.setProperty('transform','none','important');
-        el.style.setProperty('width','100%','important');
-        el.style.setProperty('height','100%','important');
-        el.style.setProperty('margin','0','important');
-      }
-    });
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',force,{once:true}); else force();
-  addEventListener('resize',force);
-  addEventListener('orientationchange',function(){setTimeout(force,100);});
-  var h=document.getElementById('video');
-  if(h) new MutationObserver(force).observe(h,{childList:true});
-})();
-</script>
 
 </body>
 
@@ -4357,106 +4290,68 @@ input.fe-range[type="range"]::-moz-range-thumb{
 
 <!-- vNext: keep rendered YouTube picture unchanged; trim parent video region to the picture only. Keep logo untouched and move search row clear of it. -->
 
-<!-- FINAL VIDEO AUTHORITY: rebuilt YouTube screen after removing previous screen control -->
-
-
-<style id="cm-video-orientation-clean-authority-v2">
-@media (orientation:portrait){
-  #video.video > iframe.cm-youtube-screen{
-    position:static!important;
-    display:block!important;
-    width:100%!important;
-    height:100%!important;
-    min-width:0!important;
-    min-height:0!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    left:auto!important;
-    right:auto!important;
-    top:auto!important;
-    bottom:auto!important;
-    margin:0!important;
-    padding:0!important;
-    transform:none!important;
-    border:0!important;
-  }
-}
-
-/* The only active landscape video geometry rule. */
+<!-- FINAL VIDEO AUTHORITY: one orientation-aware rule only -->
+<style id="cm-video-final-authority-v5">
 @media (orientation:landscape){
   #video.video.landscape-video{
     position:fixed!important;
-
-    /* Portrait uses the base 16:9 video. Keep exactly that shape in landscape. */
-    width:min(85%,646px)!important;
-    height:auto!important;
-    aspect-ratio:16 / 9!important;
-    max-width:calc(100vw - 300px)!important;
-    max-height:calc(100dvh - 100px)!important;
-
-    left:0!important;
-    right:auto!important;
-    top:50%!important;
-    bottom:auto!important;
-    transform:translate(0,-50%)!important;
-
-    margin:0!important;
-    overflow:hidden!important;
-    background:#000!important;
-    z-index:1!important;
-    display:block!important;
-    box-sizing:border-box!important;
+    left:20%!important;right:23%!important;
+    top:13%!important;bottom:11%!important;
+    width:auto!important;height:auto!important;
+    margin:0!important;transform:none!important;
+    overflow:hidden!important;background:#000!important;
+    z-index:1!important;display:block!important;
   }
-
-  #video.video.landscape-video > iframe.cm-youtube-screen,
-  #video.video.landscape-video > video{
+  #video.video.landscape-video > .cm-yt-shift-layer{
     position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    min-width:0!important;
-    min-height:0!important;
-    max-width:100%!important;
-    max-height:100%!important;
-    margin:0!important;
-    padding:0!important;
+    left:0!important;top:0!important;
+    width:100%!important;height:100%!important;
+    margin:0!important;padding:0!important;
+    overflow:visible!important;
     transform:none!important;
-    border:0!important;
-    display:block!important;
-    object-fit:contain!important;
+  }
+  #video.video.landscape-video > .cm-yt-shift-layer > iframe{
+    position:absolute!important;
+    left:0!important;top:0!important;
+    width:100%!important;height:100%!important;
+    margin:0!important;transform:none!important;
+    max-width:none!important;max-height:none!important;
+    border:0!important;display:block!important;
+  }
+}
+@media (orientation:portrait){
+  #video.video > .cm-yt-shift-layer{
+    position:static!important;width:100%!important;height:100%!important;
+    margin:0!important;transform:none!important;
+  }
+  #video.video > .cm-yt-shift-layer > iframe{
+    position:static!important;display:block!important;
+    width:100%!important;height:100%!important;
+    max-width:100%!important;max-height:100%!important;
+    left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    margin:0!important;transform:none!important;border:0!important;
   }
 }
 </style>
-
-<script id="cm-video-final-authority-v6-js">
+<script id="cm-video-final-authority-v5-js">
 (function(){
-  function markYoutubeScreen(){
+  function wrapYoutubeIframe(){
     var host=document.getElementById('video');
     if(!host) return;
-    /* Remove the old intermediate layer if an earlier runtime state left one behind. */
-    var old=host.querySelector(':scope > .cm-yt-shift-layer');
-    if(old){
-      var f=old.querySelector('iframe');
-      if(f) host.insertBefore(f,old);
-      old.remove();
-    }
-    var frames=host.querySelectorAll(':scope > iframe');
-    frames.forEach(function(frame){
-      var src=frame.getAttribute('src')||'';
-      if(src.indexOf('youtube.com')!==-1 || frame.id==='cmYoutubePlayer'){
-        frame.classList.add('cm-youtube-screen');
-        /* Clear geometry left by previous generations before v6 CSS takes authority. */
-        ['position','left','right','top','bottom','inset','width','height','min-width','min-height','max-width','max-height','margin','padding','transform','aspect-ratio'].forEach(function(k){
-          frame.style.removeProperty(k);
-        });
-      }
-    });
+    var frame=host.querySelector(':scope > iframe');
+    if(!frame) return;
+    var src=frame.getAttribute('src')||'';
+    if(src.indexOf('youtube.com')===-1 && frame.id!=='cmYoutubePlayer') return;
+    var layer=document.createElement('div');
+    layer.className='cm-yt-shift-layer';
+    host.insertBefore(layer,frame);
+    layer.appendChild(frame);
   }
   function init(){
     var host=document.getElementById('video');
     if(!host) return;
-    markYoutubeScreen();
-    new MutationObserver(markYoutubeScreen).observe(host,{childList:true,subtree:false});
+    wrapYoutubeIframe();
+    new MutationObserver(function(){wrapYoutubeIframe();}).observe(host,{childList:true});
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true});
   else init();
