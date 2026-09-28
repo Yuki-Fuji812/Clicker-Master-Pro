@@ -4166,6 +4166,11 @@ input.fe-range[type="range"]{touch-action:none!important}
 #video.video > .cm-yt-shift-layer,
 #video.video > .cm-yt-shift-layer > iframe{z-index:0!important;}
 button{z-index:100001!important;}
+/* Popups must always sit above scoring buttons. Stacking only; no geometry changes. */
+#searchResults.cm-search-overlay,
+#subsPanel.open,
+.fe-modal.open,
+.sheet{z-index:1000000!important;}
 </style>
 </body>
 
