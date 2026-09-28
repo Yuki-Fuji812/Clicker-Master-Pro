@@ -1343,23 +1343,21 @@ input.fe-range[type="range"]::-moz-range-thumb{
 .channelMediaTab.active{border-color:#fff;background:#3a3a42}
 </style>
 
-<style id="pure-black-background-final">
-/* FINAL: background only — force pure black in both orientations. */
-html, body, .wrap {
-  background: #000 !important;
-  background-color: #000 !important;
-}
-body {
+<style id="background-black-only-final">
+/* BACKGROUND ONLY — do not alter video/UI geometry */
+html, body {
+  background-color: #000000 !important;
   background-image: none !important;
-  background-attachment: scroll !important;
 }
 body::before,
 body::after {
   content: none !important;
   display: none !important;
   background: none !important;
+  background-image: none !important;
 }
 </style>
+
 </head>
 <body>
 <button type="button" id="contestModeV17">予選・準決勝</button>
@@ -4221,53 +4219,6 @@ input.fe-range[type="range"]::-moz-range-thumb{
   .fe-marker-v78{top:28px!important;}
 }
 </style>
-
-<style id="cm-pure-black-absolute-final-v2">
-/* Background-only final authority: pure black in portrait and landscape. */
-html,
-body,
-body.cm-score-swapped,
-.wrap {
-  background: #000000 !important;
-  background-color: #000000 !important;
-  background-image: none !important;
-}
-body {
-  background-image: none !important;
-  background-repeat: no-repeat !important;
-}
-body::before,
-body::after {
-  content: none !important;
-  display: none !important;
-  background: none !important;
-  background-image: none !important;
-  opacity: 0 !important;
-}
-@media (orientation: portrait) {
-  html, body, .wrap {
-    background: #000000 !important;
-    background-color: #000000 !important;
-    background-image: none !important;
-  }
-  body::before, body::after {
-    content: none !important;
-    display: none !important;
-  }
-}
-@media (orientation: landscape) {
-  html, body, .wrap {
-    background: #000000 !important;
-    background-color: #000000 !important;
-    background-image: none !important;
-  }
-  body::before, body::after {
-    content: none !important;
-    display: none !important;
-  }
-}
-</style>
-
 </html>
 <style id="clicker-real-transparency-v43">.title-clickers,#landscapeClickerV11{mix-blend-mode:normal!important;background:transparent!important}</style>
 
